@@ -2072,126 +2072,6 @@
             <p class="subtitle">ระบบตรวจสอบข้อมูลอ้อยครบวงจร - แบบขั้นตอนการใช้งาน</p>
         </header>
         
-       <!-- Step 1: Upload CSV File -->
-<div class="step-panel active" id="panel1">
-    <div class="panel-header">
-        <h2><i class="fas fa-file-upload"></i> อัปโหลดไฟล์ CSV และกรองข้อมูลอัตโนมัติ</h2>
-        <p>อัปโหลดไฟล์ข้อมูลอ้อยของคุณในรูปแบบ CSV (สูงสุด 500MB) และกรองข้อมูลทั้งหมดด้วยการคลิกครั้งเดียว</p>
-    </div>
-    
-    <div class="upload-area" id="uploadArea">
-        <i class="fas fa-file-csv"></i>
-        <h3>ลากไฟล์ CSV ของคุณมาวางที่นี่</h3>
-        <p>หรือคลิกเพื่อเลือกไฟล์จากคอมพิวเตอร์ของคุณ</p>
-        <p><strong>รองรับไฟล์ขนาดใหญ่ถึง 500MB</strong></p>
-        <input type="file" id="csvFileInput" class="file-input" accept=".csv" style="display: none;">
-        <button class="btn btn-primary" id="browseBtn">
-            <i class="fas fa-folder-open"></i> เลือกไฟล์ CSV
-        </button>
-    </div>
-    
-    <div class="file-info" id="fileInfo">
-        <h4><i class="fas fa-info-circle"></i> ข้อมูลไฟล์</h4>
-        <div class="info-grid">
-            <div class="info-item">
-                <strong>ชื่อไฟล์:</strong>
-                <span id="fileName">-</span>
-            </div>
-            <div class="info-item">
-                <strong>ขนาดไฟล์:</strong>
-                <span id="fileSize">-</span>
-            </div>
-            <div class="info-item">
-                <strong>จำนวนแถว:</strong>
-                <span id="fileRows">-</span>
-            </div>
-            <div class="info-item">
-                <strong>จำนวนคอลัมน์:</strong>
-                <span id="fileCols">-</span>
-            </div>
-        </div>
-        
-        <!-- ✅ เพิ่ม: ตรวจสอบคอลัมน์ที่จำเป็น -->
-        <div id="requiredColumnsStatus" style="margin-top: 20px; display: none;">
-            <h5><i class="fas fa-search"></i> ตรวจสอบคอลัมน์ที่จำเป็นสำหรับการกรอง</h5>
-            <div id="columnsCheckList" class="conditions-list" style="font-size: 0.9rem;">
-                <!-- รายการคอลัมน์จะแสดงที่นี่ -->
-            </div>
-        </div>
-    </div>
-    
-    <div id="loadingSpinner" class="spinner" style="display: none;"></div>
-    
-    <!-- ✅ เพิ่ม: ส่วนกรองข้อมูลทั้งหมด -->
-    <div id="filterSection" style="display: none; margin-top: 30px;">
-        <div class="panel-header">
-            <h3><i class="fas fa-filter"></i> กรองข้อมูลอัตโนมัติ (11 ขั้นตอน)</h3>
-            <p>กดปุ่มด้านล่างเพื่อกรองข้อมูลทั้งหมดด้วยการคลิกครั้งเดียว</p>
-        </div>
-        
-        <!-- ปุ่มกรองข้อมูลทั้งหมด -->
-        <div style="text-align: center; margin: 30px 0;">
-            <button class="btn btn-success process-btn" id="filterAllBtn" style="padding: 20px 40px; font-size: 1.3rem;">
-                <i class="fas fa-filter"></i> กรองข้อมูลทั้งหมด (11 ขั้นตอน)
-            </button>
-            <div id="filterSpinner" class="spinner" style="display: none;"></div>
-        </div>
-        
-        <!-- ✅ เพิ่ม: ผลการกรองแบบเรียลไทม์ -->
-        <div id="filterResults" style="display: none;">
-            <div class="panel-header">
-                <h3><i class="fas fa-chart-bar"></i> ผลการกรองข้อมูล</h3>
-                <p>สรุปผลการกรองและแก้ไขข้อมูลในทุกขั้นตอน</p>
-            </div>
-            
-            <!-- แสดงขั้นตอนการกรองทั้งหมด -->
-            <div class="process-steps" id="filterSteps">
-                <!-- ขั้นตอนการกรองจะถูกสร้างโดย JavaScript -->
-            </div>
-            
-            <!-- สรุปผลรวมทั้งหมด -->
-            <div class="final-summary" style="margin-top: 30px;">
-                <h3><i class="fas fa-clipboard-check"></i> สรุปผลการกรองทั้งหมด</h3>
-                <div class="summary-grid" id="filterSummary">
-                    <div class="summary-item">
-                        <div class="summary-value" id="totalRowsBefore">0</div>
-                        <div class="summary-label">แถวทั้งหมดก่อนกรอง</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value" id="totalRowsAfter">0</div>
-                        <div class="summary-label">แถวที่เหลือหลังกรอง</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value" id="totalRemoved">0</div>
-                        <div class="summary-label">แถวที่ถูกตัดออก</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value" id="removedPercentage">0%</div>
-                        <div class="summary-label">เปอร์เซ็นต์ที่ถูกตัด</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- ✅ เพิ่ม: ส่วนดาวน์โหลดผลลัพธ์ -->
-            <div class="download-section" style="margin-top: 40px; text-align: center;">
-                <h3><i class="fas fa-download"></i> ดาวน์โหลดผลลัพธ์</h3>
-                <p>ดาวน์โหลดไฟล์ CSV ที่ผ่านการกรองและแก้ไขแล้ว</p>
-                
-                <button class="btn btn-primary download-btn" id="downloadFilteredBtn" style="padding: 15px 40px; font-size: 1.2rem;">
-                    <i class="fas fa-file-csv"></i> ดาวน์โหลดไฟล์ CSV
-                </button>
-                
-                <div class="download-info" style="background-color: #e8f4fd; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem;">
-                    <p><i class="fas fa-info-circle"></i> <strong>คำแนะนำ:</strong> หากเปิดไฟล์ CSV แล้วภาษาไทยแสดงผลผิดเพี้ยน:</p>
-                    <ol style="margin-left: 20px; margin-top: 5px;">
-                        <li>ใช้โปรแกรม <strong>Notepad++</strong> หรือ <strong>Visual Studio Code</strong> เพื่อเปิดไฟล์ (รองรับ UTF-8)</li>
-                        <li>หากใช้ Excel: ไปที่ <strong>Data → Get Data → From File → From Text/CSV</strong> → เลือกไฟล์ → เลือก Encoding เป็น <strong>65001: Unicode (UTF-8)</strong></li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <div class="navigation-buttons">
         <div></div>
         <button class="btn btn-success" id="nextToStep2" disabled>
@@ -2346,7 +2226,87 @@
                         </div>
                     </div>
                 </div>
+                  <!-- ✅ เพิ่ม: ตรวจสอบคอลัมน์ที่จำเป็น -->
+        <div id="requiredColumnsStatus" style="margin-top: 20px; display: none;">
+            <h5><i class="fas fa-search"></i> ตรวจสอบคอลัมน์ที่จำเป็นสำหรับการกรอง</h5>
+            <div id="columnsCheckList" class="conditions-list" style="font-size: 0.9rem;">
+                <!-- รายการคอลัมน์จะแสดงที่นี่ -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+    
+    <!-- ✅ เพิ่ม: ส่วนกรองข้อมูลทั้งหมด -->
+    <div id="filterSection" style="display: none; margin-top: 30px;">
+        <div class="panel-header">
+            <h3><i class="fas fa-filter"></i> กรองข้อมูลอัตโนมัติ (11 ขั้นตอน)</h3>
+            <p>กดปุ่มด้านล่างเพื่อกรองข้อมูลทั้งหมดด้วยการคลิกครั้งเดียว</p>
+        </div>
+        
+        <!-- ปุ่มกรองข้อมูลทั้งหมด -->
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="btn btn-success process-btn" id="filterAllBtn" style="padding: 20px 40px; font-size: 1.3rem;">
+                <i class="fas fa-filter"></i> กรองข้อมูลทั้งหมด (11 ขั้นตอน)
+            </button>
+            <div id="filterSpinner" class="spinner" style="display: none;"></div>
+        </div>
+        
+        <!-- ✅ เพิ่ม: ผลการกรองแบบเรียลไทม์ -->
+        <div id="filterResults" style="display: none;">
+            <div class="panel-header">
+                <h3><i class="fas fa-chart-bar"></i> ผลการกรองข้อมูล</h3>
+                <p>สรุปผลการกรองและแก้ไขข้อมูลในทุกขั้นตอน</p>
+            </div>
+            
+            <!-- แสดงขั้นตอนการกรองทั้งหมด -->
+            <div class="process-steps" id="filterSteps">
+                <!-- ขั้นตอนการกรองจะถูกสร้างโดย JavaScript -->
+            </div>
+            
+            <!-- สรุปผลรวมทั้งหมด -->
+            <div class="final-summary" style="margin-top: 30px;">
+                <h3><i class="fas fa-clipboard-check"></i> สรุปผลการกรองทั้งหมด</h3>
+                <div class="summary-grid" id="filterSummary">
+                    <div class="summary-item">
+                        <div class="summary-value" id="totalRowsBefore">0</div>
+                        <div class="summary-label">แถวทั้งหมดก่อนกรอง</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="totalRowsAfter">0</div>
+                        <div class="summary-label">แถวที่เหลือหลังกรอง</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="totalRemoved">0</div>
+                        <div class="summary-label">แถวที่ถูกตัดออก</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="removedPercentage">0%</div>
+                        <div class="summary-label">เปอร์เซ็นต์ที่ถูกตัด</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ✅ เพิ่ม: ส่วนดาวน์โหลดผลลัพธ์ -->
+            <div class="download-section" style="margin-top: 40px; text-align: center;">
+                <h3><i class="fas fa-download"></i> ดาวน์โหลดผลลัพธ์</h3>
+                <p>ดาวน์โหลดไฟล์ CSV ที่ผ่านการกรองและแก้ไขแล้ว</p>
                 
+                <button class="btn btn-primary download-btn" id="downloadFilteredBtn" style="padding: 15px 40px; font-size: 1.2rem;">
+                    <i class="fas fa-file-csv"></i> ดาวน์โหลดไฟล์ CSV
+                </button>
+                
+                <div class="download-info" style="background-color: #e8f4fd; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.9rem;">
+                    <p><i class="fas fa-info-circle"></i> <strong>คำแนะนำ:</strong> หากเปิดไฟล์ CSV แล้วภาษาไทยแสดงผลผิดเพี้ยน:</p>
+                    <ol style="margin-left: 20px; margin-top: 5px;">
+                        <li>ใช้โปรแกรม <strong>Notepad++</strong> หรือ <strong>Visual Studio Code</strong> เพื่อเปิดไฟล์ (รองรับ UTF-8)</li>
+                        <li>หากใช้ Excel: ไปที่ <strong>Data → Get Data → From File → From Text/CSV</strong> → เลือกไฟล์ → เลือก Encoding เป็น <strong>65001: Unicode (UTF-8)</strong></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
                 <div id="loadingSpinner" class="spinner" style="display: none;"></div>
                 
                 <div class="navigation-buttons">
