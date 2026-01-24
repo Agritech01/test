@@ -321,7 +321,38 @@
             color: #666;
             margin-bottom: 20px;
         }
-        
+        <!-- เพิ่มส่วนนี้ใน header หลังจาก upload-area -->
+<div class="filter-options" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: var(--border-radius);">
+    <h4 style="color: var(--secondary-color); margin-bottom: 15px;">
+        <i class="fas fa-filter"></i> ตัวเลือกการกรองข้อมูล
+    </h4>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <button class="btn btn-outline" id="enableAutoFilter">
+            <i class="fas fa-robot"></i> เปิดใช้งานการกรองอัตโนมัติ (11 ขั้นตอน)
+        </button>
+        <button class="btn btn-outline" id="disableAutoFilter" style="display: none;">
+            <i class="fas fa-times"></i> ปิดการกรองอัตโนมัติ
+        </button>
+        <div style="flex: 1; min-width: 300px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                <input type="checkbox" id="autoFilterCheckbox" checked>
+                <span>กรองข้อมูลอัตโนมัติหลังอัปโหลด (แนะนำ)</span>
+            </label>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 5px;">
+                ระบบจะกรองข้อมูล 11 ขั้นตอนก่อนเข้าสู่ขั้นตอนที่ 2
+            </p>
+        </div>
+    </div>
+    
+    <div id="filterProgressSection" style="display: none; margin-top: 20px;">
+        <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <h5 style="color: var(--secondary-color); margin-bottom: 15px;">
+                <i class="fas fa-spinner fa-spin"></i> กำลังกรองข้อมูลอัตโนมัติ...
+            </h5>
+            <div id="filterProgressSteps"></div>
+        </div>
+    </div>
+</div>
         .file-info {
             background-color: #f8f9fa;
             padding: 20px;
@@ -932,7 +963,36 @@
             color: white;
             border-color: var(--primary-color);
         }
-        
+        .filter-options {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: var(--border-radius);
+    border: 1px solid #dee2e6;
+}
+
+.filter-step {
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.filter-step:last-child {
+    margin-bottom: 0;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
         .ai-fix-btn {
             background-color: var(--accent-color);
             color: white;
@@ -2763,7 +2823,254 @@ uploadArea.addEventListener('dragover', (e) => {
             if (this.files.length === 0) return;
             handleFileUpload(this.files[0]);
         });
+
+        // ตัวแปรเพิ่มเติม
+let autoFilterEnabled = true;
+let isFiltering = false;
+let originalData = null;
+let filteredData = null;
+
+// ฟังก์ชันหลักสำหรับกรองข้อมูลอัตโนมัติ
+async function processAutoFilter() {
+    if (!uploadedData || isFiltering) return;
+    
+    isFiltering = true;
+    document.getElementById('filterProgressSection').style.display = 'block';
+    const progressSteps = document.getElementById('filterProgressSteps');
+    
+    // เก็บข้อมูลต้นฉบับ
+    originalData = JSON.parse(JSON.stringify(uploadedData));
+    filteredData = JSON.parse(JSON.stringify(uploadedData.data));
+    
+    // ขั้นตอนการกรอง 11 ขั้นตอน
+    const filterSteps = [
+        { id: 1, name: "กรองเลขโควต้า", func: filterQuotaData },
+        { id: 2, name: "กรองชื่อประเภทอ้อย", func: filterSugarcaneTypeData },
+        { id: 3, name: "กรองประเภทแปลง", func: filterSugarcaneCategoryData },
+        { id: 4, name: "แก้ไขโซน", func: filterZoneData },
+        { id: 5, name: "กรองสาเหตุเสียหาย", func: filterDamageCauseData },
+        { id: 6, name: "แก้ไขรหัสนักเกษตร", func: filterFarmerCodeData },
+        { id: 7, name: "แปลงพื้นที่เสียหาย", func: processDamageAreaData },
+        { id: 8, name: "แปลงและคำนวณพื้นที่", func: processAreaData },
+        { id: 9, name: "กรองเลขแปลงintech", func: filterIntechPlotData }
+    ];
+    
+    // แสดง progress
+    progressSteps.innerHTML = '';
+    filterSteps.forEach(step => {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'filter-step';
+        stepDiv.id = `filter-step-${step.id}`;
+        stepDiv.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid #eee;">
+                <div style="width: 30px; height: 30px; border-radius: 50%; background: #e9ecef; 
+                            display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    ${step.id}
+                </div>
+                <span style="flex: 1;">${step.name}</span>
+                <span id="filter-step-${step.id}-status" style="color: #6c757d;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </span>
+            </div>
+        `;
+        progressSteps.appendChild(stepDiv);
+    });
+    
+    // ดำเนินการกรองทีละขั้นตอน
+    for (const step of filterSteps) {
+        const stepElement = document.getElementById(`filter-step-${step.id}`);
+        const statusElement = document.getElementById(`filter-step-${step.id}-status`);
         
+        try {
+            const result = await step.func();
+            
+            if (result.success) {
+                statusElement.innerHTML = `<i class="fas fa-check" style="color: var(--success-color);"></i>`;
+                statusElement.style.color = 'var(--success-color)';
+            } else if (result.skipped) {
+                statusElement.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i> ข้าม`;
+                statusElement.style.color = 'var(--warning-color)';
+            } else {
+                statusElement.innerHTML = `<i class="fas fa-times" style="color: var(--danger-color);"></i> ล้มเหลว`;
+                statusElement.style.color = 'var(--danger-color)';
+            }
+            
+            // รอเล็กน้อยระหว่างขั้นตอน
+            await delay(200);
+            
+        } catch (error) {
+            statusElement.innerHTML = `<i class="fas fa-times" style="color: var(--danger-color);"></i> ผิดพลาด`;
+            statusElement.style.color = 'var(--danger-color)';
+            console.error(`ขั้นตอน ${step.name} ผิดพลาด:`, error);
+        }
+    }
+    
+    // อัปเดตข้อมูลใน uploadedData ด้วยข้อมูลที่กรองแล้ว
+    uploadedData.data = [...filteredData];
+    uploadedData.totalRows = filteredData.length;
+    
+    // อัปเดต UI
+    fileRows.textContent = uploadedData.data.length.toLocaleString();
+    
+    // ซ่อน progress และเปิดใช้งานขั้นตอนต่อไป
+    setTimeout(() => {
+        document.getElementById('filterProgressSection').style.display = 'none';
+        isFiltering = false;
+        
+        // แสดงสรุปการกรอง
+        showFilterSummary();
+        
+        // เปิดใช้งานขั้นตอนที่ 2
+        nextToStep2.disabled = false;
+        alert(`✅ กรองข้อมูลเสร็จสิ้น!\n\nจำนวนแถวก่อนกรอง: ${originalData.data.length}\nจำนวนแถวหลังกรอง: ${filteredData.length}\nตัดออก: ${originalData.data.length - filteredData.length} แถว`);
+    }, 500);
+}
+
+// แสดงสรุปการกรอง
+function showFilterSummary() {
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'filter-summary';
+    summaryDiv.style.cssText = `
+        background: #e8f5e9;
+        padding: 20px;
+        border-radius: var(--border-radius);
+        margin-top: 20px;
+        border-left: 5px solid var(--success-color);
+    `;
+    
+    const removedCount = originalData.data.length - filteredData.length;
+    const percentage = originalData.data.length > 0 ? 
+        ((removedCount / originalData.data.length) * 100).toFixed(2) : 0;
+    
+    summaryDiv.innerHTML = `
+        <h5 style="color: var(--success-color); margin-bottom: 15px;">
+            <i class="fas fa-clipboard-check"></i> สรุปการกรองข้อมูลอัตโนมัติ
+        </h5>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);">
+                    ${originalData.data.length.toLocaleString()}
+                </div>
+                <div style="font-size: 0.9rem; color: #666;">แถวก่อนกรอง</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold; color: var(--success-color);">
+                    ${filteredData.length.toLocaleString()}
+                </div>
+                <div style="font-size: 0.9rem; color: #666;">แถวหลังกรอง</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold; color: var(--danger-color);">
+                    ${removedCount.toLocaleString()}
+                </div>
+                <div style="font-size: 0.9rem; color: #666;">ตัดออก</div>
+            </div>
+            <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold; color: var(--warning-color);">
+                    ${percentage}%
+                </div>
+                <div style="font-size: 0.9rem; color: #666;">เปอร์เซ็นต์ที่ตัด</div>
+            </div>
+        </div>
+        <div style="margin-top: 15px; padding: 10px; background: #fff3e0; border-radius: 6px; font-size: 0.9rem;">
+            <i class="fas fa-info-circle"></i> ข้อมูลนี้ได้ผ่านการกรอง 11 ขั้นตอนแล้วและพร้อมสำหรับขั้นตอนที่ 2 (เลือกคอลัมน์)
+        </div>
+    `;
+    
+    const filterOptions = document.querySelector('.filter-options');
+    filterOptions.appendChild(summaryDiv);
+}
+
+// ปุ่มควบคุมการกรองอัตโนมัติ
+document.getElementById('enableAutoFilter').addEventListener('click', function() {
+    autoFilterEnabled = true;
+    document.getElementById('autoFilterCheckbox').checked = true;
+    document.getElementById('enableAutoFilter').style.display = 'none';
+    document.getElementById('disableAutoFilter').style.display = 'inline-flex';
+});
+
+document.getElementById('disableAutoFilter').addEventListener('click', function() {
+    autoFilterEnabled = false;
+    document.getElementById('autoFilterCheckbox').checked = false;
+    document.getElementById('enableAutoFilter').style.display = 'inline-flex';
+    document.getElementById('disableAutoFilter').style.display = 'none';
+});
+
+// แก้ไขฟังก์ชัน processCSVData ให้เรียกกรองอัตโนมัติ
+function processCSVData(csvText, fileName) {
+    try {
+        const lines = csvText.split('\n');
+        if (lines.length === 0) {
+            throw new Error('ไฟล์ว่างเปล่า');
+        }
+        
+        const headers = parseCSVLine(lines[0]);
+        
+        const data = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim() === '') continue;
+            
+            const values = parseCSVLine(lines[i]);
+            const row = {};
+            
+            headers.forEach((header, index) => {
+                row[header] = values[index] ? values[index].trim() : '';
+            });
+            
+            data.push(row);
+        }
+        
+        uploadedData = {
+            headers: headers,
+            data: data,
+            fileName: fileName,
+            totalRows: data.length,
+            totalCols: headers.length,
+            originalCSV: csvText
+        };
+        
+        fileRows.textContent = data.length.toLocaleString();
+        fileCols.textContent = headers.length;
+        fileInfo.classList.add('show');
+        loadingSpinner.style.display = 'none';
+        
+        console.log('โหลดข้อมูลสำเร็จ:', uploadedData);
+        
+        // เรียกใช้การกรองอัตโนมัติถ้าเปิดใช้งาน
+        if (autoFilterEnabled) {
+            // ไม่เปิดใช้งานปุ่มไปขั้นตอนที่ 2 ทันที
+            nextToStep2.disabled = true;
+            
+            // เรียกใช้การกรองอัตโนมัติ
+            setTimeout(() => {
+                processAutoFilter();
+            }, 500);
+        } else {
+            // ถ้าปิดการกรองอัตโนมัติ ให้เปิดใช้งานปุ่มไปขั้นตอนที่ 2 ทันที
+            nextToStep2.disabled = false;
+        }
+        
+    } catch (error) {
+        alert('รูปแบบไฟล์ CSV ไม่ถูกต้อง: ' + error.message);
+        loadingSpinner.style.display = 'none';
+    }
+}
+
+// เพิ่มฟังก์ชันกรองข้อมูลแต่ละขั้นตอน (เดิมจากโค้ดที่สอง)
+async function filterQuotaData() {
+    // ... โค้ดเดิมจากไฟล์ที่สอง ...
+}
+
+async function filterSugarcaneTypeData() {
+    // ... โค้ดเดิมจากไฟล์ที่สอง ...
+}
+
+// ... ฟังก์ชันกรองอื่นๆ ทั้ง 9 ขั้นตอน ...
+
+// ฟังก์ชัน helper สำหรับ delay
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
         function handleFileUpload(file) {
             if (!file) return;
             
@@ -2904,24 +3211,26 @@ uploadArea.addEventListener('dragover', (e) => {
             goToStep(2);
         });
         
-        function prepareColumnSelection() {
-            allColumns = [...uploadedData.headers];
-            
-            // ✅ แก้ไข: เลือกคอลัมน์ทั้งหมดอัตโนมัติ
-            selectedColumns = [...allColumns];
-            
-            // อัพเดตจำนวนคอลัมน์ทั้งหมด
-            totalColumns.textContent = allColumns.length;
-            
-            // สร้างรายการคอลัมน์
-            renderColumnGrid();
-            
-            // อัพเดตสถิติ
-            updateColumnStats();
-            
-            // ✅ แก้ไข: เปิดใช้งานปุ่มต่อไปทันทีเมื่อเลือกคอลัมน์ทั้งหมด
-            nextToStep3.disabled = false;
-        }
+        // แก้ไขฟังก์ชัน prepareColumnSelection
+function prepareColumnSelection() {
+    // ใช้ headers จาก uploadedData ที่อาจผ่านการกรองแล้ว
+    allColumns = [...uploadedData.headers];
+    
+    // ✅ แก้ไข: เลือกคอลัมน์ทั้งหมดอัตโนมัติ
+    selectedColumns = [...allColumns];
+    
+    // อัพเดตจำนวนคอลัมน์ทั้งหมด
+    totalColumns.textContent = allColumns.length;
+    
+    // สร้างรายการคอลัมน์
+    renderColumnGrid();
+    
+    // อัพเดตสถิติ
+    updateColumnStats();
+    
+    // ✅ แก้ไข: เปิดใช้งานปุ่มต่อไปทันทีเมื่อเลือกคอลัมน์ทั้งหมด
+    nextToStep3.disabled = false;
+}
         
         function renderColumnGrid() {
             columnsGrid.innerHTML = '';
