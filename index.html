@@ -735,6 +735,564 @@
         flex-direction: column;
         align-items: flex-start;
     }
+    /* Dashboard Summary */
+.dashboard-summary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 30px;
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+}
+
+.summary-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.summary-icon.success {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+}
+
+.summary-icon.warning {
+    background: rgba(255, 152, 0, 0.1);
+    color: var(--warning-color);
+}
+
+.summary-icon.error {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--danger-color);
+}
+
+.summary-icon.info {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+}
+
+.summary-content {
+    flex: 1;
+}
+
+.summary-content h4 {
+    margin: 0 0 5px 0;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.summary-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.progress-bar {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+}
+
+.progress-fill.success {
+    background: var(--success-color);
+}
+
+.progress-fill.warning {
+    background: var(--warning-color);
+}
+
+.progress-fill.error {
+    background: var(--danger-color);
+}
+
+.progress-fill.info {
+    background: var(--primary-color);
+}
+
+.summary-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-sm {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+/* Data Type Configuration */
+.data-type-configuration {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 25px;
+    margin-bottom: 30px;
+    animation: fadeIn 0.5s ease;
+    display: none;
+}
+
+.data-type-configuration h3 {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.config-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.data-type-table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.data-type-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.data-type-table th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px;
+    text-align: left;
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    cursor: pointer;
+    user-select: none;
+}
+
+.data-type-table th:hover {
+    background-color: var(--secondary-color);
+}
+
+.data-type-table th i {
+    margin-left: 5px;
+    opacity: 0.7;
+}
+
+.data-type-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.type-select, .format-select, .unit-select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-family: 'Prompt', sans-serif;
+    background: white;
+}
+
+.type-select:focus, .format-select:focus, .unit-select:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+
+.data-sample-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Data Table */
+.data-table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+}
+
+.table-info {
+    display: flex;
+    gap: 20px;
+    color: #6c757d;
+    font-size: 0.9rem;
+    align-items: center;
+}
+
+.table-actions {
+    display: flex;
+    gap: 10px;
+}
+
+#dataStatus {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+#dataStatus:hover {
+    opacity: 0.9;
+}
+
+.data-table-container {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    background: white;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.data-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.3s ease;
+}
+
+.data-table tr:hover td {
+    background: #f8f9fa;
+}
+
+/* Cell Styling */
+.cell-error {
+    background: rgba(247, 37, 133, 0.1) !important;
+    color: var(--danger-color) !important;
+    font-weight: 600;
+    position: relative;
+    cursor: pointer;
+}
+
+.cell-error:hover {
+    background: rgba(247, 37, 133, 0.2) !important;
+}
+
+.cell-error:after {
+    content: "!";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--danger-color);
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.cell-warning {
+    background: rgba(255, 152, 0, 0.1) !important;
+    color: var(--warning-color) !important;
+    cursor: pointer;
+}
+
+.cell-valid {
+    color: var(--success-color);
+}
+
+.cell-editing {
+    background: #fffde7 !important;
+    border: 2px solid var(--accent-color) !important;
+}
+
+.cell-highlight {
+    animation: highlightCell 2s ease;
+}
+
+@keyframes highlightCell {
+    0% { background-color: #fff3e0; }
+    50% { background-color: #ffecb3; }
+    100% { background-color: transparent; }
+}
+
+/* Cell Editor Modal */
+.cell-editor-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell-editor-modal.show {
+    display: flex;
+}
+
+.cell-editor-modal .modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-header h4 {
+    margin: 0;
+    color: var(--secondary-color);
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6c757d;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.cell-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.cell-info p {
+    margin: 5px 0;
+    color: #495057;
+}
+
+.error-text {
+    color: var(--danger-color) !important;
+    font-weight: 500;
+}
+
+.warning-text {
+    color: var(--warning-color) !important;
+    font-weight: 500;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.1);
+}
+
+.suggestions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.suggestion-item {
+    background: #e3f2fd;
+    color: var(--primary-color);
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.suggestion-item:hover {
+    background: #bbdefb;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Filter dropdown in table header */
+.filter-dropdown {
+    width: calc(100% - 10px);
+    margin-top: 5px;
+    padding: 4px 6px;
+    font-size: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Prompt', sans-serif;
+    background-color: white;
+}
+
+.filter-dropdown:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .data-type-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .data-table-controls {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .table-info {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .table-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .data-table-controls {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .table-info {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .table-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .config-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .btn-sm {
+        width: 100%;
+        justify-content: center;
+    }
+}
 }
         }
     </style>
@@ -965,10 +1523,207 @@
     </div>
 </div>
             
-            <!-- Step 4: Data Validation -->
-            <div class="step-panel" id="panel4">
-                <!-- Step 4 Content จะเพิ่มที่นี่ -->
+          <!-- แทนที่เนื้อหาใน panel4 -->
+<div class="step-panel" id="panel4">
+    <div class="panel-header">
+        <h2><i class="fas fa-search"></i> ตรวจสอบและแก้ไขข้อมูล</h2>
+        <p>AI ช่วยตรวจสอบข้อมูลและแสดงผลลัพธ์ คลิกที่เซลล์สีแดงเพื่อแก้ไขได้ทันที</p>
+    </div>
+    
+    <!-- Dashboard Summary -->
+    <div class="dashboard-summary" id="dashboardSummary">
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-icon success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="summary-content">
+                    <h4>ข้อมูลถูกต้อง</h4>
+                    <div class="summary-value" id="correctDataPercent">0%</div>
+                    <div class="summary-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill success" id="correctDataBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
+            <div class="summary-card">
+                <div class="summary-icon warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="summary-content">
+                    <h4>ต้องตรวจสอบ</h4>
+                    <div class="summary-value" id="needReviewCount">0</div>
+                    <button class="btn btn-sm btn-outline" id="showReviewBtn" style="margin-top: 5px; display: none;">
+                        <i class="fas fa-eye"></i> แสดง
+                    </button>
+                    <div class="summary-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill warning" id="needReviewBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-icon error">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="summary-content">
+                    <h4>ข้อผิดพลาด</h4>
+                    <div class="summary-value" id="errorDataCount">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill error" id="errorDataBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-icon info">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div class="summary-content">
+                    <h4>แก้ไขแล้ว</h4>
+                    <div class="summary-value" id="editedCellsCount">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill info" id="editedCellsBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary-actions">
+            <button class="btn btn-primary btn-sm" id="refreshDashboard">
+                <i class="fas fa-sync-alt"></i> อัพเดต Dashboard
+            </button>
+            <button class="btn btn-success btn-sm" id="fixAllErrors">
+                <i class="fas fa-robot"></i> AI แก้ไขข้อผิดพลาดทั้งหมด
+            </button>
+        </div>
+    </div>
+    
+    <!-- Data Type Configuration -->
+    <div class="data-type-configuration" id="dataTypeConfig">
+        <h3><i class="fas fa-cogs"></i> กำหนดประเภทข้อมูลให้แต่ละคอลัมน์</h3>
+        <div class="config-controls">
+            <button class="btn btn-outline btn-sm" id="autoDetectTypes">
+                <i class="fas fa-robot"></i> ตรวจจับประเภทอัตโนมัติ
+            </button>
+            <button class="btn btn-success btn-sm" id="applyDataTypes">
+                <i class="fas fa-check"></i> ใช้การตั้งค่านี้
+            </button>
+        </div>
+        <div class="data-type-table-container">
+            <table class="data-type-table" id="dataTypeTable">
+                <thead>
+                    <tr>
+                        <th>คอลัมน์</th>
+                        <th>ตัวอย่างข้อมูล</th>
+                        <th>ประเภทข้อมูล</th>
+                        <th>รูปแบบ</th>
+                        <th>หน่วย</th>
+                        <th>คำอธิบาย</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTypeTableBody">
+                    <!-- จะถูกเพิ่มโดย JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Data Preview Table -->
+    <div class="data-table-controls">
+        <div class="table-info">
+            <span><i class="fas fa-table"></i> แสดง <span id="currentRows">0</span>/<span id="totalRows">0</span> แถว</span>
+            <span><i class="fas fa-columns"></i> <span id="currentColumns">0</span> คอลัมน์</span>
+            <span id="dataStatus"></span>
+        </div>
+        
+        <div class="table-actions">
+            <button class="btn btn-outline btn-sm" id="toggleAllRows">
+                <i class="fas fa-expand"></i> แสดงทั้งหมด (<span id="totalRowCount">0</span>)
+            </button>
+            <button class="btn btn-outline btn-sm" id="exportTable">
+                <i class="fas fa-download"></i> ส่งออกตาราง
+            </button>
+            <button class="btn btn-outline btn-sm" id="showDataTypeConfig">
+                <i class="fas fa-cog"></i> กำหนดประเภทข้อมูล
+            </button>
+        </div>
+    </div>
+    
+    <div class="data-table-container">
+        <table class="data-table" id="dataPreviewTable">
+            <thead id="dataTableHeader">
+                <!-- Headers will be populated by JavaScript -->
+            </thead>
+            <tbody id="dataTableBody">
+                <!-- Rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Cell Editor Modal -->
+    <div class="cell-editor-modal" id="cellEditorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4><i class="fas fa-edit"></i> แก้ไขข้อมูลเซลล์</h4>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="cell-info">
+                    <p><strong>คอลัมน์:</strong> <span id="editColumnName">-</span></p>
+                    <p><strong>แถวที่:</strong> <span id="editRowNumber">-</span></p>
+                    <p><strong>ประเภทข้อมูล:</strong> 
+                        <select id="editDataTypeSelect" class="form-control" style="width: auto; display: inline-block; margin-left: 10px;">
+                            <option value="text">ข้อความ</option>
+                            <option value="number">ตัวเลข</option>
+                            <option value="date">วันที่</option>
+                            <option value="enum">ค่าที่กำหนด</option>
+                            <option value="identifier">รหัส</option>
+                        </select>
+                    </p>
+                    <p><strong>ปัญหาที่พบ:</strong> <span id="editIssue" class="error-text">-</span></p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cellValueInput">ค่าใหม่:</label>
+                    <input type="text" id="cellValueInput" class="form-control" placeholder="ป้อนค่าใหม่...">
+                    <div class="suggestions" id="valueSuggestions">
+                        <!-- Suggestions will be added here -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="correctionReason">เหตุผลในการแก้ไข:</label>
+                    <select id="correctionReason" class="form-control">
+                        <option value="">เลือกเหตุผล</option>
+                        <option value="format_error">รูปแบบไม่ถูกต้อง</option>
+                        <option value="invalid_value">ค่าที่ใช้ไม่ได้</option>
+                        <option value="out_of_range">ไม่อยู่ในช่วงที่กำหนด</option>
+                        <option value="typo_error">พิมพ์ผิด</option>
+                        <option value="other">อื่นๆ</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelEdit">ยกเลิก</button>
+                <button class="btn btn-success" id="saveEdit">บันทึกการแก้ไข</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="navigation-buttons">
+        <button class="btn btn-outline" id="backToStep3">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+        </button>
+        <button class="btn btn-success" id="nextToStep5" disabled>
+            <i class="fas fa-arrow-right"></i> ดำเนินการต่อ
+        </button>
+    </div>
+</div>
             
             <!-- Step 5: Condition Checking -->
             <div class="step-panel" id="panel5">
@@ -2546,6 +3301,1318 @@ nextToStep4.addEventListener('click', function() {
     // ไปยังขั้นตอนที่ 4
     goToStep(4);
 });
+            // ============================================
+// ขั้นตอนที่ 4: ตรวจสอบและแก้ไขข้อมูล
+// ============================================
+
+// ตัวแปรสำหรับระบบตรวจสอบข้อมูล
+let userSelectedDataTypes = {};
+let currentValidationResults = {};
+let cellValidationStatus = {};
+let editingCell = null;
+let totalCells = 0;
+let isShowingAllRows = false;
+let currentRowLimit = 50;
+let dataTypeConfigVisible = false;
+
+// ข้อมูลสำหรับการตรวจสอบ
+const sugarcaneTypes = [
+    "ปลายฝนขยาย", 
+    "ปลายฝนรื้อตอ", 
+    "ตอ1", 
+    "ตอ2", 
+    "ตอ3", 
+    "ต้นฝนขยาย", 
+    "ต้นฝนรื้อตอ", 
+    "พื้นที่เสียหาย", 
+    ">ตอ3"
+];
+
+const sugarcaneNumbers = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
+
+// อ้างอิงองค์ประกอบสำหรับ Step 4
+const backToStep3 = document.getElementById('backToStep3');
+const nextToStep5 = document.getElementById('nextToStep5');
+const refreshDashboard = document.getElementById('refreshDashboard');
+const fixAllErrors = document.getElementById('fixAllErrors');
+const showReviewBtn = document.getElementById('showReviewBtn');
+const correctDataPercent = document.getElementById('correctDataPercent');
+const needReviewCount = document.getElementById('needReviewCount');
+const errorDataCount = document.getElementById('errorDataCount');
+const editedCellsCount = document.getElementById('editedCellsCount');
+const correctDataBar = document.getElementById('correctDataBar');
+const needReviewBar = document.getElementById('needReviewBar');
+const errorDataBar = document.getElementById('errorDataBar');
+const editedCellsBar = document.getElementById('editedCellsBar');
+
+// Data Table elements
+const dataTableHeader = document.getElementById('dataTableHeader');
+const dataTableBody = document.getElementById('dataTableBody');
+const currentRows = document.getElementById('currentRows');
+const totalRows = document.getElementById('totalRows');
+const currentColumns = document.getElementById('currentColumns');
+const totalRowCount = document.getElementById('totalRowCount');
+const dataStatus = document.getElementById('dataStatus');
+const toggleAllRowsBtn = document.getElementById('toggleAllRows');
+const exportTableBtn = document.getElementById('exportTable');
+const showDataTypeConfigBtn = document.getElementById('showDataTypeConfig');
+
+// Data Type Configuration elements
+const dataTypeConfig = document.getElementById('dataTypeConfig');
+const dataTypeTableBody = document.getElementById('dataTypeTableBody');
+const autoDetectTypesBtn = document.getElementById('autoDetectTypes');
+const applyDataTypesBtn = document.getElementById('applyDataTypes');
+const editDataTypeSelect = document.getElementById('editDataTypeSelect');
+
+// Cell Editor Modal elements
+const cellEditorModal = document.getElementById('cellEditorModal');
+const editColumnName = document.getElementById('editColumnName');
+const editRowNumber = document.getElementById('editRowNumber');
+const editIssue = document.getElementById('editIssue');
+const cellValueInput = document.getElementById('cellValueInput');
+const valueSuggestions = document.getElementById('valueSuggestions');
+const correctionReason = document.getElementById('correctionReason');
+const saveEditBtn = document.getElementById('saveEdit');
+const cancelEditBtn = document.getElementById('cancelEdit');
+const closeModalBtn = document.querySelector('.close-modal');
+
+// Event Listeners สำหรับ Step 4
+backToStep3.addEventListener('click', () => {
+    goToStep(3);
+});
+
+nextToStep4.addEventListener('click', function() {
+    if (!selectedColumns || selectedColumns.length === 0) {
+        alert('กรุณาเลือกคอลัมน์ที่ต้องการตรวจสอบ');
+        return;
+    }
+    
+    // เริ่มต้นระบบตรวจสอบข้อมูล
+    initDataValidationSystem();
+    
+    // ไปยังขั้นตอนที่ 4
+    goToStep(4);
+});
+
+// เริ่มต้นระบบตรวจสอบข้อมูล
+function initDataValidationSystem() {
+    // แสดง Dashboard
+    dashboardSummary.style.display = 'block';
+    
+    // ตรวจสอบว่ามีข้อมูลที่กรองแล้วหรือไม่
+    if (!filteredData || selectedColumns.length === 0) {
+        alert('กรุณากรองข้อมูลและเลือกคอลัมน์ก่อน');
+        return;
+    }
+    
+    // รันการตรวจสอบข้อมูล
+    runDataValidation();
+}
+
+function runDataValidation() {
+    if (!filteredData || selectedColumns.length === 0) return;
+    
+    // ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
+    const removedCount = removeEmptyRows();
+    
+    currentValidationResults = {
+        totalCells: 0,
+        validCells: 0,
+        warningCells: 0,
+        errorCells: 0,
+        details: {}
+    };
+    
+    cellValidationStatus = {};
+    
+    // ใช้แถวแรกตามจำนวนที่กำหนด
+    const sampleRows = filteredData.slice(0, currentRowLimit);
+    totalCells = sampleRows.length * selectedColumns.length;
+    
+    // ตรวจสอบแต่ละเซลล์
+    sampleRows.forEach((row, rowIndex) => {
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            
+            // ถ้าค่าเป็นช่องว่าง ให้ผ่านได้เลย
+            if (cellValue.trim() === '') {
+                if (!cellValidationStatus[rowIndex]) {
+                    cellValidationStatus[rowIndex] = {};
+                }
+                cellValidationStatus[rowIndex][colIndex] = {
+                    status: 'valid',
+                    message: 'ค่าว่าง - ผ่าน',
+                    suggestions: [],
+                    dataType: 'text',
+                    edited: false
+                };
+                
+                currentValidationResults.totalCells++;
+                currentValidationResults.validCells++;
+                return;
+            }
+            
+            // ใช้ประเภทข้อมูลที่ผู้ใช้เลือก หรือตรวจจับอัตโนมัติ
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            
+            // บันทึกผลการตรวจสอบ
+            if (!cellValidationStatus[rowIndex]) {
+                cellValidationStatus[rowIndex] = {};
+            }
+            
+            cellValidationStatus[rowIndex][colIndex] = validation;
+            
+            // นับสถิติ
+            currentValidationResults.totalCells++;
+            
+            if (validation.status === 'valid') {
+                currentValidationResults.validCells++;
+            } else if (validation.status === 'warning') {
+                currentValidationResults.warningCells++;
+            } else if (validation.status === 'error') {
+                currentValidationResults.errorCells++;
+            }
+            
+            // บันทึกรายละเอียด
+            if (!currentValidationResults.details[columnName]) {
+                currentValidationResults.details[columnName] = {
+                    errors: [],
+                    warnings: []
+                };
+            }
+            
+            if (validation.status === 'error') {
+                currentValidationResults.details[columnName].errors.push({
+                    row: rowIndex + 1,
+                    value: cellValue,
+                    message: validation.message
+                });
+            } else if (validation.status === 'warning') {
+                currentValidationResults.details[columnName].warnings.push({
+                    row: rowIndex + 1,
+                    value: cellValue,
+                    message: validation.message
+                });
+            }
+        });
+    });
+    
+    // แสดงข้อมูลในตาราง
+    renderDataTable();
+    
+    // อัพเดต Dashboard
+    updateDashboard();
+    
+    // อัพเดตสถานะ
+    updateDataStatus();
+}
+
+function detectColumnType(columnName, sampleValue) {
+    const columnNameLower = columnName.toLowerCase();
+    
+    // คอลัมน์ "ชื่อประเภทอ้อย" ให้เป็นประเภท "text"
+    if (columnNameLower === 'ชื่อประเภทอ้อย' || 
+        columnNameLower.includes('ชื่อประเภทอ้อย')) {
+        return 'text';
+    }
+    
+    // คอลัมน์ "ประเภทอ้อย" ให้เป็นประเภท "number"
+    if (columnNameLower === 'ประเภทอ้อย' || 
+        columnNameLower.includes('ประเภทอ้อย')) {
+        return 'number';
+    }
+    
+    // ตรวจสอบจากชื่อคอลัมน์
+    if (columnNameLower.includes('วันที่') || columnNameLower.includes('date') || 
+        columnNameLower.includes('วัน') || columnNameLower.includes('month') || 
+        columnNameLower.includes('year')) {
+        return 'date';
+    }
+    
+    if (columnNameLower.includes('จำนวน') || columnNameLower.includes('quantity') ||
+        columnNameLower.includes('ปริมาณ') || columnNameLower.includes('amount') ||
+        columnNameLower.includes('น้ำหนัก') || columnNameLower.includes('weight') ||
+        columnNameLower.includes('พื้นที่') || columnNameLower.includes('area') ||
+        columnNameLower.includes('ราคา') || columnNameLower.includes('price') ||
+        columnNameLower === 'lat' || columnNameLower === 'latitude' ||
+        columnNameLower === 'long' || columnNameLower === 'longitude') {
+        return 'number';
+    }
+    
+    if (columnNameLower.includes('รหัส') || columnNameLower.includes('code') || 
+        columnNameLower.includes('id') || columnNameLower.includes('หมายเลข') ||
+        columnNameLower.includes('เลขที่') || columnNameLower.includes('no.')) {
+        return 'identifier';
+    }
+    
+    if (columnNameLower.includes('ประเภท') || columnNameLower.includes('type') ||
+        columnNameLower.includes('สถานะ') || columnNameLower.includes('status') ||
+        columnNameLower.includes('ใช่/ไม่') || columnNameLower.includes('yes/no') ||
+        columnNameLower.includes('ระดับ') || columnNameLower.includes('level') ||
+        columnNameLower.includes('การจัด') || columnNameLower.includes('category')) {
+        return 'enum';
+    }
+    
+    // ตรวจสอบจากค่าตัวอย่าง
+    if (sampleValue === '' || sampleValue === null || sampleValue === undefined) {
+        return 'text';
+    }
+    
+    // ตรวจสอบตัวเลข
+    const numValue = parseFloat(sampleValue);
+    if (!isNaN(numValue) && sampleValue.trim() !== '' && 
+        !isNaN(parseFloat(sampleValue)) && isFinite(sampleValue)) {
+        return 'number';
+    }
+    
+    // ตรวจสอบวันที่
+    const datePatterns = [
+        /^\d{4}-\d{1,2}-\d{1,2}$/,
+        /^\d{4}\/\d{1,2}\/\d{1,2}$/,
+        /^\d{1,2}\/\d{1,2}\/\d{4}$/,
+        /^\d{1,2}-\d{1,2}-\d{4}$/
+    ];
+    
+    if (datePatterns.some(pattern => pattern.test(sampleValue.trim()))) {
+        return 'date';
+    }
+    
+    // ค่าเริ่มต้นเป็นข้อความ
+    return 'text';
+}
+
+function validateCellData(columnName, value, columnType, rowIndex, colIndex) {
+    const effectiveType = userSelectedDataTypes[columnName] || columnType;
+    
+    const result = {
+        status: 'valid',
+        message: '',
+        suggestions: [],
+        dataType: effectiveType,
+        edited: false
+    };
+    
+    // ตรวจสอบค่าว่าง (ผ่านแล้วในขั้นต้น)
+    if (value === '' || value === null || value === undefined) {
+        return result;
+    }
+    
+    // คอลัมน์ "เลขแปลงintech" เป็นค่าเริ่มต้น ไม่ต้องตรวจสอบ
+    if (columnName.toLowerCase().includes('แปลงintech')) {
+        return result;
+    }
+    
+    // การตรวจสอบสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
+    if (columnName.toLowerCase() === 'ชื่อประเภทอ้อย') {
+        if (!sugarcaneTypes.includes(value.trim())) {
+            result.status = 'error';
+            result.message = `ต้องเป็นหนึ่งใน: ${sugarcaneTypes.join(', ')}`;
+            result.suggestions = sugarcaneTypes;
+        }
+        return result;
+    }
+    
+    // การตรวจสอบสำหรับคอลัมน์ "ประเภทอ้อย"
+    if (columnName.toLowerCase() === 'ประเภทอ้อย') {
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) {
+            result.status = 'error';
+            result.message = 'ต้องเป็นตัวเลข';
+            result.suggestions = sugarcaneNumbers;
+        } else if (!sugarcaneNumbers.includes(value.trim())) {
+            result.status = 'error';
+            result.message = `ต้องเป็นหนึ่งใน: ${sugarcaneNumbers.join(', ')}`;
+            result.suggestions = sugarcaneNumbers;
+        }
+        return result;
+    }
+    
+    // ตรวจสอบตามประเภทข้อมูล
+    switch(effectiveType) {
+        case 'number':
+            if (isNaN(value) || value.trim() === '') {
+                result.status = 'error';
+                result.message = 'ต้องเป็นตัวเลข';
+                
+                if (columnName.toLowerCase() === 'lat') {
+                    result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
+                } else if (columnName.toLowerCase() === 'long') {
+                    result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
+                } else if (columnName.includes('พื้นที่')) {
+                    result.suggestions = ['10.0', '15.5', '20.0', '25.5'];
+                } else if (columnName.includes('อายุ')) {
+                    result.suggestions = ['120', '150', '180', '210'];
+                } else if (columnName.includes('โควต้า')) {
+                    result.suggestions = ['100', '150', '200', '250'];
+                } else {
+                    result.suggestions = ['0', '10', '50', '100'];
+                }
+            } else {
+                const numValue = parseFloat(value);
+                
+                // ตรวจสอบพิกัด latitude
+                if (columnName.toLowerCase() === 'lat') {
+                    if (numValue < -90 || numValue > 90) {
+                        result.status = 'error';
+                        result.message = 'latitude ต้องอยู่ระหว่าง -90 ถึง 90';
+                        result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
+                    }
+                }
+                
+                // ตรวจสอบพิกัด longitude
+                if (columnName.toLowerCase() === 'long') {
+                    if (numValue < -180 || numValue > 180) {
+                        result.status = 'error';
+                        result.message = 'longitude ต้องอยู่ระหว่าง -180 ถึง 180';
+                        result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
+                    }
+                }
+                
+                // ตรวจสอบค่าติดลบ
+                if ((columnName.includes('พื้นที่') || columnName.includes('อายุ') || 
+                     columnName.includes('จำนวน') || columnName.includes('โควต้า')) && numValue < 0) {
+                    result.status = 'error';
+                    result.message = 'ค่าต้องมากกว่าหรือเท่ากับ 0';
+                    result.suggestions = ['0', '1', '10'];
+                }
+            }
+            break;
+            
+        case 'date':
+            const datePatterns = [
+                /^\d{4}-\d{1,2}-\d{1,2}$/,
+                /^\d{4}\/\d{1,2}\/\d{1,2}$/,
+                /^\d{1,2}\/\d{1,2}\/\d{4}$/,
+                /^\d{1,2}-\d{1,2}-\d{4}$/
+            ];
+            
+            const isValidDate = datePatterns.some(pattern => pattern.test(value.trim()));
+            if (!isValidDate) {
+                result.status = 'error';
+                result.message = 'รูปแบบวันที่ไม่ถูกต้อง (รองรับ: YYYY/MM/DD, YYYY/M/D, DD/MM/YYYY)';
+                result.suggestions = ['2023/01/01', '2023/6/15', '2023/12/31'];
+            }
+            break;
+            
+        case 'enum':
+            if (columnName.toLowerCase().includes('ใช่/ไม่') || columnName.toLowerCase().includes('yes/no')) {
+                const validValues = ['ใช่', 'ไม่', 'yes', 'no', 'true', 'false'];
+                if (!validValues.includes(value.toLowerCase())) {
+                    result.status = 'error';
+                    result.message = 'ต้องเป็น "ใช่" หรือ "ไม่"';
+                    result.suggestions = ['ใช่', 'ไม่'];
+                }
+            }
+            break;
+    }
+    
+    return result;
+}
+
+function renderDataTable() {
+    // ล้างตารางเดิม
+    dataTableHeader.innerHTML = '';
+    dataTableBody.innerHTML = '';
+    
+    if (!filteredData || selectedColumns.length === 0) return;
+    
+    // สร้างหัวตาราง
+    const headerRow = document.createElement('tr');
+    
+    // เพิ่มคอลัมน์หมายเลขแถว
+    const rowNumHeader = document.createElement('th');
+    rowNumHeader.textContent = '#';
+    rowNumHeader.style.width = '50px';
+    headerRow.appendChild(rowNumHeader);
+    
+    // เพิ่มหัวคอลัมน์ข้อมูลที่เลือก
+    selectedColumns.forEach(columnName => {
+        const th = document.createElement('th');
+        
+        // ตรวจสอบประเภทคอลัมน์
+        const effectiveType = userSelectedDataTypes[columnName] || 
+                             detectColumnType(columnName, filteredData[0] ? filteredData[0][columnName] || '' : '');
+        
+        // เพิ่ม badge ประเภทข้อมูล
+        const typeBadge = document.createElement('span');
+        typeBadge.className = 'column-type-badge';
+        typeBadge.textContent = getTypeDisplayName(effectiveType);
+        typeBadge.style.marginLeft = '5px';
+        typeBadge.style.padding = '2px 6px';
+        typeBadge.style.borderRadius = '10px';
+        typeBadge.style.backgroundColor = getTypeColor(effectiveType);
+        typeBadge.style.color = 'white';
+        typeBadge.style.fontSize = '0.7rem';
+        
+        th.innerHTML = `${columnName} `;
+        th.appendChild(typeBadge);
+        
+        // เพิ่มฟิลเตอร์ dropdown
+        const filterSelect = document.createElement('select');
+        filterSelect.className = 'filter-dropdown';
+        filterSelect.innerHTML = '<option value="">ทั้งหมด</option>';
+        
+        // เก็บค่าที่ไม่ซ้ำกันสำหรับ dropdown
+        const uniqueValues = new Set();
+        const sampleRows = filteredData.slice(0, Math.min(100, filteredData.length));
+        
+        sampleRows.forEach(row => {
+            const value = row[columnName] || '';
+            if (value.trim() !== '') {
+                uniqueValues.add(value);
+            }
+        });
+        
+        // เพิ่มตัวเลือก (จำกัดที่ 50 รายการ)
+        Array.from(uniqueValues).slice(0, 50).forEach(value => {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = value.length > 30 ? value.substring(0, 27) + '...' : value;
+            filterSelect.appendChild(option);
+        });
+        
+        filterSelect.addEventListener('change', function() {
+            filterTableRows();
+        });
+        
+        th.appendChild(document.createElement('br'));
+        th.appendChild(filterSelect);
+        headerRow.appendChild(th);
+    });
+    
+    dataTableHeader.appendChild(headerRow);
+    
+    // สร้างแถวข้อมูล
+    const displayRows = filteredData.slice(0, currentRowLimit);
+    
+    // อัพเดตจำนวนแถวที่แสดง
+    totalRows.textContent = filteredData.length;
+    currentRows.textContent = Math.min(currentRowLimit, filteredData.length);
+    totalRowCount.textContent = filteredData.length;
+    currentColumns.textContent = selectedColumns.length;
+    
+    displayRows.forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        
+        // เพิ่มหมายเลขแถว
+        const rowNumCell = document.createElement('td');
+        rowNumCell.textContent = rowIndex + 1;
+        rowNumCell.style.fontWeight = 'bold';
+        tr.appendChild(rowNumCell);
+        
+        // เพิ่มข้อมูลแต่ละเซลล์
+        selectedColumns.forEach((columnName, colIndex) => {
+            const td = document.createElement('td');
+            const cellValue = row[columnName] || '';
+            td.textContent = cellValue;
+            
+            // ตรวจสอบประเภทที่ควรใช้
+            const effectiveType = userSelectedDataTypes[columnName] || 
+                                 detectColumnType(columnName, cellValue);
+            
+            // ตรวจสอบข้อมูล
+            const validation = cellValidationStatus[rowIndex] ? cellValidationStatus[rowIndex][colIndex] : 
+                               validateCellData(columnName, cellValue, effectiveType, rowIndex, colIndex);
+            
+            // เพิ่มคลาสตามสถานะการตรวจสอบ
+            if (validation.status === 'error') {
+                td.className = 'cell-error cell-highlight';
+                td.title = validation.message;
+                td.style.cursor = 'pointer';
+                td.addEventListener('click', () => openCellEditor(rowIndex, colIndex));
+            } else if (validation.status === 'warning') {
+                td.className = 'cell-warning cell-highlight';
+                td.title = validation.message;
+                td.style.cursor = 'pointer';
+                td.addEventListener('click', () => openCellEditor(rowIndex, colIndex));
+            } else {
+                td.className = 'cell-valid';
+            }
+            
+            // เพิ่มข้อมูลสำหรับการแก้ไข
+            td.dataset.row = rowIndex;
+            td.dataset.col = colIndex;
+            td.dataset.column = columnName;
+            td.dataset.value = cellValue;
+            td.dataset.type = effectiveType;
+            
+            tr.appendChild(td);
+        });
+        
+        dataTableBody.appendChild(tr);
+    });
+}
+
+function getTypeDisplayName(type) {
+    const names = {
+        'text': 'ข้อความ',
+        'number': 'ตัวเลข',
+        'date': 'วันที่',
+        'enum': 'ค่าที่กำหนด',
+        'identifier': 'รหัส'
+    };
+    return names[type] || type;
+}
+
+function getTypeColor(type) {
+    const colors = {
+        'text': '#1565c0',
+        'number': '#2e7d32',
+        'date': '#ef6c00',
+        'enum': '#7b1fa2',
+        'identifier': '#00695c'
+    };
+    return colors[type] || '#6c757d';
+}
+
+function updateDashboard() {
+    const total = currentValidationResults.totalCells;
+    const valid = currentValidationResults.validCells;
+    const warning = currentValidationResults.warningCells;
+    const error = currentValidationResults.errorCells;
+    
+    // คำนวณเปอร์เซ็นต์
+    const validPercent = total > 0 ? Math.round((valid / total) * 100) : 0;
+    const warningPercent = total > 0 ? Math.round((warning / total) * 100) : 0;
+    const errorPercent = total > 0 ? Math.round((error / total) * 100) : 0;
+    
+    // อัพเดต Dashboard
+    correctDataPercent.textContent = `${validPercent}%`;
+    needReviewCount.textContent = warning;
+    errorDataCount.textContent = error;
+    
+    // แสดงปุ่ม "ต้องตรวจสอบ" ถ้ามีข้อมูลที่ต้องตรวจสอบ
+    if (warning > 0) {
+        showReviewBtn.style.display = 'inline-block';
+        showReviewBtn.addEventListener('click', showReviewRows);
+    } else {
+        showReviewBtn.style.display = 'none';
+    }
+    
+    // อัพเดต Progress bars
+    correctDataBar.style.width = `${validPercent}%`;
+    needReviewBar.style.width = `${warningPercent}%`;
+    errorDataBar.style.width = `${errorPercent}%`;
+    
+    // อัพเดตจำนวนเซลล์ที่แก้ไขแล้ว
+    const editedCount = countEditedCells();
+    editedCellsCount.textContent = editedCount;
+    const editedPercent = total > 0 ? Math.round((editedCount / total) * 100) : 0;
+    editedCellsBar.style.width = `${Math.min(editedPercent, 100)}%`;
+    
+    // ต้องมีข้อมูลถูกต้อง 100% จึงจะไปขั้นตอนต่อไปได้
+    nextToStep5.disabled = validPercent !== 100 || error > 0;
+}
+
+function countEditedCells() {
+    let count = 0;
+    for (let rowIndex in cellValidationStatus) {
+        for (let colIndex in cellValidationStatus[rowIndex]) {
+            if (cellValidationStatus[rowIndex][colIndex].edited) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+function updateDataStatus() {
+    const errorCount = currentValidationResults.errorCells;
+    const warningCount = currentValidationResults.warningCells;
+    
+    if (errorCount > 0) {
+        dataStatus.innerHTML = `<span style="cursor: pointer; text-decoration: underline;" id="showErrorsBtn">⚠️ มี ${errorCount} ข้อผิดพลาดที่ต้องแก้ไข</span>`;
+        dataStatus.style.color = 'var(--danger-color)';
+        dataStatus.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+        
+        // เพิ่ม event listener สำหรับปุ่มแสดงข้อผิดพลาด
+        setTimeout(() => {
+            const showErrorsBtn = document.getElementById('showErrorsBtn');
+            if (showErrorsBtn) {
+                showErrorsBtn.addEventListener('click', showErrorRowsOnly);
+            }
+        }, 100);
+    } else if (warningCount > 0) {
+        dataStatus.textContent = `⚠️ มี ${warningCount} รายการที่ต้องตรวจสอบ`;
+        dataStatus.style.color = 'var(--warning-color)';
+        dataStatus.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+    } else {
+        dataStatus.textContent = '✓ ข้อมูลถูกต้องทั้งหมด (100%)';
+        dataStatus.style.color = 'var(--success-color)';
+        dataStatus.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+    }
+}
+
+function filterTableRows() {
+    const filterSelects = document.querySelectorAll('.filter-dropdown');
+    const rows = document.querySelectorAll('#dataTableBody tr');
+    
+    rows.forEach(row => {
+        let shouldShow = true;
+        
+        filterSelects.forEach((filterSelect, index) => {
+            const filterValue = filterSelect.value;
+            if (filterValue === '') return;
+            
+            const cell = row.children[index + 1]; // +1 เพราะข้ามเซลล์หมายเลขแถว
+            if (cell) {
+                const cellValue = cell.textContent;
+                if (cellValue !== filterValue) {
+                    shouldShow = false;
+                }
+            }
+        });
+        
+        row.style.display = shouldShow ? '' : 'none';
+    });
+}
+
+function showErrorRowsOnly() {
+    const rows = document.querySelectorAll('#dataTableBody tr');
+    let errorRowCount = 0;
+    
+    rows.forEach(row => {
+        let hasError = false;
+        const cells = row.querySelectorAll('td');
+        
+        cells.forEach(cell => {
+            if (cell.classList.contains('cell-error')) {
+                hasError = true;
+            }
+        });
+        
+        if (hasError) {
+            row.style.display = '';
+            errorRowCount++;
+            row.style.backgroundColor = 'rgba(255, 235, 238, 0.5)';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    if (errorRowCount > 0) {
+        alert(`แสดงเฉพาะแถวที่มีข้อผิดพลาด: ${errorRowCount} แถว`);
+    }
+}
+
+function showReviewRows() {
+    const rows = document.querySelectorAll('#dataTableBody tr');
+    let reviewRowCount = 0;
+    
+    rows.forEach(row => {
+        let hasWarning = false;
+        const cells = row.querySelectorAll('td');
+        
+        cells.forEach(cell => {
+            if (cell.classList.contains('cell-warning')) {
+                hasWarning = true;
+            }
+        });
+        
+        if (hasWarning) {
+            row.style.display = '';
+            reviewRowCount++;
+            row.style.backgroundColor = 'rgba(255, 248, 225, 0.5)';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    if (reviewRowCount > 0) {
+        alert(`แสดงเฉพาะแถวที่ต้องตรวจสอบ: ${reviewRowCount} แถว`);
+    }
+}
+
+function removeEmptyRows() {
+    if (!filteredData || selectedColumns.length === 0) return 0;
+    
+    const originalRowCount = filteredData.length;
+    const newFilteredData = [];
+    
+    filteredData.forEach(row => {
+        let hasData = false;
+        
+        selectedColumns.forEach(columnName => {
+            const value = row[columnName] || '';
+            if (value.toString().trim() !== '') {
+                hasData = true;
+            }
+        });
+        
+        if (hasData) {
+            newFilteredData.push(row);
+        }
+    });
+    
+    filteredData = newFilteredData;
+    
+    return originalRowCount - newFilteredData.length;
+}
+
+// Event Listeners สำหรับฟังก์ชันเพิ่มเติม
+refreshDashboard.addEventListener('click', () => {
+    if (filteredData) {
+        runDataValidation();
+        updateDashboard();
+        updateDataStatus();
+        alert('✅ อัพเดต Dashboard เรียบร้อยแล้ว');
+    }
+});
+
+fixAllErrors.addEventListener('click', () => {
+    if (filteredData) {
+        if (confirm('AI จะพยายามแก้ไขข้อผิดพลาดทั้งหมดอัตโนมัติ\nยืนยันดำเนินการ?')) {
+            autoFixAllErrors();
+        }
+    }
+});
+
+// Cell Editor Modal functions
+function openCellEditor(rowIndex, colIndex) {
+    if (!filteredData || !cellValidationStatus[rowIndex]) return;
+    
+    const columnName = selectedColumns[colIndex];
+    const cell = document.querySelector(`td[data-row="${rowIndex}"][data-col="${colIndex}"]`);
+    const currentValue = filteredData[rowIndex][columnName] || '';
+    const validation = cellValidationStatus[rowIndex][colIndex];
+    const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, currentValue);
+    
+    // บันทึกข้อมูลเซลล์ที่กำลังแก้ไข
+    editingCell = { rowIndex, colIndex, cell, columnName, currentValue, validation, columnType };
+    
+    // อัพเดตข้อมูลใน modal
+    editColumnName.textContent = columnName;
+    editRowNumber.textContent = rowIndex + 1;
+    editDataTypeSelect.value = columnType;
+    editIssue.textContent = validation.message;
+    editIssue.className = validation.status === 'error' ? 'error-text' : 'warning-text';
+    cellValueInput.value = currentValue;
+    
+    // เพิ่มคำแนะนำ
+    valueSuggestions.innerHTML = '';
+    
+    if (columnName.toLowerCase() === 'ชื่อประเภทอ้อย') {
+        const suggestions = [
+            "ปลายฝนขยาย", "ปลายฝนรื้อตอ", "ตอ1", "ตอ2", "ตอ3", 
+            "ต้นฝนขยาย", "ต้นฝนรื้อตอ", "พื้นที่เสียหาย", ">ตอ3"
+        ];
+        suggestions.forEach(suggestion => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'suggestion-item';
+            btn.textContent = suggestion;
+            btn.addEventListener('click', () => {
+                cellValueInput.value = suggestion;
+            });
+            valueSuggestions.appendChild(btn);
+        });
+    }
+    else if (columnName.toLowerCase() === 'ประเภทอ้อย') {
+        const suggestions = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
+        suggestions.forEach(suggestion => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'suggestion-item';
+            btn.textContent = suggestion;
+            btn.addEventListener('click', () => {
+                cellValueInput.value = suggestion;
+            });
+            valueSuggestions.appendChild(btn);
+        });
+    }
+    else if (validation.suggestions && validation.suggestions.length > 0) {
+        validation.suggestions.forEach(suggestion => {
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'suggestion-item';
+            suggestionItem.textContent = suggestion;
+            suggestionItem.addEventListener('click', () => {
+                cellValueInput.value = suggestion;
+            });
+            valueSuggestions.appendChild(suggestionItem);
+        });
+    }
+    
+    // แสดง modal
+    cellEditorModal.classList.add('show');
+    cellValueInput.focus();
+}
+
+function saveCellEdit() {
+    if (!editingCell || !filteredData) return;
+    
+    const newValue = cellValueInput.value.trim();
+    const newDataType = editDataTypeSelect.value;
+    const { rowIndex, colIndex, cell, columnName, currentValue, columnType } = editingCell;
+    
+    // อัพเดตประเภทข้อมูลถ้าผู้ใช้เปลี่ยน
+    if (newDataType !== columnType) {
+        userSelectedDataTypes[columnName] = newDataType;
+    }
+    
+    // อัพเดตข้อมูล
+    filteredData[rowIndex][columnName] = newValue;
+    
+    // ตรวจสอบข้อมูลใหม่
+    const newValidation = validateCellData(columnName, newValue, newDataType, rowIndex, colIndex);
+    newValidation.edited = true;
+    cellValidationStatus[rowIndex][colIndex] = newValidation;
+    
+    // อัพเดตเซลล์ในตาราง
+    cell.textContent = newValue;
+    cell.dataset.value = newValue;
+    
+    // อัพเดตคลาสตามสถานะใหม่
+    cell.className = '';
+    if (newValidation.status === 'error') {
+        cell.className = 'cell-error cell-highlight';
+        cell.title = newValidation.message;
+        cell.style.cursor = 'pointer';
+        cell.addEventListener('click', () => openCellEditor(rowIndex, colIndex));
+    } else if (newValidation.status === 'warning') {
+        cell.className = 'cell-warning cell-highlight';
+        cell.title = newValidation.message;
+        cell.style.cursor = 'pointer';
+        cell.addEventListener('click', () => openCellEditor(rowIndex, colIndex));
+    } else {
+        cell.className = 'cell-valid';
+    }
+    
+    // รันการตรวจสอบใหม่
+    runDataValidation();
+    
+    // ปิด modal
+    closeCellEditor();
+}
+
+function closeCellEditor() {
+    cellEditorModal.classList.remove('show');
+    editingCell = null;
+    cellValueInput.value = '';
+    valueSuggestions.innerHTML = '';
+    correctionReason.value = '';
+}
+
+// Event Listeners สำหรับ modal
+saveEditBtn.addEventListener('click', saveCellEdit);
+cancelEditBtn.addEventListener('click', closeCellEditor);
+closeModalBtn.addEventListener('click', closeCellEditor);
+
+cellEditorModal.addEventListener('click', (e) => {
+    if (e.target === cellEditorModal) {
+        closeCellEditor();
+    }
+});
+
+// Data Type Configuration
+showDataTypeConfigBtn.addEventListener('click', showDataTypeConfiguration);
+
+autoDetectTypesBtn.addEventListener('click', autoDetectDataTypes);
+
+applyDataTypesBtn.addEventListener('click', function() {
+    dataTypeConfigVisible = false;
+    dataTypeConfig.style.display = 'none';
+    
+    // รันการตรวจสอบใหม่ด้วยประเภทข้อมูลที่ตั้งค่า
+    if (filteredData) {
+        runDataValidation();
+        alert('✅ ใช้การตั้งค่าประเภทข้อมูลเรียบร้อย!');
+    }
+});
+
+toggleAllRowsBtn.addEventListener('click', toggleAllRows);
+
+exportTableBtn.addEventListener('click', exportTableToCSV);
+
+nextToStep5.addEventListener('click', () => {
+    if (currentValidationResults.errorCells > 0) {
+        alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
+        return;
+    }
+    
+    const validPercent = parseInt(correctDataPercent.textContent);
+    if (validPercent !== 100) {
+        alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
+        return;
+    }
+    
+    const editedCount = countEditedCells();
+    
+    alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
+    
+    // ไปยังขั้นตอนที่ 5
+    goToStep(5);
+});
+
+function showDataTypeConfiguration() {
+    dataTypeConfigVisible = true;
+    dataTypeConfig.style.display = 'block';
+    renderDataTypeConfigurationTable();
+}
+
+function renderDataTypeConfigurationTable() {
+    if (!filteredData || selectedColumns.length === 0) return;
+    
+    const tableBody = document.getElementById('dataTypeTableBody');
+    tableBody.innerHTML = '';
+    
+    selectedColumns.forEach((columnName) => {
+        const row = document.createElement('tr');
+        
+        // หาตัวอย่างข้อมูล
+        const sampleValues = filteredData.slice(0, 5).map(row => row[columnName] || '');
+        const nonEmptySamples = sampleValues.filter(v => v.trim() !== '');
+        const sampleText = nonEmptySamples.length > 0 ? nonEmptySamples[0] : '(ค่าว่าง)';
+        
+        // ตรวจจับประเภทอัตโนมัติ
+        const columnNameLower = columnName.toLowerCase();
+        let currentType;
+        
+        if (columnNameLower === 'ชื่อประเภทอ้อย') {
+            currentType = 'text';
+        } else if (columnNameLower === 'ประเภทอ้อย') {
+            currentType = 'number';
+        } else {
+            const autoType = detectColumnType(columnName, sampleText);
+            currentType = userSelectedDataTypes[columnName] || autoType;
+        }
+        
+        row.innerHTML = `
+            <td><strong>${columnName}</strong></td>
+            <td class="data-sample-cell" title="${sampleText}">${sampleText}</td>
+            <td>
+                <select class="type-select" data-column="${columnName}">
+                    <option value="text" ${currentType === 'text' ? 'selected' : ''}>ข้อความ</option>
+                    <option value="number" ${currentType === 'number' ? 'selected' : ''}>ตัวเลข</option>
+                    <option value="date" ${currentType === 'date' ? 'selected' : ''}>วันที่</option>
+                    <option value="enum" ${currentType === 'enum' ? 'selected' : ''}>ค่าที่กำหนด</option>
+                    <option value="identifier" ${currentType === 'identifier' ? 'selected' : ''}>รหัส</option>
+                </select>
+            </td>
+            <td>
+                <select class="format-select" data-column="${columnName}">
+                    <option value="default" selected>ค่าเริ่มต้น</option>
+                    ${currentType === 'number' ? 
+                        '<option value="decimal">ทศนิยม</option><option value="integer">จำนวนเต็ม</option>' : 
+                        currentType === 'date' ?
+                        '<option value="YYYY-MM-DD">YYYY-MM-DD</option><option value="DD/MM/YYYY">DD/MM/YYYY</option><option value="YYYY/MM/DD">YYYY/MM/DD</option>' :
+                        currentType === 'text' && columnNameLower === 'ชื่อประเภทอ้อย' ?
+                        sugarcaneTypes.map(type => `<option value="${type}">${type}</option>`).join('') :
+                        ''}
+                </select>
+            </td>
+            <td>
+                <select class="unit-select" data-column="${columnName}">
+                    <option value="none" selected>ไม่มีหน่วย</option>
+                    ${columnName.toLowerCase().includes('พื้นที่') ? 
+                        '<option value="ไร่">ไร่</option><option value="งาน">งาน</option><option value="ตารางเมตร">ตร.ม.</option>' :
+                        columnName.toLowerCase().includes('อายุ') ?
+                        '<option value="วัน">วัน</option><option value="เดือน">เดือน</option><option value="ปี">ปี</option>' :
+                        columnName.toLowerCase().includes('ปริมาณ') ?
+                        '<option value="กิโลกรัม">กก.</option><option value="ตัน">ตัน</option>' : ''}
+                </select>
+            </td>
+            <td><input type="text" class="form-control" placeholder="คำอธิบาย..." value="${getColumnDescription(columnName)}"></td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+    
+    // เพิ่ม event listeners สำหรับ dropdown
+    document.querySelectorAll('.type-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const column = this.dataset.column;
+            userSelectedDataTypes[column] = this.value;
+            
+            // อัพเดต format select ตามประเภท
+            const row = this.closest('tr');
+            const formatSelect = row.querySelector('.format-select');
+            
+            // รีเซ็ต format
+            formatSelect.innerHTML = '<option value="default" selected>ค่าเริ่มต้น</option>';
+            
+            if (this.value === 'number') {
+                formatSelect.innerHTML += '<option value="decimal">ทศนิยม</option><option value="integer">จำนวนเต็ม</option>';
+            } else if (this.value === 'date') {
+                formatSelect.innerHTML += '<option value="YYYY-MM-DD">YYYY-MM-DD</option><option value="DD/MM/YYYY">DD/MM/YYYY</option><option value="YYYY/MM/DD">YYYY/MM/DD</option>';
+            } else if (this.value === 'text' && column.toLowerCase() === 'ชื่อประเภทอ้อย') {
+                sugarcaneTypes.forEach(type => {
+                    formatSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+            }
+        });
+    });
+}
+
+function getColumnDescription(columnName) {
+    const descriptions = {
+        'โซน': 'เขตพื้นที่',
+        'รหัสนักเกษตร': 'รหัสประจำตัวนักเกษตร',
+        'ชื่อนักเกษตร': 'ชื่อ-นามสกุลนักเกษตร',
+        'ชื่อประเภทอ้อย': 'ประเภทของอ้อย เช่น ปลายฝนขยาย, ต้นฝนรื้อตอ',
+        'ประเภทอ้อย': 'รหัสประเภทอ้อย เช่น 101, 102, 103, 104, 105',
+        'เลขโควต้า': 'หมายเลขโควต้าที่ได้รับจัดสรร',
+        'ชื่อชาวไร่': 'ชื่อ-นามสกุลชาวไร่',
+        'เลขแปลงintech': 'หมายเลขแปลงในระบบ Intech',
+        'lat': 'ค่าพิกัดละติจูด',
+        'long': 'ค่าพิกัดลองจิจูด',
+        'พื้นที่': 'ขนาดพื้นที่ปลูกอ้อย',
+        'อายุ': 'อายุอ้อย (วัน)',
+        'จำนวน': 'ปริมาณหรือจำนวน',
+        'ปริมาณปุ๋ย': 'ปริมาณปุ๋ยที่ใช้',
+        'โครงการ': 'ชื่อโครงการที่เกี่ยวข้อง',
+        'วันที่ปลูก': 'วันที่ปลูกอ้อย'
+    };
+    
+    for (const key in descriptions) {
+        if (columnName.toLowerCase().includes(key.toLowerCase())) {
+            return descriptions[key];
+        }
+    }
+    
+    return '';
+}
+
+function autoDetectDataTypes() {
+    if (!filteredData || selectedColumns.length === 0) return;
+    
+    selectedColumns.forEach(columnName => {
+        const columnNameLower = columnName.toLowerCase();
+        
+        if (columnNameLower === 'ชื่อประเภทอ้อย') {
+            userSelectedDataTypes[columnName] = 'text';
+        }
+        else if (columnNameLower === 'ประเภทอ้อย') {
+            userSelectedDataTypes[columnName] = 'number';
+        }
+        else {
+            const sampleValues = filteredData.slice(0, 10).map(row => row[columnName] || '');
+            const nonEmptySamples = sampleValues.filter(v => v.trim() !== '');
+            
+            if (nonEmptySamples.length > 0) {
+                const detectedType = detectColumnType(columnName, nonEmptySamples[0]);
+                userSelectedDataTypes[columnName] = detectedType;
+            }
+        }
+    });
+    
+    renderDataTypeConfigurationTable();
+    alert('✅ ตรวจจับประเภทข้อมูลอัตโนมัติเรียบร้อยแล้ว!');
+}
+
+function toggleAllRows() {
+    isShowingAllRows = !isShowingAllRows;
+    
+    if (isShowingAllRows) {
+        currentRowLimit = filteredData.length;
+        toggleAllRowsBtn.innerHTML = 
+            `<i class="fas fa-compress"></i> ซ่อนบางส่วน (${currentRowLimit})`;
+    } else {
+        currentRowLimit = 50;
+        toggleAllRowsBtn.innerHTML = 
+            `<i class="fas fa-expand"></i> แสดงทั้งหมด (${filteredData.length})`;
+    }
+    
+    renderDataTable();
+}
+
+function exportTableToCSV() {
+    if (!filteredData || selectedColumns.length === 0) return;
+    
+    // ใช้คอลัมน์ตามลำดับเดิมในไฟล์ต้นฉบับ
+    const exportColumns = [...uploadedData.headers].filter(col => 
+        selectedColumns.includes(col)
+    );
+    
+    // สร้าง CSV
+    let csvContent = '';
+    
+    // เพิ่ม BOM สำหรับ UTF-8
+    csvContent += '\ufeff';
+    
+    // เพิ่มหัวตาราง
+    csvContent += exportColumns.join(',') + '\n';
+    
+    // เพิ่มข้อมูลทั้งหมด
+    filteredData.forEach(row => {
+        const rowValues = exportColumns.map(col => {
+            let value = row[col] || '';
+            
+            // แปลงอักขระพิเศษ
+            value = value.toString().replace(/"/g, '""');
+            
+            // ใส่ quotes ถ้ามี comma, newline หรือ quotes
+            if (value.includes(',') || value.includes('\n') || value.includes('\r') || value.includes('"')) {
+                value = `"${value}"`;
+            }
+            
+            return value;
+        });
+        csvContent += rowValues.join(',') + '\n';
+    });
+    
+    // สร้าง blob และดาวน์โหลด
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `cleaned_${uploadedData.fileName.replace('.csv', '')}_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert(`✅ ดาวน์โหลดไฟล์ CSV เรียบร้อย!\nจำนวนแถว: ${filteredData.length}\nจำนวนคอลัมน์: ${exportColumns.length}\n✅ คอลัมน์เรียงตามลำดับเดิม`);
+}
+
+function autoFixAllErrors() {
+    if (!filteredData) return;
+    
+    let fixedCount = 0;
+    const sampleRows = filteredData.slice(0, currentRowLimit);
+    
+    sampleRows.forEach((row, rowIndex) => {
+        selectedColumns.forEach((columnName, colIndex) => {
+            const validation = cellValidationStatus[rowIndex] ? cellValidationStatus[rowIndex][colIndex] : null;
+            
+            if (validation && validation.status === 'error') {
+                let cellValue = row[columnName] || '';
+                let fixedValue = cellValue;
+                const columnNameLower = columnName.toLowerCase();
+                const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+                
+                // AI แก้ไขสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
+                if (columnNameLower === 'ชื่อประเภทอ้อย') {
+                    const validTypes = [
+                        "ปลายฝนขยาย", "ปลายฝนรื้อตอ", "ตอ1", "ตอ2", "ตอ3", 
+                        "ต้นฝนขยาย", "ต้นฝนรื้อตอ", "พื้นที่เสียหาย", ">ตอ3"
+                    ];
+                    
+                    // พยายามหาค่าที่ใกล้เคียง
+                    let bestMatch = null;
+                    let bestScore = 0;
+                    
+                    validTypes.forEach(validType => {
+                        const similarity = calculateSimilarity(cellValue, validType);
+                        if (similarity > bestScore && similarity > 0.3) {
+                            bestScore = similarity;
+                            bestMatch = validType;
+                        }
+                    });
+                    
+                    if (bestMatch) {
+                        fixedValue = bestMatch;
+                    } else {
+                        fixedValue = validTypes[0];
+                    }
+                }
+                // AI แก้ไขสำหรับคอลัมน์ "ประเภทอ้อย"
+                else if (columnNameLower === 'ประเภทอ้อย') {
+                    const validNumbers = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
+                    
+                    const numValue = parseFloat(cellValue);
+                    if (isNaN(numValue)) {
+                        fixedValue = "101";
+                    } else {
+                        let closest = validNumbers[0];
+                        let minDiff = Math.abs(numValue - parseInt(closest));
+                        
+                        validNumbers.forEach(num => {
+                            const diff = Math.abs(numValue - parseInt(num));
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                closest = num;
+                            }
+                        });
+                        
+                        fixedValue = closest;
+                    }
+                }
+                else if (columnType === 'number' && isNaN(cellValue)) {
+                    if (columnName.toLowerCase().includes('ประเภทอ้อย')) {
+                        fixedValue = '101';
+                    } else if (columnName.toLowerCase() === 'lat') {
+                        fixedValue = '13.7563';
+                    } else if (columnName.toLowerCase() === 'long') {
+                        fixedValue = '100.5018';
+                    } else if (columnName.includes('พื้นที่')) {
+                        fixedValue = '10.0';
+                    } else if (columnName.includes('อายุ')) {
+                        fixedValue = '120';
+                    } else if (columnName.includes('โควต้า')) {
+                        fixedValue = '100';
+                    } else {
+                        fixedValue = '0';
+                    }
+                } else if (columnType === 'date' && !/^\d{4}-\d{1,2}-\d{1,2}$/.test(cellValue)) {
+                    const dateMatch = cellValue.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+                    if (dateMatch) {
+                        const day = dateMatch[1].padStart(2, '0');
+                        const month = dateMatch[2].padStart(2, '0');
+                        const year = dateMatch[3];
+                        fixedValue = `${year}/${month}/${day}`;
+                    } else {
+                        fixedValue = '2023/06/01';
+                    }
+                }
+                
+                // บันทึกค่าที่แก้ไข
+                if (fixedValue !== cellValue) {
+                    filteredData[rowIndex][columnName] = fixedValue;
+                    fixedCount++;
+                    
+                    if (!cellValidationStatus[rowIndex]) {
+                        cellValidationStatus[rowIndex] = {};
+                    }
+                    cellValidationStatus[rowIndex][colIndex].edited = true;
+                }
+            }
+        });
+    });
+    
+    // อัพเดตการตรวจสอบใหม่
+    runDataValidation();
+    renderDataTable();
+    updateDashboard();
+    updateDataStatus();
+    
+    alert(`AI ได้แก้ไขข้อผิดพลาด ${fixedCount} รายการ`);
+}
+
+function calculateSimilarity(str1, str2) {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    
+    if (longer.length === 0) return 1.0;
+    
+    return (longer.length - editDistance(longer, shorter)) / parseFloat(longer.length);
+}
+
+function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+    
+    const costs = [];
+    for (let i = 0; i <= s1.length; i++) {
+        let lastValue = i;
+        for (let j = 0; j <= s2.length; j++) {
+            if (i === 0) {
+                costs[j] = j;
+            } else {
+                if (j > 0) {
+                    let newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    }
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+        }
+        if (i > 0) costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
+}
             // อัพเดต panels
             panels.forEach((panel, index) => {
                 panel.classList.remove('active');
