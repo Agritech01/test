@@ -684,28 +684,84 @@
         .data-table tr:hover td {
             background: #f8f9fa;
         }
-        
-        /* ✅ สไตล์สำหรับฟิลเตอร์ในหัวตาราง (Dropdown) */
-        .data-table th, .checking-table th {
-            position: relative;
-        }
-        
-        .filter-dropdown {
-            width: calc(100% - 10px);
-            margin-top: 5px;
-            padding: 4px 6px;
-            font-size: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Prompt', sans-serif;
-            background-color: white;
-        }
-        
-        .filter-dropdown:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.2);
-        }
+     /* ✅ สไตล์สำหรับฟิลเตอร์ในหัวตาราง (Dropdown) */
+.data-table th, .checking-table th {
+    position: relative;
+}
+
+.filter-dropdown {
+    width: calc(100% - 10px);
+    margin-top: 5px;
+    padding: 4px 6px;
+    font-size: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Prompt', sans-serif;
+    background-color: white;
+}
+
+.filter-dropdown:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.2);
+}
+
+/* ✅ ปรับขนาดคอลัมน์ใหม่ทั้งหมด 12 คอลัมน์ */
+.checking-table th:nth-child(1),
+.checking-table td:nth-child(1) {
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+    text-align: center;
+    position: sticky;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    z-index: 20;
+}
+
+.checking-table td:nth-child(1) {
+    background: white;
+    color: var(--dark-color);
+    border-right: 1px solid #eee;
+}
+
+.checking-table th:nth-child(2),
+.checking-table td:nth-child(2) {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    position: sticky;
+    left: 60px;
+    background: var(--primary-color);
+    color: white;
+    z-index: 20;
+    border-right: 1px solid #ddd;
+}
+
+.checking-table td:nth-child(2) {
+    background: #f8f9fa;
+    color: var(--dark-color);
+}
+
+/* ✅ คอลัมน์สถานะ (คอลัมน์ที่ 11) */
+.checking-table th:nth-child(11),
+.checking-table td:nth-child(11) {
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
+    text-align: center;
+    background-color: #f8f9fa;
+}
+
+/* ✅ คอลัมน์หมายเหตุ (คอลัมน์ที่ 12) */
+.checking-table th:nth-child(12),
+.checking-table td:nth-child(12) {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    background-color: #f8f9fa;
+}
         
         /* Animation สำหรับ highlight เซลล์ */
         @keyframes highlightCell {
@@ -2621,69 +2677,69 @@
         </footer>
     </div>
 <script>
-    // ข้อมูลสำหรับการตรวจสอบ - แก้ไขตามเงื่อนไขใหม่
-    const sugarcaneTypes = [
-        "ปลายฝนขยาย", 
-        "ปลายฝนรื้อตอ", 
-        "ตอ1", 
-        "ตอ2", 
-        "ตอ3", 
-        "ต้นฝนขยาย", 
-        "ต้นฝนรื้อตอ", 
-        "พื้นที่เสียหาย", 
-        ">ตอ3"
-    ];
-    
-    // ✅ เพิ่มข้อมูลสำหรับคอลัมน์ "ประเภทอ้อย" (ตัวเลข)
-    const sugarcaneNumbers = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
-    
-    const fertilizerTypes = ["ปุ๋ยเคมี", "ปุ๋ยอินทรีย์", "ปุ๋ยชีวภาพ", "ปุ๋ยหมัก", "ปุ๋ยคอก"];
+  // ข้อมูลสำหรับการตรวจสอบ - แก้ไขตามเงื่อนไขใหม่
+const sugarcaneTypes = [
+    "ปลายฝนขยาย", 
+    "ปลายฝนรื้อตอ", 
+    "ตอ1", 
+    "ตอ2", 
+    "ตอ3", 
+    "ต้นฝนขยาย", 
+    "ต้นฝนรื้อตอ", 
+    "พื้นที่เสียหาย", 
+    ">ตอ3"
+];
 
-    // ✅ เพิ่ม: ประเภทการใส่ปุ๋ยตามเงื่อนไขใหม่
-    const fertilizerConditions = {
-        // อ้อยปลูกใหม่
-        "ปลายฝนขยาย": {
-            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
-        },
-        "ปลายฝนรื้อตอ": {
-            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
-        },
-        "ต้นฝนขยาย": {
-            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
-        },
-        "ต้นฝนรื้อตอ": {
-            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
-        },
-        // อ้อยตอ
-        "ตอ1": {
-            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
-        },
-        "ตอ2": {
-            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
-        },
-        "ตอ3": {
-            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
-        },
-        ">ตอ3": {
-            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
-            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
-            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
-        }
-    };
+// ✅ เพิ่มข้อมูลสำหรับคอลัมน์ "ประเภทอ้อย" (ตัวเลข)
+const sugarcaneNumbers = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
+
+const fertilizerTypes = ["ปุ๋ยเคมี", "ปุ๋ยอินทรีย์", "ปุ๋ยชีวภาพ", "ปุ๋ยหมัก", "ปุ๋ยคอก"];
+
+// ✅ เพิ่ม: ประเภทการใส่ปุ๋ยตามเงื่อนไขใหม่
+const fertilizerConditions = {
+    // อ้อยปลูกใหม่
+    "ปลายฝนขยาย": {
+        period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+    },
+    "ปลายฝนรื้อตอ": {
+        period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+    },
+    "ต้นฝนขยาย": {
+        period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+    },
+    "ต้นฝนรื้อตอ": {
+        period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+    },
+    // อ้อยตอ
+    "ตอ1": {
+        period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+    },
+    "ตอ2": {
+        period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+    },
+    "ตอ3": {
+        period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+    },
+    ">ตอ3": {
+        period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+        period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+        period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+    }
+};
 
     // ✅ เพิ่ม: ฟังก์ชันตรวจสอบว่าประเภทอ้อยอยู่ในกลุ่มใด
     function getSugarcaneGroup(sugarcaneType) {
@@ -3967,24 +4023,24 @@
         goToStep(3);
     });
     
-    function prepareColumnSelection() {
-        allColumns = [...uploadedData.headers];
-        
-        // ✅ แก้ไข: เลือกคอลัมน์ทั้งหมดอัตโนมัติ
-        selectedColumns = [...allColumns];
-        
-        // อัพเดตจำนวนคอลัมน์ทั้งหมด
-        totalColumns.textContent = allColumns.length;
-        
-        // สร้างรายการคอลัมน์
-        renderColumnGrid();
-        
-        // อัพเดตสถิติ
-        updateColumnStats();
-        
-        // ✅ แก้ไข: เปิดใช้งานปุ่มต่อไปทันทีเมื่อเลือกคอลัมน์ทั้งหมด
-        nextToStep4.disabled = false;
-    }
+   function prepareColumnSelection() {
+    allColumns = [...uploadedData.headers];
+    
+    // ✅ แก้ไข: เลือกคอลัมน์ทั้งหมดอัตโนมัติ
+    selectedColumns = [...allColumns];
+    
+    // อัพเดตจำนวนคอลัมน์ทั้งหมด
+    totalColumns.textContent = allColumns.length;
+    
+    // สร้างรายการคอลัมน์
+    renderColumnGrid();
+    
+    // อัพเดตสถิติ
+    updateColumnStats();
+    
+    // ✅ แก้ไข: เปิดใช้งานปุ่มต่อไปทันทีเมื่อเลือกคอลัมน์ทั้งหมด
+    nextToStep4.disabled = false;
+}
     
     function renderColumnGrid() {
         columnsGrid.innerHTML = '';
@@ -4308,105 +4364,105 @@
         updateDashboard();
     }
     
-    // ✅ แก้ไขฟังก์ชันตรวจจับประเภทข้อมูลตามข้อกำหนดใหม่
-    function detectColumnType(columnName, sampleValue) {
-        const columnNameLower = columnName.toLowerCase();
-        
-        // ✅ แก้ไข: คอลัมน์ "ชื่อประเภทอ้อย" ให้เป็นประเภท "text" (ข้อความ)
-        if (columnNameLower === 'ชื่อประเภทอ้อย' || 
-            columnNameLower.includes('ชื่อประเภทอ้อย')) {
-            return 'text';
-        }
-        
-        // ✅ แก้ไข: คอลัมน์ "ประเภทอ้อย" ให้เป็นประเภท "number" (ตัวเลข)
-        if (columnNameLower === 'ประเภทอ้อย' || 
-            columnNameLower.includes('ประเภทอ้อย')) {
-            return 'number';
-        }
-        
-        // ✅ แก้ไข: คอลัมน์ "ประวัติการใช้พื้นที่" เป็นข้อความโดยอัตโนมัติ
-        if (columnNameLower.includes('ประวัติการใช้พื้นที่') || 
-            columnNameLower.includes('ประวัติ') || 
-            columnNameLower.includes('การใช้พื้นที่')) {
-            return 'text';
-        }
-        
-        // ✅ แก้ไข: คอลัมน์ "ความเสี่ยงพื้นที่" เป็นข้อความ
-        if (columnNameLower.includes('ความเสี่ยงพื้นที่') || columnNameLower.includes('ความเสี่ยง')) {
-            return 'text';
-        }
-        
-        // ✅ แก้ไข: คอลัมน์ "ความลาดเอียงของพื้นที่" เป็นข้อความ
-        if (columnNameLower.includes('ความลาดเอียง') || columnNameLower.includes('ลาดเอียง') || columnNameLower.includes('slope')) {
-            return 'text';
-        }
-        
-        // ตรวจสอบจากชื่อคอลัมน์ (ให้ความสำคัญสูงสุด)
-        if (columnNameLower.includes('วันที่') || columnNameLower.includes('date') || 
-            columnNameLower.includes('วัน') || columnNameLower.includes('month') || 
-            columnNameLower.includes('year')) {
-            return 'date';
-        }
-        
-        if (columnNameLower.includes('จำนวน') || columnNameLower.includes('quantity') ||
-            columnNameLower.includes('ปริมาณ') || columnNameLower.includes('amount') ||
-            columnNameLower.includes('น้ำหนัก') || columnNameLower.includes('weight') ||
-            columnNameLower.includes('พื้นที่') || columnNameLower.includes('area') ||
-            columnNameLower.includes('ราคา') || columnNameLower.includes('price') ||
-            columnNameLower === 'lat' || columnNameLower === 'latitude' ||
-            columnNameLower === 'long' || columnNameLower === 'longitude') {
-            return 'number';
-        }
-        
-        if (columnNameLower.includes('รหัส') || columnNameLower.includes('code') || 
-            columnNameLower.includes('id') || columnNameLower.includes('หมายเลข') ||
-            columnNameLower.includes('เลขที่') || columnNameLower.includes('no.')) {
-            return 'identifier';
-        }
-        
-        if (columnNameLower.includes('ประเภท') || columnNameLower.includes('type') ||
-            columnNameLower.includes('สถานะ') || columnNameLower.includes('status') ||
-            columnNameLower.includes('ใช่/ไม่') || columnNameLower.includes('yes/no') ||
-            columnNameLower.includes('ระดับ') || columnNameLower.includes('level') ||
-            columnNameLower.includes('การจัด') || columnNameLower.includes('category')) {
-            return 'enum';
-        }
-        
-        // ตรวจสอบจากค่าตัวอย่าง
-        if (sampleValue === '' || sampleValue === null || sampleValue === undefined) {
-            return 'text';
-        }
-        
-        // ตรวจสอบตัวเลข
-        const numValue = parseFloat(sampleValue);
-        if (!isNaN(numValue) && sampleValue.trim() !== '' && 
-            !isNaN(parseFloat(sampleValue)) && isFinite(sampleValue)) {
-            return 'number';
-        }
-        
-        // ตรวจสอบวันที่
-        const datePatterns = [
-            /^\d{4}-\d{1,2}-\d{1,2}$/,
-            /^\d{4}\/\d{1,2}\/\d{1,2}$/,
-            /^\d{1,2}\/\d{1,2}\/\d{4}$/,
-            /^\d{1,2}-\d{1,2}-\d{4}$/
-        ];
-        
-        if (datePatterns.some(pattern => pattern.test(sampleValue.trim()))) {
-            return 'date';
-        }
-        
-        // ตรวจสอบว่ามีค่าที่กำหนดหรือไม่
-        const sampleLower = sampleValue.toLowerCase().trim();
-        if (sampleLower === 'ใช่' || sampleLower === 'ไม่' || 
-            sampleLower === 'yes' || sampleLower === 'no' ||
-            sampleLower === 'true' || sampleLower === 'false') {
-            return 'enum';
-        }
-        
-        // ค่าเริ่มต้นเป็นข้อความ
+   // ✅ แก้ไขฟังก์ชันตรวจจับประเภทข้อมูลตามข้อกำหนดใหม่
+function detectColumnType(columnName, sampleValue) {
+    const columnNameLower = columnName.toLowerCase();
+    
+    // ✅ แก้ไข: คอลัมน์ "ชื่อประเภทอ้อย" ให้เป็นประเภท "text" (ข้อความ)
+    if (columnNameLower === 'ชื่อประเภทอ้อย' || 
+        columnNameLower.includes('ชื่อประเภทอ้อย')) {
         return 'text';
     }
+    
+    // ✅ แก้ไข: คอลัมน์ "ประเภทอ้อย" ให้เป็นประเภท "number" (ตัวเลข)
+    if (columnNameLower === 'ประเภทอ้อย' || 
+        columnNameLower.includes('ประเภทอ้อย')) {
+        return 'number';
+    }
+    
+    // ✅ แก้ไข: คอลัมน์ "ประวัติการใช้พื้นที่" เป็นข้อความโดยอัตโนมัติ
+    if (columnNameLower.includes('ประวัติการใช้พื้นที่') || 
+        columnNameLower.includes('ประวัติ') || 
+        columnNameLower.includes('การใช้พื้นที่')) {
+        return 'text';
+    }
+    
+    // ✅ แก้ไข: คอลัมน์ "ความเสี่ยงพื้นที่" เป็นข้อความ
+    if (columnNameLower.includes('ความเสี่ยงพื้นที่') || columnNameLower.includes('ความเสี่ยง')) {
+        return 'text';
+    }
+    
+    // ✅ แก้ไข: คอลัมน์ "ความลาดเอียงของพื้นที่" เป็นข้อความ
+    if (columnNameLower.includes('ความลาดเอียง') || columnNameLower.includes('ลาดเอียง') || columnNameLower.includes('slope')) {
+        return 'text';
+    }
+    
+    // ตรวจสอบจากชื่อคอลัมน์ (ให้ความสำคัญสูงสุด)
+    if (columnNameLower.includes('วันที่') || columnNameLower.includes('date') || 
+        columnNameLower.includes('วัน') || columnNameLower.includes('month') || 
+        columnNameLower.includes('year')) {
+        return 'date';
+    }
+    
+    if (columnNameLower.includes('จำนวน') || columnNameLower.includes('quantity') ||
+        columnNameLower.includes('ปริมาณ') || columnNameLower.includes('amount') ||
+        columnNameLower.includes('น้ำหนัก') || columnNameLower.includes('weight') ||
+        columnNameLower.includes('พื้นที่') || columnNameLower.includes('area') ||
+        columnNameLower.includes('ราคา') || columnNameLower.includes('price') ||
+        columnNameLower === 'lat' || columnNameLower === 'latitude' ||
+        columnNameLower === 'long' || columnNameLower === 'longitude') {
+        return 'number';
+    }
+    
+    if (columnNameLower.includes('รหัส') || columnNameLower.includes('code') || 
+        columnNameLower.includes('id') || columnNameLower.includes('หมายเลข') ||
+        columnNameLower.includes('เลขที่') || columnNameLower.includes('no.')) {
+        return 'identifier';
+    }
+    
+    if (columnNameLower.includes('ประเภท') || columnNameLower.includes('type') ||
+        columnNameLower.includes('สถานะ') || columnNameLower.includes('status') ||
+        columnNameLower.includes('ใช่/ไม่') || columnNameLower.includes('yes/no') ||
+        columnNameLower.includes('ระดับ') || columnNameLower.includes('level') ||
+        columnNameLower.includes('การจัด') || columnNameLower.includes('category')) {
+        return 'enum';
+    }
+    
+    // ตรวจสอบจากค่าตัวอย่าง
+    if (sampleValue === '' || sampleValue === null || sampleValue === undefined) {
+        return 'text';
+    }
+    
+    // ตรวจสอบตัวเลข
+    const numValue = parseFloat(sampleValue);
+    if (!isNaN(numValue) && sampleValue.trim() !== '' && 
+        !isNaN(parseFloat(sampleValue)) && isFinite(sampleValue)) {
+        return 'number';
+    }
+    
+    // ตรวจสอบวันที่
+    const datePatterns = [
+        /^\d{4}-\d{1,2}-\d{1,2}$/,
+        /^\d{4}\/\d{1,2}\/\d{1,2}$/,
+        /^\d{1,2}\/\d{1,2}\/\d{4}$/,
+        /^\d{1,2}-\d{1,2}-\d{4}$/
+    ];
+    
+    if (datePatterns.some(pattern => pattern.test(sampleValue.trim()))) {
+        return 'date';
+    }
+    
+    // ตรวจสอบว่ามีค่าที่กำหนดหรือไม่
+    const sampleLower = sampleValue.toLowerCase().trim();
+    if (sampleLower === 'ใช่' || sampleLower === 'ไม่' || 
+        sampleLower === 'yes' || sampleLower === 'no' ||
+        sampleLower === 'true' || sampleLower === 'false') {
+        return 'enum';
+    }
+    
+    // ค่าเริ่มต้นเป็นข้อความ
+    return 'text';
+}
     
     function validateCellData(columnName, value, columnType, rowIndex, colIndex) {
         // ใช้ประเภทที่ผู้ใช้เลือกถ้ามี
@@ -5045,85 +5101,86 @@
     // ============================================
     // ตั้งค่า Event Listeners สำหรับฟังก์ชันเพิ่มเติม (Step 4)
     // ============================================
-    function setupEnhancedEventListeners() {
-        // Dashboard buttons
-        refreshDashboard.addEventListener('click', () => {
-            if (filteredData) {
-                runDataValidationFromFilteredData();
-                updateDashboard();
-                updateDataStatus();
-                alert('✅ อัพเดต Dashboard เรียบร้อยแล้ว');
+   // ✅ ตั้งค่า Event Listeners สำหรับฟังก์ชันเพิ่มเติม (Step 4)
+function setupEnhancedEventListeners() {
+    // Dashboard buttons
+    refreshDashboard.addEventListener('click', () => {
+        if (filteredData) {
+            runDataValidationFromFilteredData();
+            updateDashboard();
+            updateDataStatus();
+            alert('✅ อัพเดต Dashboard เรียบร้อยแล้ว');
+        }
+    });
+    
+    fixAllErrors.addEventListener('click', () => {
+        if (filteredData) {
+            if (confirm('AI จะพยายามแก้ไขข้อผิดพลาดทั้งหมดอัตโนมัติ\nยืนยันดำเนินการ?')) {
+                autoFixAllErrorsForFilteredData();
             }
-        });
+        }
+    });
+    
+    // Cell editor modal
+    saveEdit.addEventListener('click', () => {
+        if (filteredData && editingCell) {
+            saveCellEditForFilteredData();
+        }
+    });
+    
+    cancelEdit.addEventListener('click', closeCellEditor);
+    closeModal.addEventListener('click', closeCellEditor);
+    
+    // ปิด modal เมื่อคลิกนอก
+    cellEditorModal.addEventListener('click', (e) => {
+        if (e.target === cellEditorModal) {
+            closeCellEditor();
+        }
+    });
+    
+    // Data Type Configuration
+    showDataTypeConfig.addEventListener('click', showDataTypeConfiguration);
+    
+    autoDetectTypes.addEventListener('click', autoDetectDataTypes);
+    
+    applyDataTypes.addEventListener('click', function() {
+        dataTypeConfigVisible = false;
+        dataTypeConfig.style.display = 'none';
         
-        fixAllErrors.addEventListener('click', () => {
-            if (filteredData) {
-                if (confirm('AI จะพยายามแก้ไขข้อผิดพลาดทั้งหมดอัตโนมัติ\nยืนยันดำเนินการ?')) {
-                    autoFixAllErrorsForFilteredData();
-                }
-            }
-        });
+        // รันการตรวจสอบใหม่ด้วยประเภทข้อมูลที่ตั้งค่า
+        if (filteredData) {
+            runDataValidationFromFilteredData();
+            alert('✅ ใช้การตั้งค่าประเภทข้อมูลเรียบร้อย!');
+        }
+    });
+    
+    // Table actions
+    showAllRows.addEventListener('click', toggleAllRows);
+    
+    exportTable.addEventListener('click', exportTableToCSV);
+    
+    // ปุ่มต่อไปใน Step 4
+    nextToStep5.addEventListener('click', () => {
+        if (currentValidationResults.errorCells > 0) {
+            alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
+            return;
+        }
         
-        // Cell editor modal
-        saveEdit.addEventListener('click', () => {
-            if (filteredData && editingCell) {
-                saveCellEditForFilteredData();
-            }
-        });
+        // ✅ แก้ไข: ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
+        const validPercent = parseInt(correctDataPercent.textContent);
+        if (validPercent !== 100) {
+            alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
+            return;
+        }
         
-        cancelEdit.addEventListener('click', closeCellEditor);
-        closeModal.addEventListener('click', closeCellEditor);
+        const editedCount = countEditedCells();
         
-        // ปิด modal เมื่อคลิกนอก
-        cellEditorModal.addEventListener('click', (e) => {
-            if (e.target === cellEditorModal) {
-                closeCellEditor();
-            }
-        });
+        alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
         
-        // Data Type Configuration
-        showDataTypeConfig.addEventListener('click', showDataTypeConfiguration);
-        
-        autoDetectTypes.addEventListener('click', autoDetectDataTypes);
-        
-        applyDataTypes.addEventListener('click', function() {
-            dataTypeConfigVisible = false;
-            dataTypeConfig.style.display = 'none';
-            
-            // รันการตรวจสอบใหม่ด้วยประเภทข้อมูลที่ตั้งค่า
-            if (filteredData) {
-                runDataValidationFromFilteredData();
-                alert('✅ ใช้การตั้งค่าประเภทข้อมูลเรียบร้อย!');
-            }
-        });
-        
-        // Table actions
-        showAllRows.addEventListener('click', toggleAllRows);
-        
-        exportTable.addEventListener('click', exportTableToCSV);
-        
-        // ปุ่มต่อไปใน Step 4
-        nextToStep5.addEventListener('click', () => {
-            if (currentValidationResults.errorCells > 0) {
-                alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
-                return;
-            }
-            
-            // ✅ แก้ไข: ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
-            const validPercent = parseInt(correctDataPercent.textContent);
-            if (validPercent !== 100) {
-                alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
-                return;
-            }
-            
-            const editedCount = countEditedCells();
-            
-            alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
-            
-            // ไปยังขั้นตอนที่ 5
-            goToStep(5);
-        });
-    }
+        // ไปยังขั้นตอนที่ 5
+        goToStep(5);
+    });
+}
     
     // ฟังก์ชันเพิ่มเติมสำหรับ Step 4
     function showDataTypeConfiguration() {
@@ -5514,171 +5571,179 @@
         closeCellEditor();
     }
     
-    function closeCellEditor() {
-        cellEditorModal.classList.remove('show');
-        editingCell = null;
-        cellValueInput.value = '';
-        valueSuggestions.innerHTML = '';
+  function validateCellData(columnName, value, columnType, rowIndex, colIndex) {
+    // ใช้ประเภทที่ผู้ใช้เลือกถ้ามี
+    const effectiveType = userSelectedDataTypes[columnName] || columnType;
+    
+    const result = {
+        status: 'valid',
+        message: '',
+        suggestions: [],
+        dataType: effectiveType,
+        edited: false
+    };
+    
+    // ตรวจสอบค่าว่าง (ผ่านแล้วในขั้นต้น)
+    if (value === '' || value === null || value === undefined) {
+        return result;
     }
     
-    function autoFixAllErrorsForFilteredData() {
-        if (!filteredData) return;
+    // ✅ แก้ไข: คอลัมน์ "เลขแปลงintech" เป็นค่าเริ่มต้น ไม่ต้องตรวจสอบ
+    if (columnName.toLowerCase().includes('แปลงintech')) {
+        return result;
+    }
+    
+    // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
+    if (columnName.toLowerCase() === 'ชื่อประเภทอ้อย') {
+        // ค่าที่แนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
+        const validTypes = [
+            "ปลายฝนขยาย", "ปลายฝนรื้อตอ", "ตอ1", "ตอ2", "ตอ3", 
+            "ต้นฝนขยาย", "ต้นฝนรื้อตอ", "พื้นที่เสียหาย", ">ตอ3"
+        ];
         
-        let fixedCount = 0;
-        const sampleRows = filteredData.slice(0, currentRowLimit);
+        if (!validTypes.includes(value.trim())) {
+            result.status = 'error';
+            result.message = `ต้องเป็นหนึ่งใน: ${validTypes.join(', ')}`;
+            result.suggestions = validTypes;
+        }
+        return result;
+    }
+    
+    // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
+    if (columnName.toLowerCase() === 'ประเภทอ้อย') {
+        // ค่าที่แนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
+        const validNumbers = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
         
-        sampleRows.forEach((row, rowIndex) => {
-            selectedColumns.forEach((columnName, colIndex) => {
-                const validation = cellValidationStatus[rowIndex] ? cellValidationStatus[rowIndex][colIndex] : null;
+        // ตรวจสอบว่าเป็นตัวเลขหรือไม่
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) {
+            result.status = 'error';
+            result.message = 'ต้องเป็นตัวเลข';
+            result.suggestions = validNumbers;
+        } 
+        // ตรวจสอบว่าตรงกับตัวเลขที่กำหนดหรือไม่
+        else if (!validNumbers.includes(value.trim())) {
+            result.status = 'error';
+            result.message = `ต้องเป็นหนึ่งใน: ${validNumbers.join(', ')}`;
+            result.suggestions = validNumbers;
+        }
+        return result;
+    }
+    
+    // ตรวจสอบตามประเภทข้อมูล
+    switch(effectiveType) {
+        case 'number':
+            if (isNaN(value) || value.trim() === '') {
+                result.status = 'error';
+                result.message = 'ต้องเป็นตัวเลข';
                 
-                if (validation && validation.status === 'error') {
-                    let cellValue = row[columnName] || '';
-                    let fixedValue = cellValue;
-                    const columnNameLower = columnName.toLowerCase();
-                    const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
-                    
-                    // ✅ แก้ไข: AI แก้ไขสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
-                    if (columnNameLower === 'ชื่อประเภทอ้อย') {
-                        const validTypes = [
-                            "ปลายฝนขยาย", "ปลายฝนรื้อตอ", "ตอ1", "ตอ2", "ตอ3", 
-                            "ต้นฝนขยาย", "ต้นฝนรื้อตอ", "พื้นที่เสียหาย", ">ตอ3"
-                        ];
-                        
-                        // พยายามหาค่าที่ใกล้เคียง
-                        let bestMatch = null;
-                        let bestScore = 0;
-                        
-                        validTypes.forEach(validType => {
-                            // คำนวณความคล้ายคลึง
-                            const similarity = calculateSimilarity(cellValue, validType);
-                            if (similarity > bestScore && similarity > 0.3) {
-                                bestScore = similarity;
-                                bestMatch = validType;
-                            }
-                        });
-                        
-                        if (bestMatch) {
-                            fixedValue = bestMatch;
-                        } else {
-                            // ถ้าไม่เจอค่าที่ใกล้เคียง ให้ใช้ค่าแรกในรายการ
-                            fixedValue = validTypes[0];
-                        }
-                    }
-                    // ✅ แก้ไข: AI แก้ไขสำหรับคอลัมน์ "ประเภทอ้อย"
-                    else if (columnNameLower === 'ประเภทอ้อย') {
-                        const validNumbers = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
-                        
-                        // ลองแปลงเป็นตัวเลข
-                        const numValue = parseFloat(cellValue);
-                        if (isNaN(numValue)) {
-                            // ถ้าไม่ใช่ตัวเลข ให้ใช้ค่าแรก
-                            fixedValue = "101";
-                        } else {
-                            // หาค่าที่ใกล้เคียงที่สุด
-                            let closest = validNumbers[0];
-                            let minDiff = Math.abs(numValue - parseInt(closest));
-                            
-                            validNumbers.forEach(num => {
-                                const diff = Math.abs(numValue - parseInt(num));
-                                if (diff < minDiff) {
-                                    minDiff = diff;
-                                    closest = num;
-                                }
-                            });
-                            
-                            fixedValue = closest;
-                        }
-                    }
-                    else if (columnType === 'number' && isNaN(cellValue)) {
-                        // ✅ แก้ไข: คอลัมน์ "ประเภทอ้อย" ใช้ค่า 101-105
-                        if (columnName.toLowerCase().includes('ประเภทอ้อย')) {
-                            fixedValue = '101'; // ค่าเริ่มต้นสำหรับประเภทอ้อย
-                        } else if (columnName.toLowerCase() === 'lat') {
-                            fixedValue = '13.7563'; // ค่า latitude ตัวอย่างสำหรับประเทศไทย
-                        } else if (columnName.toLowerCase() === 'long') {
-                            fixedValue = '100.5018'; // ค่า longitude ตัวอย่างสำหรับประเทศไทย
-                        } else if (columnName.includes('พื้นที่')) {
-                            fixedValue = '10.0';
-                        } else if (columnName.includes('อายุ')) {
-                            fixedValue = '120';
-                        } else if (columnName.includes('โควต้า')) {
-                            fixedValue = '100';
-                        } else {
-                            fixedValue = '0';
-                        }
-                    } else if (columnType === 'date' && !/^\d{4}-\d{1,2}-\d{1,2}$/.test(cellValue)) {
-                        // พยายามแปลงรูปแบบวันที่
-                        const dateMatch = cellValue.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
-                        if (dateMatch) {
-                            const day = dateMatch[1].padStart(2, '0');
-                            const month = dateMatch[2].padStart(2, '0');
-                            const year = dateMatch[3];
-                            fixedValue = `${year}/${month}/${day}`;
-                        } else {
-                            fixedValue = '2023/06/01';
-                        }
-                    }
-                    
-                    // บันทึกค่าที่แก้ไข
-                    if (fixedValue !== cellValue) {
-                        filteredData[rowIndex][columnName] = fixedValue;
-                        fixedCount++;
-                        
-                        // ทำเครื่องหมายว่าแก้ไขแล้ว
-                        if (!cellValidationStatus[rowIndex]) {
-                            cellValidationStatus[rowIndex] = {};
-                        }
-                        cellValidationStatus[rowIndex][colIndex].edited = true;
+                if (columnName.toLowerCase() === 'lat') {
+                    result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
+                } else if (columnName.toLowerCase() === 'long') {
+                    result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
+                } else if (columnName.includes('พื้นที่')) {
+                    result.suggestions = ['10.0', '15.5', '20.0', '25.5'];
+                } else if (columnName.includes('อายุ')) {
+                    result.suggestions = ['120', '150', '180', '210'];
+                } else if (columnName.includes('โควต้า')) {
+                    result.suggestions = ['100', '150', '200', '250'];
+                } else {
+                    result.suggestions = ['0', '10', '50', '100'];
+                }
+            } else {
+                const numValue = parseFloat(value);
+                
+                // ตรวจสอบพิกัด latitude (lat)
+                if (columnName.toLowerCase() === 'lat') {
+                    if (numValue < -90 || numValue > 90) {
+                        result.status = 'error';
+                        result.message = 'latitude ต้องอยู่ระหว่าง -90 ถึง 90';
+                        result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
+                    } else if (Math.abs(numValue) < 1 || Math.abs(numValue) > 99) {
+                        result.status = 'warning';
+                        result.message = 'latitude มักเป็นเลขหลักสิบ (13-17 สำหรับประเทศไทย)';
+                        result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
                     }
                 }
-            });
-        });
-        
-        // อัพเดตการตรวจสอบใหม่
-        runDataValidationFromFilteredData();
-        renderDataTableFromFilteredData();
-        updateDashboard();
-        updateDataStatus();
-        
-        alert(`AI ได้แก้ไขข้อผิดพลาด ${fixedCount} รายการ`);
-    }
-    
-    // ฟังก์ชันช่วยคำนวณความคล้ายคลึง
-    function calculateSimilarity(str1, str2) {
-        const longer = str1.length > str2.length ? str1 : str2;
-        const shorter = str1.length > str2.length ? str2 : str1;
-        
-        if (longer.length === 0) return 1.0;
-        
-        return (longer.length - editDistance(longer, shorter)) / parseFloat(longer.length);
-    }
-    
-    // ฟังก์ชันคำนวณระยะห่างระหว่างข้อความ
-    function editDistance(s1, s2) {
-        s1 = s1.toLowerCase();
-        s2 = s2.toLowerCase();
-        
-        const costs = [];
-        for (let i = 0; i <= s1.length; i++) {
-            let lastValue = i;
-            for (let j = 0; j <= s2.length; j++) {
-                if (i === 0) {
-                    costs[j] = j;
-                } else {
-                    if (j > 0) {
-                        let newValue = costs[j - 1];
-                        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
-                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                        }
-                        costs[j - 1] = lastValue;
-                        lastValue = newValue;
+                
+                // ตรวจสอบพิกัด longitude (long)
+                if (columnName.toLowerCase() === 'long') {
+                    if (numValue < -180 || numValue > 180) {
+                        result.status = 'error';
+                        result.message = 'longitude ต้องอยู่ระหว่าง -180 ถึง 180';
+                        result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
+                    } else if (Math.abs(numValue) < 90 || Math.abs(numValue) > 110) {
+                        result.status = 'warning';
+                        result.message = 'longitude มักเป็นเลขหลักร้อย (100-104 สำหรับประเทศไทย)';
+                        result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
                     }
+                }
+                
+                // ตรวจสอบค่าติดลบสำหรับบางคอลัมน์
+                if ((columnName.includes('พื้นที่') || columnName.includes('อายุ') || 
+                     columnName.includes('จำนวน') || columnName.includes('โควต้า')) && numValue < 0) {
+                    result.status = 'error';
+                    result.message = 'ค่าต้องมากกว่าหรือเท่ากับ 0';
+                    result.suggestions = ['0', '1', '10'];
                 }
             }
-            if (i > 0) costs[s2.length] = lastValue;
-        }
-        return costs[s2.length];
+            break;
+            
+        case 'date':
+            // ตรวจสอบรูปแบบวันที่ (รองรับ YYYY/MM/DD และ YYYY/M/D)
+            const datePatterns = [
+                /^\d{4}-\d{1,2}-\d{1,2}$/,          // YYYY-MM-DD
+                /^\d{4}\/\d{1,2}\/\d{1,2}$/,       // YYYY/MM/DD หรือ YYYY/M/D
+                /^\d{1,2}\/\d{1,2}\/\d{4}$/,       // DD/MM/YYYY หรือ D/M/YYYY
+                /^\d{1,2}-\d{1,2}-\d{4}$/          // DD-MM-YYYY หรือ D-M-YYYY
+            ];
+            
+            const isValidDate = datePatterns.some(pattern => pattern.test(value.trim()));
+            if (!isValidDate) {
+                result.status = 'error';
+                result.message = 'รูปแบบวันที่ไม่ถูกต้อง (รองรับ: YYYY/MM/DD, YYYY/M/D, DD/MM/YYYY)';
+                result.suggestions = ['2023/01/01', '2023/6/15', '2023/12/31'];
+            }
+            break;
+            
+        case 'enum':
+            if (columnName.toLowerCase().includes('ใช่/ไม่') || columnName.toLowerCase().includes('yes/no')) {
+                const validValues = ['ใช่', 'ไม่', 'yes', 'no', 'true', 'false'];
+                if (!validValues.includes(value.toLowerCase())) {
+                    result.status = 'error';
+                    result.message = 'ต้องเป็น "ใช่" หรือ "ไม่"';
+                    result.suggestions = ['ใช่', 'ไม่'];
+                }
+            }
+            break;
+            
+        case 'identifier':
+            if (value.length > 50) {
+                result.status = 'warning';
+                result.message = 'รหัสยาวเกินไป';
+            }
+            break;
+            
+        case 'text':
+            // ✅ แก้ไข: คอลัมน์ "ความเสี่ยงพื้นที่" และ "ความลาดเอียงของพื้นที่" เป็นข้อความ ไม่ต้องตรวจสอบเพิ่มเติม
+            if (columnName.toLowerCase().includes('ความเสี่ยงพื้นที่') || 
+                columnName.toLowerCase().includes('ความลาดเอียง')) {
+                // ไม่ต้องตรวจสอบเพิ่มเติม
+            } else if (columnName.toLowerCase().includes('แปลงintech')) {
+                // ตรวจสอบรูปแบบเลขแปลงintech
+                if (!/^\d+$/.test(value) && value.trim() !== '') {
+                    result.status = 'warning';
+                    result.message = 'เลขแปลงintech ควรเป็นตัวเลข';
+                }
+            } else if (value.length < 1 && value.trim() !== '') {
+                result.status = 'warning';
+                result.message = 'ข้อความสั้นเกินไป';
+            }
+            break;
     }
+    
+    return result;
+}
     
     // ============================================
     // ระบบตรวจสอบเงื่อนไข (Step 5)
@@ -6454,99 +6519,99 @@
     }
     
     function performSugarcaneConditionCheck() {
-        if (!checkingTableData || checkingTableData.length === 0) {
-            return {
-                totalRows: 0,
-                passed: 0,
-                failed: 0,
-                warnings: 0,
-                details: []
-            };
-        }
-        
-        const results = {
-            totalRows: checkingTableData.length,
+    if (!checkingTableData || checkingTableData.length === 0) {
+        return {
+            totalRows: 0,
             passed: 0,
             failed: 0,
             warnings: 0,
             details: []
         };
-        
-        // ค้นหาคอลัมน์ที่จำเป็น
-        const sugarcaneTypeCol = findColumnByName(selectedColumns, ['ชื่อประเภทอ้อย', 'ประเภทอ้อย', 'sugarcane']);
-        const plantingDateCol = findColumnByName(selectedColumns, ['วันที่ปลูก', 'planting', 'date']);
-        const ageCol = findColumnByName(selectedColumns, ['อายุ', 'age']);
-        
-        checkingTableData.forEach((row, index) => {
-            const issues = [];
-            const warnings = [];
-            
-            // ตรวจสอบคอลัมน์ "ชื่อประเภทอ้อย"
-            if (sugarcaneTypeCol) {
-                const sugarcaneType = row[sugarcaneTypeCol] || '';
-                const trimmedType = sugarcaneType.trim();
-                
-                if (!sugarcaneType || trimmedType === '') {
-                    issues.push('❌ ไม่มีข้อมูล "ชื่อประเภทอ้อย"');
-                } else if (!sugarcaneTypes.includes(trimmedType)) {
-                    issues.push(`❌ "ชื่อประเภทอ้อย" ไม่ถูกต้อง: "${sugarcaneType}" (ควรเป็น: ${sugarcaneTypes.join(', ')})`);
-                }
-            } else {
-                issues.push('❌ ไม่พบคอลัมน์ "ชื่อประเภทอ้อย" ในข้อมูล');
-            }
-            
-            // ตรวจสอบคอลัมน์ "วันที่ปลูก"
-            if (plantingDateCol) {
-                const plantingDate = row[plantingDateCol] || '';
-                
-                if (!plantingDate || plantingDate.trim() === '') {
-                    warnings.push('⚠️ ไม่มีข้อมูล "วันที่ปลูก"');
-                } else {
-                    const dateObj = parseDateString(plantingDate);
-                    if (!dateObj) {
-                        issues.push(`❌ "วันที่ปลูก" รูปแบบไม่ถูกต้อง: "${plantingDate}" (ควรเป็น YYYY/MM/DD หรือ DD/MM/YYYY)`);
-                    }
-                }
-            } else {
-                warnings.push('⚠️ ไม่พบคอลัมน์ "วันที่ปลูก" ในข้อมูล');
-            }
-            
-            // ตรวจสอบคอลัมน์ "อายุ" (ถ้ามี)
-            if (ageCol) {
-                const age = row[ageCol] || '';
-                if (age && age.trim() !== '') {
-                    const ageNum = parseInt(age);
-                    if (isNaN(ageNum)) {
-                        issues.push(`❌ "อายุ" ต้องเป็นตัวเลข: "${age}"`);
-                    } else if (ageNum < 0 || ageNum > 365) {
-                        warnings.push(`⚠️ "อายุ" นอกเหนือช่วงปกติ: ${ageNum} วัน`);
-                    }
-                }
-            }
-            
-            // บันทึกผลลัพธ์สำหรับแถวนี้
-            const rowResult = {
-                rowIndex: index,
-                hasErrors: issues.length > 0,
-                hasWarnings: warnings.length > 0,
-                issues: issues,
-                warnings: warnings,
-                status: issues.length > 0 ? 'error' : (warnings.length > 0 ? 'warning' : 'valid')
-            };
-            
-            results.details.push(rowResult);
-            
-            if (rowResult.status === 'valid') {
-                results.passed++;
-            } else if (rowResult.status === 'error') {
-                results.failed++;
-            } else if (rowResult.status === 'warning') {
-                results.warnings++;
-            }
-        });
-        
-        return results;
     }
+    
+    const results = {
+        totalRows: checkingTableData.length,
+        passed: 0,
+        failed: 0,
+        warnings: 0,
+        details: []
+    };
+    
+    // ค้นหาคอลัมน์ที่จำเป็น
+    const sugarcaneTypeCol = findColumnByName(selectedColumns, ['ชื่อประเภทอ้อย', 'ประเภทอ้อย', 'sugarcane']);
+    const plantingDateCol = findColumnByName(selectedColumns, ['วันที่ปลูก', 'planting', 'date']);
+    const ageCol = findColumnByName(selectedColumns, ['อายุ', 'age']);
+    
+    checkingTableData.forEach((row, index) => {
+        const issues = [];
+        const warnings = [];
+        
+        // ตรวจสอบคอลัมน์ "ชื่อประเภทอ้อย"
+        if (sugarcaneTypeCol) {
+            const sugarcaneType = row[sugarcaneTypeCol] || '';
+            const trimmedType = sugarcaneType.trim();
+            
+            if (!sugarcaneType || trimmedType === '') {
+                issues.push('❌ ไม่มีข้อมูล "ชื่อประเภทอ้อย"');
+            } else if (!sugarcaneTypes.includes(trimmedType)) {
+                issues.push(`❌ "ชื่อประเภทอ้อย" ไม่ถูกต้อง: "${sugarcaneType}" (ควรเป็น: ${sugarcaneTypes.join(', ')})`);
+            }
+        } else {
+            issues.push('❌ ไม่พบคอลัมน์ "ชื่อประเภทอ้อย" ในข้อมูล');
+        }
+        
+        // ตรวจสอบคอลัมน์ "วันที่ปลูก"
+        if (plantingDateCol) {
+            const plantingDate = row[plantingDateCol] || '';
+            
+            if (!plantingDate || plantingDate.trim() === '') {
+                warnings.push('⚠️ ไม่มีข้อมูล "วันที่ปลูก"');
+            } else {
+                const dateObj = parseDateString(plantingDate);
+                if (!dateObj) {
+                    issues.push(`❌ "วันที่ปลูก" รูปแบบไม่ถูกต้อง: "${plantingDate}" (ควรเป็น YYYY/MM/DD หรือ DD/MM/YYYY)`);
+                }
+            }
+        } else {
+            warnings.push('⚠️ ไม่พบคอลัมน์ "วันที่ปลูก" ในข้อมูล');
+        }
+        
+        // ตรวจสอบคอลัมน์ "อายุ" (ถ้ามี)
+        if (ageCol) {
+            const age = row[ageCol] || '';
+            if (age && age.trim() !== '') {
+                const ageNum = parseInt(age);
+                if (isNaN(ageNum)) {
+                    issues.push(`❌ "อายุ" ต้องเป็นตัวเลข: "${age}"`);
+                } else if (ageNum < 0 || ageNum > 365) {
+                    warnings.push(`⚠️ "อายุ" นอกเหนือช่วงปกติ: ${ageNum} วัน`);
+                }
+            }
+        }
+        
+        // บันทึกผลลัพธ์สำหรับแถวนี้
+        const rowResult = {
+            rowIndex: index,
+            hasErrors: issues.length > 0,
+            hasWarnings: warnings.length > 0,
+            issues: issues,
+            warnings: warnings,
+            status: issues.length > 0 ? 'error' : (warnings.length > 0 ? 'warning' : 'valid')
+        };
+        
+        results.details.push(rowResult);
+        
+        if (rowResult.status === 'valid') {
+            results.passed++;
+        } else if (rowResult.status === 'error') {
+            results.failed++;
+        } else if (rowResult.status === 'warning') {
+            results.warnings++;
+        }
+    });
+    
+    return results;
+}
     
     function performFertilizerConditionCheck() {
         // ฟังก์ชันตรวจสอบเงื่อนไขปุ๋ย (ตัวอย่าง)
