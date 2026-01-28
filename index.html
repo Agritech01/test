@@ -2620,3 +2620,1578 @@
             <p>© 2024 ระบบ Clean Data สำหรับข้อมูลอ้อย - ตรวจสอบประเภทข้อมูลและเงื่อนไขครบวงจร</p>
         </footer>
     </div>
+<script>
+    // ข้อมูลสำหรับการตรวจสอบ - แก้ไขตามเงื่อนไขใหม่
+    const sugarcaneTypes = [
+        "ปลายฝนขยาย", 
+        "ปลายฝนรื้อตอ", 
+        "ตอ1", 
+        "ตอ2", 
+        "ตอ3", 
+        "ต้นฝนขยาย", 
+        "ต้นฝนรื้อตอ", 
+        "พื้นที่เสียหาย", 
+        ">ตอ3"
+    ];
+    
+    // ✅ เพิ่มข้อมูลสำหรับคอลัมน์ "ประเภทอ้อย" (ตัวเลข)
+    const sugarcaneNumbers = ["101", "102", "103", "104", "105", "106", "107", "108", "1050"];
+    
+    const fertilizerTypes = ["ปุ๋ยเคมี", "ปุ๋ยอินทรีย์", "ปุ๋ยชีวภาพ", "ปุ๋ยหมัก", "ปุ๋ยคอก"];
+
+    // ✅ เพิ่ม: ประเภทการใส่ปุ๋ยตามเงื่อนไขใหม่
+    const fertilizerConditions = {
+        // อ้อยปลูกใหม่
+        "ปลายฝนขยาย": {
+            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+        },
+        "ปลายฝนรื้อตอ": {
+            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+        },
+        "ต้นฝนขยาย": {
+            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+        },
+        "ต้นฝนรื้อตอ": {
+            period1: { minAge: 1, maxAge: 60, expected: "รองพื้น", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 3" }
+        },
+        // อ้อยตอ
+        "ตอ1": {
+            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+        },
+        "ตอ2": {
+            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+        },
+        "ตอ3": {
+            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+        },
+        ">ตอ3": {
+            period1: { minAge: 1, maxAge: 60, expected: "แต่งหน้าครั้งที่1", periodName: "งวด 1" },
+            period2: { minAge: 61, maxAge: 120, expected: "แต่งหน้าครั้งที่2", periodName: "งวด 2" },
+            period3: { minAge: 121, maxAge: 180, expected: "แต่งหน้าครั้งที่3", periodName: "งวด 3" }
+        }
+    };
+
+    // ✅ เพิ่ม: ฟังก์ชันตรวจสอบว่าประเภทอ้อยอยู่ในกลุ่มใด
+    function getSugarcaneGroup(sugarcaneType) {
+        const newPlantingTypes = ["ปลายฝนขยาย", "ปลายฝนรื้อตอ", "ต้นฝนขยาย", "ต้นฝนรื้อตอ"];
+        const ratoonTypes = ["ตอ1", "ตอ2", "ตอ3", ">ตอ3"];
+        
+        const normalizedType = sugarcaneType.trim();
+        
+        if (newPlantingTypes.includes(normalizedType)) {
+            return "new";
+        } else if (ratoonTypes.includes(normalizedType)) {
+            return "ratoon";
+        } else {
+            return "unknown";
+        }
+    }
+
+    // ✅ เพิ่ม: ฟังก์ชันตรวจสอบว่าอายุอยู่ในช่วงที่กำหนดหรือไม่
+    function checkAgeRange(age, minAge, maxAge) {
+        if (!age || age.trim() === "") return false;
+        
+        const ageNum = parseInt(age);
+        if (isNaN(ageNum)) return false;
+        
+        return ageNum >= minAge && ageNum <= maxAge;
+    }
+    
+    // ประเภทข้อมูลที่รองรับ
+    const dataTypes = ["text", "number", "date", "enum", "identifier"];
+    const dataTypeDisplayNames = {
+        "text": "Text (ข้อความ)",
+        "number": "Number (ตัวเลข)", 
+        "date": "Date (วันที่)",
+        "enum": "Enum (ค่าเฉพาะ)",
+        "identifier": "Identifier (ตัวระบุ)"
+    };
+    
+    // คอลัมน์ที่ต้องการเลือกอัตโนมัติสำหรับขั้นตอนที่ 6
+    const autoExportColumns = [
+        "โซน", "รหัสนักเกษตร", "ชื่อนักเกษตร", "ชื่อประเภทอ้อย", 
+        "พื้นที่", "เลขโควต้า", "ชื่อชาวไร่", "เลขแปลงintech"
+    ];
+    
+    // ตัวแปรเก็บข้อมูล
+    let uploadedData = null;
+    let filteredData = null; // ข้อมูลหลังการกรอง
+    let allColumns = [];
+    let selectedColumns = [];
+    let exportColumns = []; // สำหรับขั้นตอนที่ 6
+    let dataTypeConfigurations = {};
+    let currentStep = 1;
+    let currentFilter = "all";
+    let currentColumnFilter = "all";
+    let currentSort = { column: "column", direction: "asc" };
+    let editedCells = {}; // เก็บข้อมูลเซลล์ที่แก้ไข
+    
+    // สำหรับ Dashboard และ Data Table
+    let currentValidationResults = {};
+    let cellValidationStatus = {};
+    let editingCell = null;
+    let totalCells = 0;
+    
+    // ตัวแปรเพิ่มเติมสำหรับฟังก์ชันใหม่
+    let userSelectedDataTypes = {};
+    let isShowingAllRows = false;
+    let currentRowLimit = 50;
+    let dataTypeConfigVisible = false;
+    
+    // ตัวแปรสำหรับระบบตรวจสอบเงื่อนไข
+    let currentCondition = "sugarcane";
+    let conditionResults = {};
+    let checkingTableData = [];
+    let showOnlyFailed = false;
+    
+    // ตัวแปรสำหรับระบบกรองข้อมูล
+    let filterResults = {};
+    let allFilterStepsResults = {};
+    
+    // อ้างอิงองค์ประกอบ DOM
+    const csvFileInput = document.getElementById('csvFileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const browseBtn = document.getElementById('browseBtn');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const fileRows = document.getElementById('fileRows');
+    const fileCols = document.getElementById('fileCols');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    
+    // Step navigation
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const step4 = document.getElementById('step4');
+    const step5 = document.getElementById('step5');
+    const step6 = document.getElementById('step6');
+    
+    // Panels
+    const panel1 = document.getElementById('panel1');
+    const panel2 = document.getElementById('panel2');
+    const panel3 = document.getElementById('panel3');
+    const panel4 = document.getElementById('panel4');
+    const panel5 = document.getElementById('panel5');
+    const panel6 = document.getElementById('panel6');
+    
+    // Navigation buttons
+    const nextToStep2 = document.getElementById('nextToStep2');
+    const nextToStep3 = document.getElementById('nextToStep3');
+    const nextToStep4 = document.getElementById('nextToStep4');
+    const nextToStep5 = document.getElementById('nextToStep5');
+    const nextToStep6 = document.getElementById('nextToStep6');
+    const backToStep1 = document.getElementById('backToStep1');
+    const backToStep2 = document.getElementById('backToStep2');
+    const backToStep3 = document.getElementById('backToStep3');
+    const backToStep4 = document.getElementById('backToStep4');
+    const backToStep5 = document.getElementById('backToStep5');
+    const downloadCleanData = document.getElementById('downloadCleanData');
+    
+    // Step 2: Filtering elements
+    const runAllFilters = document.getElementById('runAllFilters');
+    const exportFilteredData = document.getElementById('exportFilteredData');
+    const filterSpinner = document.getElementById('filterSpinner');
+    const filteringSteps = document.getElementById('filteringSteps');
+    const totalRowsBeforeFilter = document.getElementById('totalRowsBeforeFilter');
+    const totalRowsAfterFilter = document.getElementById('totalRowsAfterFilter');
+    const totalRemovedRows = document.getElementById('totalRemovedRows');
+    const removedPercentageFilter = document.getElementById('removedPercentageFilter');
+    
+    // Column selection elements
+    const totalColumns = document.getElementById('totalColumns');
+    const filteredCount = document.getElementById('filteredCount');
+    const selectedCount = document.getElementById('selectedCount');
+    const selectedSummaryCount = document.getElementById('selectedSummaryCount');
+    const selectedColumnsList = document.getElementById('selectedColumnsList');
+    const columnSearch = document.getElementById('columnSearch');
+    const columnsGrid = document.getElementById('columnsGrid');
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    const columnFilterButtons = document.querySelectorAll('#panel3 .selection-btn');
+    
+    // Dashboard elements
+    const dashboardSummary = document.getElementById('dashboardSummary');
+    const correctDataPercent = document.getElementById('correctDataPercent');
+    const needReviewCount = document.getElementById('needReviewCount');
+    const errorDataCount = document.getElementById('errorDataCount');
+    const editedCellsCount = document.getElementById('editedCellsCount');
+    const correctDataBar = document.getElementById('correctDataBar');
+    const needReviewBar = document.getElementById('needReviewBar');
+    const errorDataBar = document.getElementById('errorDataBar');
+    const editedCellsBar = document.getElementById('editedCellsBar');
+    const refreshDashboard = document.getElementById('refreshDashboard');
+    const fixAllErrors = document.getElementById('fixAllErrors');
+    const showReviewBtn = document.getElementById('showReviewBtn');
+    
+    // Data Table elements
+    const dataTableHeader = document.getElementById('dataTableHeader');
+    const dataTableBody = document.getElementById('dataTableBody');
+    const cellEditorModal = document.getElementById('cellEditorModal');
+    const editColumnName = document.getElementById('editColumnName');
+    const editRowNumber = document.getElementById('editRowNumber');
+    const editDataType = document.getElementById('editDataType');
+    const editIssue = document.getElementById('editIssue');
+    const cellValueInput = document.getElementById('cellValueInput');
+    const valueSuggestions = document.getElementById('valueSuggestions');
+    const saveEdit = document.getElementById('saveEdit');
+    const cancelEdit = document.getElementById('cancelEdit');
+    const closeModal = document.querySelector('.close-modal');
+    const dataStatus = document.getElementById('dataStatus');
+    const showAllRows = document.getElementById('toggleAllRows');
+    const exportTable = document.getElementById('exportTable');
+    const currentRows = document.getElementById('currentRows');
+    const totalRows = document.getElementById('totalRows');
+    const currentColumns = document.getElementById('currentColumns');
+    const totalRowCount = document.getElementById('totalRowCount');
+    
+    // Data Type Configuration elements
+    const dataTypeConfig = document.getElementById('dataTypeConfig');
+    const dataTypeTableBody = document.getElementById('dataTypeTableBody');
+    const autoDetectTypes = document.getElementById('autoDetectTypes');
+    const applyDataTypes = document.getElementById('applyDataTypes');
+    const showDataTypeConfig = document.getElementById('showDataTypeConfig');
+    const editDataTypeSelect = document.getElementById('editDataTypeSelect');
+    
+    // Step 5 elements
+    const runSelectedCheck = document.getElementById('runSelectedCheck');
+    const runAllChecks = document.getElementById('runAllChecks');
+    const exportCheckResults = document.getElementById('exportCheckResults');
+    const checkingRowsCount = document.getElementById('checkingRowsCount');
+    const checkingTableHeader = document.getElementById('checkingTableHeader');
+    const foundIssues = document.getElementById('foundIssues');
+    const passedChecks = document.getElementById('passedChecks');
+    const failedChecks = document.getElementById('failedChecks');
+    
+    // Step 6 elements
+    const exportColumnsGrid = document.getElementById('exportColumnsGrid');
+    const exportSelectedCount = document.getElementById('exportSelectedCount');
+    const exportColumnsList = document.getElementById('exportColumnsList');
+    const exportSelectAllBtn = document.getElementById('exportSelectAllBtn');
+    const exportDeselectAllBtn = document.getElementById('exportDeselectAllBtn');
+    
+    // ============================================
+    // ฟังก์ชันจัดการขั้นตอน
+    // ============================================
+    function goToStep(stepNumber) {
+        // อัพเดตขั้นตอนปัจจุบัน
+        currentStep = stepNumber;
+        
+        // อัพเดต navigation steps
+        [step1, step2, step3, step4, step5, step6].forEach((step, index) => {
+            step.classList.remove('active', 'completed');
+            if (index + 1 < stepNumber) {
+                step.classList.add('completed');
+            } else if (index + 1 === stepNumber) {
+                step.classList.add('active');
+            }
+        });
+        
+        // อัพเดต panels
+        [panel1, panel2, panel3, panel4, panel5, panel6].forEach((panel, index) => {
+            panel.classList.remove('active');
+            if (index + 1 === stepNumber) {
+                panel.classList.add('active');
+            }
+        });
+        
+        // แสดงหรือซ่อน Dashboard
+        if (stepNumber === 4) {
+            dashboardSummary.style.display = 'block';
+            initDataValidationSystem();
+        } else {
+            dashboardSummary.style.display = 'none';
+        }
+        
+        // เรียกใช้งานระบบตรวจสอบเงื่อนไขถ้าไปที่ขั้นตอนที่ 5
+        if (stepNumber === 5) {
+            setTimeout(initConditionChecking, 100);
+        }
+        
+        // เรียกใช้งานระบบเลือกคอลัมน์สำหรับส่งออกถ้าไปที่ขั้นตอนที่ 6
+        if (stepNumber === 6) {
+            setTimeout(initExportColumnSelection, 100);
+        }
+    }
+    
+    // ============================================
+    // ขั้นตอนที่ 1: อัปโหลดไฟล์ CSV
+    // ============================================
+    // ✅ แก้ไข: ฟังก์ชันอัปโหลดไฟล์ที่ทำงานได้
+    function openFileDialog() {
+        console.log('เปิดหน้าต่างเลือกไฟล์...');
+        csvFileInput.click();
+    }
+    
+    // ✅ ปุ่ม "เลือกไฟล์ CSV" - ใช้ onclick แบบตรง
+    browseBtn.onclick = function() {
+        console.log('คลิกปุ่ม Browse');
+        openFileDialog();
+    };
+    
+    // ✅ พื้นที่อัปโหลด - ใช้ onclick แบบตรง
+    uploadArea.onclick = function(event) {
+        // ตรวจสอบว่าไม่ได้คลิกที่ปุ่ม
+        if (event.target !== browseBtn && !browseBtn.contains(event.target)) {
+            console.log('คลิกพื้นที่อัปโหลด');
+            openFileDialog();
+        }
+    };
+    
+    // ✅ แก้ไข: เพิ่ม event listener สำหรับ drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--primary-color)';
+        uploadArea.style.backgroundColor = 'rgba(76, 201, 240, 0.1)';
+    });
+    
+    uploadArea.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--accent-color)';
+        uploadArea.style.backgroundColor = 'rgba(76, 201, 240, 0.05)';
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--accent-color)';
+        uploadArea.style.backgroundColor = 'rgba(76, 201, 240, 0.05)';
+        
+        if (e.dataTransfer.files.length) {
+            csvFileInput.files = e.dataTransfer.files;
+            handleFileUpload(csvFileInput.files[0]);
+        }
+    });
+    
+    csvFileInput.addEventListener('change', function(e) {
+        if (this.files.length === 0) return;
+        handleFileUpload(this.files[0]);
+    });
+    
+    function handleFileUpload(file) {
+        if (!file) return;
+        
+        // ตรวจสอบขนาดไฟล์ (500MB = 500 * 1024 * 1024 bytes)
+        const maxSize = 500 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('ไฟล์มีขนาดใหญ่เกินไป กรุณาเลือกไฟล์ขนาดไม่เกิน 500MB');
+            csvFileInput.value = '';
+            return;
+        }
+        
+        // แสดงข้อมูลไฟล์
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        
+        // แสดง loading spinner
+        loadingSpinner.style.display = 'block';
+        
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const csvText = event.target.result;
+                processCSVData(csvText, file.name);
+            } catch (error) {
+                alert('เกิดข้อผิดพลาดในการอ่านไฟล์: ' + error.message);
+                loadingSpinner.style.display = 'none';
+            }
+        };
+        
+        reader.onerror = function() {
+            alert('เกิดข้อผิดพลาดในการอ่านไฟล์');
+            loadingSpinner.style.display = 'none';
+        };
+        
+        reader.readAsText(file, 'UTF-8');
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+                // ตรวจสอบว่าเป็น escaped quote หรือไม่
+                if (i + 1 < line.length && line[i + 1] === '"') {
+                    current += '"';
+                    i++; // ข้าม quote ถัดไป
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (char === ',' && !inQuotes) {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        result.push(current);
+        return result;
+    }
+    
+    // ============================================
+    // ขั้นตอนที่ 2: ระบบกรองข้อมูล (9 ขั้นตอน)
+    // ============================================
+    nextToStep2.addEventListener('click', function() {
+        if (!uploadedData) {
+            alert('กรุณาอัปโหลดไฟล์ก่อน');
+            return;
+        }
+        
+        // เตรียมระบบกรองข้อมูล
+        prepareFilteringSystem();
+        
+        // ไปยังขั้นตอนที่ 2
+        goToStep(2);
+    });
+    
+    function prepareFilteringSystem() {
+        // สร้างโครงสร้างขั้นตอนการกรอง
+        const filterSteps = [
+            { 
+                id: 1, 
+                title: "กรองเลขโควต้า", 
+                description: "ตัดแถวที่มีค่า '59008956' หรือ '40000542' ในคอลัมน์ 'เลขโควต้า'",
+                icon: "filter",
+                color: "danger"
+            },
+            { 
+                id: 2, 
+                title: "กรองชื่อประเภทอ้อย", 
+                description: "ตัดแถวที่มีค่า 'พื้นที่เสียหาย' ในคอลัมน์ 'ชื่อประเภทอ้อย'",
+                icon: "filter",
+                color: "info"
+            },
+            { 
+                id: 3, 
+                title: "กรองประเภทแปลง", 
+                description: "ตัดแถวที่มีค่า 'แปลงดัมมี่' ในคอลัมน์ 'ประเภทแปลง'",
+                icon: "filter",
+                color: "purple"
+            },
+            { 
+                id: 4, 
+                title: "แก้ไขโซน", 
+                description: "แก้ไข 'C1/1' → 'C1' และ 'C4/1' → 'C4' ในคอลัมน์ 'โซน'",
+                icon: "edit",
+                color: "teal"
+            },
+            { 
+                id: 5, 
+                title: "กรองสาเหตุเสียหาย", 
+                description: "ล้างข้อมูลในคอลัมน์ 'พื้นที่เสียหาย' และ 'สาเหตุเสียหาย' เมื่อมีค่า '-', ตัวเลขทั้งหมด, หรือค่าว่าง",
+                icon: "filter",
+                color: "blue"
+            },
+            { 
+                id: 6, 
+                title: "แก้ไขรหัสนักเกษตร", 
+                description: "แก้ไข '2' → '002', '3' → '003', '4' → '004', '8' → '008', '9' → '009' ในคอลัมน์ 'รหัสนักเกษตร'",
+                icon: "id-card",
+                color: "warning"
+            },
+            { 
+                id: 7, 
+                title: "แปลงพื้นที่เสียหาย", 
+                description: "เรียงข้อมูลจาก Z-A และแปลงเป็นตัวเลขทศนิยม 2 ตำแหน่งในคอลัมน์ 'พื้นที่เสียหาย'",
+                icon: "sort-amount-down",
+                color: "teal"
+            },
+            { 
+                id: 8, 
+                title: "แปลงและคำนวณพื้นที่", 
+                description: "แปลงเป็นทศนิยม 2 ตำแหน่ง, คำนวณ พื้นที่ - พื้นที่เสียหาย, ตัดแถวที่พื้นที่ ≤ 0",
+                icon: "calculator",
+                color: "teal"
+            },
+            { 
+                id: 9, 
+                title: "กรองเลขแปลงintech", 
+                description: "ตัดแถวที่มีค่า '' หรือช่องว่างในคอลัมน์ 'เลขแปลงintech'",
+                icon: "filter",
+                color: "orange"
+            }
+        ];
+        
+        // สร้าง UI สำหรับขั้นตอนการกรอง
+        filteringSteps.innerHTML = '';
+        filterSteps.forEach(step => {
+            const stepCard = document.createElement('div');
+            stepCard.className = 'filter-step-card';
+            stepCard.id = `filter-step-${step.id}`;
+            stepCard.innerHTML = `
+                <div class="filter-step-header">
+                    <div class="filter-step-icon">${step.id}</div>
+                    <div>
+                        <div class="filter-step-title">${step.title}</div>
+                        <div class="filter-step-description">${step.description}</div>
+                    </div>
+                </div>
+                <div class="filter-step-results">
+                    <div id="filter-step-${step.id}-status" style="text-align: center; padding: 10px;">
+                        <i class="fas fa-clock"></i> รอการดำเนินการ
+                    </div>
+                    <div class="filter-results-grid" id="filter-step-${step.id}-results" style="display: none;"></div>
+                </div>
+            `;
+            filteringSteps.appendChild(stepCard);
+        });
+        
+        // อัพเดตสรุปผลลัพธ์
+        updateFilterSummary();
+        
+        // ตั้งค่า event listeners
+        runAllFilters.addEventListener('click', runAllFilterSteps);
+        exportFilteredData.addEventListener('click', exportFilteredDataToCSV);
+    }
+    
+    function runAllFilterSteps() {
+        if (!uploadedData) return;
+        
+        // รีเซ็ตข้อมูลกรอง
+        filteredData = [...uploadedData.data];
+        allFilterStepsResults = {};
+        
+        // แสดง spinner
+        filterSpinner.style.display = 'block';
+        runAllFilters.disabled = true;
+        
+        // อัพเดตสรุปเริ่มต้น
+        totalRowsBeforeFilter.textContent = uploadedData.data.length.toLocaleString();
+        totalRowsAfterFilter.textContent = filteredData.length.toLocaleString();
+        totalRemovedRows.textContent = '0';
+        removedPercentageFilter.textContent = '0%';
+        
+        // ดำเนินการกรองทีละขั้นตอน
+        const filterSteps = [
+            filterQuotaData,
+            filterSugarcaneTypeData,
+            filterSugarcaneCategoryData,
+            filterZoneData,
+            filterDamageCauseData,
+            filterFarmerCodeData,
+            processDamageAreaData,
+            processAreaData,
+            filterIntechPlotData
+        ];
+        
+        let currentStepIndex = 0;
+        
+        function processNextStep() {
+            if (currentStepIndex >= filterSteps.length) {
+                // กรองเสร็จสิ้น
+                filterSpinner.style.display = 'none';
+                runAllFilters.disabled = false;
+                exportFilteredData.disabled = false;
+                nextToStep3.disabled = false;
+                
+                // อัพเดตสรุปผล
+                updateFilterSummary();
+                
+                alert(`✅ กรองข้อมูลเสร็จสมบูรณ์!\n\nแถวทั้งหมดก่อนกรอง: ${uploadedData.data.length}\nแถวที่เหลือหลังกรอง: ${filteredData.length}\nแถวที่ถูกตัดออก: ${uploadedData.data.length - filteredData.length}`);
+                return;
+            }
+            
+            const stepFunction = filterSteps[currentStepIndex];
+            const stepId = currentStepIndex + 1;
+            const stepCard = document.getElementById(`filter-step-${stepId}`);
+            const stepStatus = document.getElementById(`filter-step-${stepId}-status`);
+            const stepResults = document.getElementById(`filter-step-${stepId}-results`);
+            
+            // อัพเดตสถานะ
+            stepStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล...';
+            
+            // ดำเนินการกรอง
+            setTimeout(() => {
+                const stepResult = stepFunction();
+                allFilterStepsResults[stepId] = stepResult;
+                
+                // อัพเดต UI
+                if (stepResult.success) {
+                    stepCard.classList.add('success');
+                    stepStatus.innerHTML = `<i class="fas fa-check-circle text-success"></i> ดำเนินการสำเร็จ`;
+                    stepStatus.style.color = "var(--success-color)";
+                    
+                    // แสดงผลลัพธ์
+                    let resultsHTML = '';
+                    if (stepResult.stats) {
+                        Object.keys(stepResult.stats).forEach(key => {
+                            resultsHTML += `
+                                <div class="filter-result-item">
+                                    <div class="filter-result-value">${stepResult.stats[key]}</div>
+                                    <div class="filter-result-label">${key}</div>
+                                </div>
+                            `;
+                        });
+                    }
+                    
+                    stepResults.innerHTML = resultsHTML;
+                    stepResults.style.display = 'grid';
+                    
+                } else {
+                    stepCard.classList.add(stepResult.skipped ? 'warning' : 'error');
+                    stepStatus.innerHTML = stepResult.skipped ? 
+                        `<i class="fas fa-exclamation-triangle text-warning"></i> ข้ามขั้นตอน: ${stepResult.message}` :
+                        `<i class="fas fa-times-circle text-danger"></i> ล้มเหลว: ${stepResult.message}`;
+                    stepStatus.style.color = stepResult.skipped ? "var(--warning-color)" : "var(--danger-color)";
+                }
+                
+                // อัพเดตสรุปผลรวม
+                updateFilterSummary();
+                
+                // ดำเนินการขั้นตอนต่อไป
+                currentStepIndex++;
+                setTimeout(processNextStep, 300);
+            }, 500);
+        }
+        
+        // เริ่มกรอง
+        processNextStep();
+    }
+    
+    function updateFilterSummary() {
+        if (!uploadedData || !filteredData) return;
+        
+        const initialRows = uploadedData.data.length;
+        const finalRows = filteredData.length;
+        const totalRemovedRowsValue = initialRows - finalRows;
+        const percentage = initialRows > 0 ? ((totalRemovedRowsValue / initialRows) * 100).toFixed(2) : 0;
+        
+        totalRowsBeforeFilter.textContent = initialRows.toLocaleString();
+        totalRowsAfterFilter.textContent = finalRows.toLocaleString();
+        totalRemovedRows.textContent = totalRemovedRowsValue.toLocaleString();
+        removedPercentageFilter.textContent = `${percentage}%`;
+    }
+    
+    // ฟังก์ชันค้นหาคอลัมน์
+    function findColumnExact(columnName) {
+        if (!uploadedData || !uploadedData.headers) return null;
+        
+        for (const header of uploadedData.headers) {
+            if (header.trim() === columnName) {
+                return header;
+            }
+        }
+        
+        return null;
+    }
+    
+    function isAllNumbers(value) {
+        if (!value || value.trim() === '') return false;
+        
+        const cleanedValue = value.trim();
+        
+        if (!isNaN(cleanedValue) && !isNaN(parseFloat(cleanedValue))) {
+            const regex = /^[-+]?\d*\.?\d+$/;
+            return regex.test(cleanedValue);
+        }
+        
+        return false;
+    }
+    
+    function formatToTwoDecimals(value) {
+        if (value === null || value === undefined || value === '') {
+            return '';
+        }
+        
+        const num = parseFloat(value);
+        
+        if (isNaN(num)) {
+            return value;
+        }
+        
+        return num.toFixed(2);
+    }
+    
+    function convertScientificNotation(value) {
+        if (!value || value.trim() === '') return value;
+        
+        const strValue = value.toString().trim();
+        
+        const scientificNotationRegex = /^[-+]?[0-9]*\.?[0-9]+[eE][-+]?[0-9]+$/;
+        
+        if (scientificNotationRegex.test(strValue)) {
+            try {
+                const num = parseFloat(strValue);
+                
+                if (!isNaN(num)) {
+                    return num.toLocaleString('fullwide', { useGrouping: false });
+                }
+            } catch (e) {
+                console.warn('ไม่สามารถแปลงสัญกรณ์ทางวิทยาศาสตร์:', strValue, e);
+            }
+        }
+        
+        return strValue;
+    }
+    
+    function convertToText(value) {
+        if (value === null || value === undefined || value === '') {
+            return '';
+        }
+        
+        const strValue = value.toString().trim();
+        
+        if (isAllNumbers(strValue)) {
+            return "'" + strValue;
+        }
+        
+        return strValue;
+    }
+    
+    // ฟังก์ชันกรองข้อมูลแต่ละขั้นตอน
+    function filterQuotaData() {
+        const columnName = findColumnExact("เลขโควต้า");
+        if (!columnName) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'เลขโควต้า'",
+                stats: {}
+            };
+        }
+        
+        const newFilteredData = [];
+        const removedRows = [];
+        let removed59008956 = 0;
+        let removed40000542 = 0;
+        
+        filteredData.forEach((row, index) => {
+            const value = row[columnName] ? row[columnName].toString().trim() : '';
+            let shouldRemove = false;
+            
+            if (value === '59008956') {
+                shouldRemove = true;
+                removed59008956++;
+            }
+            else if (value === '40000542') {
+                shouldRemove = true;
+                removed40000542++;
+            }
+            
+            if (shouldRemove) {
+                removedRows.push({
+                    index: index + 2,
+                    value: value
+                });
+            } else {
+                newFilteredData.push(row);
+            }
+        });
+        
+        filteredData = newFilteredData;
+        
+        return {
+            success: true,
+            removedCount: removedRows.length,
+            stats: {
+                "ตัดออก": removedRows.length.toLocaleString(),
+                "59008956": removed59008956.toLocaleString(),
+                "40000542": removed40000542.toLocaleString(),
+                "เหลือ": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function filterSugarcaneTypeData() {
+        const columnName = findColumnExact("ชื่อประเภทอ้อย");
+        if (!columnName) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'ชื่อประเภทอ้อย'",
+                stats: {}
+            };
+        }
+        
+        const newFilteredData = [];
+        const removedRows = [];
+        let removedCount = 0;
+        
+        filteredData.forEach((row, index) => {
+            const value = row[columnName] ? row[columnName].toString().trim() : '';
+            let shouldRemove = false;
+            
+            if (value === "พื้นที่เสียหาย") {
+                shouldRemove = true;
+                removedCount++;
+            }
+            
+            if (shouldRemove) {
+                removedRows.push({
+                    index: index + 2,
+                    value: value
+                });
+            } else {
+                newFilteredData.push(row);
+            }
+        });
+        
+        filteredData = newFilteredData;
+        
+        return {
+            success: true,
+            removedCount: removedRows.length,
+            stats: {
+                "ตัดออก": removedRows.length.toLocaleString(),
+                "พื้นที่เสียหาย": removedCount.toLocaleString(),
+                "เหลือ": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function filterSugarcaneCategoryData() {
+        const columnName = findColumnExact("ประเภทแปลง");
+        if (!columnName) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'ประเภทแปลง'",
+                stats: {}
+            };
+        }
+        
+        const newFilteredData = [];
+        const removedRows = [];
+        let removedCount = 0;
+        
+        filteredData.forEach((row, index) => {
+            const value = row[columnName] ? row[columnName].toString().trim() : '';
+            let shouldRemove = false;
+            
+            if (value === "แปลงดัมมี่") {
+                shouldRemove = true;
+                removedCount++;
+            }
+            
+            if (shouldRemove) {
+                removedRows.push({
+                    index: index + 2,
+                    value: value
+                });
+            } else {
+                newFilteredData.push(row);
+            }
+        });
+        
+        filteredData = newFilteredData;
+        
+        return {
+            success: true,
+            removedCount: removedRows.length,
+            stats: {
+                "ตัดออก": removedRows.length.toLocaleString(),
+                "แปลงดัมมี่": removedCount.toLocaleString(),
+                "เหลือ": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function filterZoneData() {
+        const columnName = findColumnExact("โซน");
+        if (!columnName) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'โซน'",
+                stats: {}
+            };
+        }
+        
+        const modifiedData = [];
+        const modifiedRows = [];
+        let modifiedC1 = 0;
+        let modifiedC4 = 0;
+        
+        filteredData.forEach((row, index) => {
+            const modifiedRow = {...row};
+            const value = row[columnName] ? row[columnName].toString().trim() : '';
+            let isModified = false;
+            let newValue = value;
+            
+            if (value === "C1/1") {
+                newValue = "C1";
+                isModified = true;
+                modifiedC1++;
+            } else if (value === "C4/1") {
+                newValue = "C4";
+                isModified = true;
+                modifiedC4++;
+            }
+            
+            modifiedRow[columnName] = newValue;
+            
+            if (isModified) {
+                modifiedRows.push({
+                    index: index + 2,
+                    originalValue: value,
+                    newValue: newValue
+                });
+            }
+            
+            modifiedData.push(modifiedRow);
+        });
+        
+        filteredData = modifiedData;
+        
+        return {
+            success: true,
+            modifiedCount: modifiedRows.length,
+            stats: {
+                "แก้ไข": modifiedRows.length.toLocaleString(),
+                "C1/1→C1": modifiedC1.toLocaleString(),
+                "C4/1→C4": modifiedC4.toLocaleString(),
+                "แถวทั้งหมด": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function filterDamageCauseData() {
+        const damageCauseColumn = findColumnExact("สาเหตุเสียหาย");
+        const damageAreaColumn = findColumnExact("พื้นที่เสียหาย");
+        
+        if (!damageCauseColumn || !damageAreaColumn) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'สาเหตุเสียหาย' หรือ 'พื้นที่เสียหาย'",
+                stats: {}
+            };
+        }
+        
+        const modifiedData = [];
+        const clearedRows = [];
+        let clearedDash = 0;
+        let clearedNumber = 0;
+        let clearedEmpty = 0;
+        
+        filteredData.forEach((row, index) => {
+            const modifiedRow = {...row};
+            const damageCauseValue = row[damageCauseColumn] ? row[damageCauseColumn].toString().trim() : '';
+            const damageAreaValue = row[damageAreaColumn] ? row[damageAreaColumn].toString().trim() : '';
+            let shouldClear = false;
+            
+            if (damageCauseValue === "-") {
+                shouldClear = true;
+                clearedDash++;
+            } else if (isAllNumbers(damageCauseValue)) {
+                shouldClear = true;
+                clearedNumber++;
+            } else if (damageCauseValue === "") {
+                shouldClear = true;
+                clearedEmpty++;
+            }
+            
+            if (shouldClear) {
+                modifiedRow[damageCauseColumn] = "";
+                modifiedRow[damageAreaColumn] = "";
+                
+                clearedRows.push({
+                    index: index + 2,
+                    damageCauseOriginal: damageCauseValue,
+                    damageAreaOriginal: damageAreaValue
+                });
+            }
+            
+            modifiedData.push(modifiedRow);
+        });
+        
+        filteredData = modifiedData;
+        
+        return {
+            success: true,
+            clearedCount: clearedRows.length,
+            stats: {
+                "ล้างข้อมูล": clearedRows.length.toLocaleString(),
+                "ค่า '-':": clearedDash.toLocaleString(),
+                "ตัวเลขทั้งหมด": clearedNumber.toLocaleString(),
+                "ค่าว่าง": clearedEmpty.toLocaleString(),
+                "แถวทั้งหมด": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function filterFarmerCodeData() {
+        const columnName = findColumnExact("รหัสนักเกษตร");
+        if (!columnName) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'รหัสนักเกษตร'",
+                stats: {}
+            };
+        }
+        
+        const modifiedData = [];
+        const modifiedRows = [];
+        let modified2 = 0;
+        let modified3 = 0;
+        let modified4 = 0;
+        let modified8 = 0;
+        let modified9 = 0;
+        
+        filteredData.forEach((row, index) => {
+            const modifiedRow = {...row};
+            const value = row[columnName] ? row[columnName].toString().trim() : '';
+            let isModified = false;
+            let newValue = value;
+            
+            if (value === "2") {
+                newValue = "002";
+                isModified = true;
+                modified2++;
+            } else if (value === "3") {
+                newValue = "003";
+                isModified = true;
+                modified3++;
+            } else if (value === "4") {
+                newValue = "004";
+                isModified = true;
+                modified4++;
+            } else if (value === "8") {
+                newValue = "008";
+                isModified = true;
+                modified8++;
+            } else if (value === "9") {
+                newValue = "009";
+                isModified = true;
+                modified9++;
+            }
+            
+            modifiedRow[columnName] = newValue;
+            
+            if (isModified) {
+                modifiedRows.push({
+                    index: index + 2,
+                    originalValue: value,
+                    newValue: newValue
+                });
+            }
+            
+            modifiedData.push(modifiedRow);
+        });
+        
+        filteredData = modifiedData;
+        
+        return {
+            success: true,
+            modifiedCount: modifiedRows.length,
+            stats: {
+                "แก้ไข": modifiedRows.length.toLocaleString(),
+                "2→002": modified2.toLocaleString(),
+                "3→003": modified3.toLocaleString(),
+                "4→004": modified4.toLocaleString(),
+                "8→008": modified8.toLocaleString(),
+                "9→009": modified9.toLocaleString(),
+                "แถวทั้งหมด": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function processDamageAreaData() {
+        const columnName = findColumnExact("พื้นที่เสียหาย");
+        if (!columnName) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'พื้นที่เสียหาย'",
+                stats: {}
+            };
+        }
+        
+        // เรียงข้อมูลจาก Z-A
+        const sortedData = [...filteredData].sort((a, b) => {
+            const valueA = a[columnName] ? a[columnName].toString().trim() : '';
+            const valueB = b[columnName] ? b[columnName].toString().trim() : '';
+            return valueB.localeCompare(valueA);
+        });
+        
+        // แปลงเป็นตัวเลขและจัดรูปแบบ
+        const processedData = sortedData.map(row => {
+            const modifiedRow = {...row};
+            const originalValue = row[columnName] ? row[columnName].toString().trim() : '';
+            
+            if (originalValue !== '') {
+                const formattedValue = formatToTwoDecimals(originalValue);
+                modifiedRow[columnName] = formattedValue;
+            }
+            
+            return modifiedRow;
+        });
+        
+        filteredData = processedData;
+        
+        // นับข้อมูลที่แปลง
+        let convertedCount = 0;
+        filteredData.forEach(row => {
+            const value = row[columnName] ? row[columnName].toString().trim() : '';
+            if (value !== '' && !isNaN(parseFloat(value))) {
+                convertedCount++;
+            }
+        });
+        
+        return {
+            success: true,
+            stats: {
+                "แปลงข้อมูล": convertedCount.toLocaleString(),
+                "เรียง Z-A": filteredData.length.toLocaleString(),
+                "แถวทั้งหมด": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function processAreaData() {
+        const areaColumn = findColumnExact("พื้นที่");
+        const damageAreaColumn = findColumnExact("พื้นที่เสียหาย");
+        
+        if (!areaColumn || !damageAreaColumn) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'พื้นที่' หรือ 'พื้นที่เสียหาย'",
+                stats: {}
+            };
+        }
+        
+        const newFilteredData = [];
+        const removedRows = [];
+        let formattedCount = 0;
+        let calculatedCount = 0;
+        let removedZeroCount = 0;
+        
+        filteredData.forEach((row, index) => {
+            const modifiedRow = {...row};
+            const areaValue = row[areaColumn] ? row[areaColumn].toString().trim() : '';
+            const damageAreaValue = row[damageAreaColumn] ? row[damageAreaColumn].toString().trim() : '';
+            let shouldRemove = false;
+            let newAreaValue = areaValue;
+            
+            // แปลงพื้นที่เดิมเป็นทศนิยม 2 ตำแหน่ง
+            if (areaValue !== '') {
+                const formattedAreaValue = formatToTwoDecimals(areaValue);
+                if (formattedAreaValue !== areaValue && formattedAreaValue !== '') {
+                    newAreaValue = formattedAreaValue;
+                    formattedCount++;
+                } else if (!isNaN(parseFloat(areaValue))) {
+                    formattedCount++;
+                }
+            }
+            
+            // คำนวณพื้นที่ใหม่ = พื้นที่ - พื้นที่เสียหาย
+            if (newAreaValue !== '' && damageAreaValue !== '') {
+                const areaNum = parseFloat(newAreaValue);
+                const damageAreaNum = parseFloat(formatToTwoDecimals(damageAreaValue));
+                
+                if (!isNaN(areaNum) && !isNaN(damageAreaNum)) {
+                    const newAreaNum = areaNum - damageAreaNum;
+                    const formattedNewArea = newAreaNum.toFixed(2);
+                    
+                    if (formattedNewArea !== newAreaValue) {
+                        newAreaValue = formattedNewArea;
+                        calculatedCount++;
+                    }
+                    
+                    // ตรวจสอบว่าพื้นที่ใหม่ ≤ 0 หรือไม่
+                    if (newAreaNum <= 0) {
+                        shouldRemove = true;
+                        removedZeroCount++;
+                    }
+                }
+            }
+            
+            modifiedRow[areaColumn] = newAreaValue;
+            
+            if (shouldRemove) {
+                removedRows.push({
+                    index: index + 2,
+                    areaValue: newAreaValue,
+                    damageAreaValue: damageAreaValue
+                });
+            } else {
+                newFilteredData.push(modifiedRow);
+            }
+        });
+        
+        filteredData = newFilteredData;
+        
+        return {
+            success: true,
+            removedCount: removedRows.length,
+            stats: {
+                "ตัดออก": removedRows.length.toLocaleString(),
+                "แปลงทศนิยม": formattedCount.toLocaleString(),
+                "คำนวณพื้นที่": calculatedCount.toLocaleString(),
+                "พื้นที่ ≤ 0": removedZeroCount.toLocaleString(),
+                "เหลือ": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function filterIntechPlotData() {
+        const columnName = findColumnExact("เลขแปลงintech");
+        if (!columnName) {
+            return { 
+                success: false, 
+                skipped: true, 
+                message: "ไม่พบคอลัมน์ 'เลขแปลงintech'",
+                stats: {}
+            };
+        }
+        
+        const newFilteredData = [];
+        const removedRows = [];
+        let removedCount = 0;
+        
+        filteredData.forEach((row, index) => {
+            const value = row[columnName] ? row[columnName].toString().trim() : '';
+            let shouldRemove = false;
+            
+            if (value === "") {
+                shouldRemove = true;
+                removedCount++;
+            }
+            
+            if (shouldRemove) {
+                removedRows.push({
+                    index: index + 2,
+                    value: value
+                });
+            } else {
+                newFilteredData.push(row);
+            }
+        });
+        
+        filteredData = newFilteredData;
+        
+        return {
+            success: true,
+            removedCount: removedRows.length,
+            stats: {
+                "ตัดออก": removedRows.length.toLocaleString(),
+                "ค่าว่าง": removedCount.toLocaleString(),
+                "เหลือ": filteredData.length.toLocaleString()
+            }
+        };
+    }
+    
+    function exportFilteredDataToCSV() {
+        if (!filteredData || filteredData.length === 0) {
+            alert('ไม่มีข้อมูลที่จะดาวน์โหลด');
+            return;
+        }
+        
+        // สร้างเนื้อหา CSV
+        const headers = uploadedData.headers;
+        const csvRows = [];
+        
+        // เพิ่มหัวคอลัมน์
+        csvRows.push(headers.join(','));
+        
+        // เพิ่มข้อมูล
+        filteredData.forEach(row => {
+            const values = headers.map(header => {
+                let value = row[header] || '';
+                
+                // แปลงค่าสำหรับคอลัมน์ "เลขแปลงintech"
+                if (header === findColumnExact("เลขแปลงintech")) {
+                    value = convertScientificNotation(value);
+                }
+                
+                // แปลงค่าสำหรับคอลัมน์ "รหัสนักเกษตร"
+                if (header === findColumnExact("รหัสนักเกษตร")) {
+                    value = convertToText(value);
+                }
+                
+                // ใส่เครื่องหมายคำพูดถ้าค่ามีเครื่องหมาย comma
+                if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                    return '"' + value.replace(/"/g, '""') + '"';
+                }
+                return value;
+            });
+            csvRows.push(values.join(','));
+        });
+        
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        link.href = url;
+        link.download = `filtered_${uploadedData.fileName}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert(`✅ ดาวน์โหลดข้อมูลที่กรองแล้วเรียบร้อย!\nจำนวนแถว: ${filteredData.length}\nจำนวนคอลัมน์: ${headers.length}`);
+    }
+    
+    // ============================================
+    // ขั้นตอนที่ 3: เลือกคอลัมน์
+    // ============================================
+    nextToStep3.addEventListener('click', function() {
+        if (!filteredData || filteredData.length === 0) {
+            alert('กรุณากรองข้อมูลก่อน');
+            return;
+        }
+        
+        // เตรียมข้อมูลคอลัมน์ทั้งหมดจากข้อมูลที่กรองแล้ว
+        prepareColumnSelection();
+        
+        // ไปยังขั้นตอนที่ 3
+        goToStep(3);
+    });
+    
+    function prepareColumnSelection() {
+        allColumns = [...uploadedData.headers];
+        
+        // ✅ แก้ไข: เลือกคอลัมน์ทั้งหมดอัตโนมัติ
+        selectedColumns = [...allColumns];
+        
+        // อัพเดตจำนวนคอลัมน์ทั้งหมด
+        totalColumns.textContent = allColumns.length;
+        
+        // สร้างรายการคอลัมน์
+        renderColumnGrid();
+        
+        // อัพเดตสถิติ
+        updateColumnStats();
+        
+        // ✅ แก้ไข: เปิดใช้งานปุ่มต่อไปทันทีเมื่อเลือกคอลัมน์ทั้งหมด
+        nextToStep4.disabled = false;
+    }
+    
+    function renderColumnGrid() {
+        columnsGrid.innerHTML = '';
+        
+        const searchTerm = columnSearch.value.toLowerCase();
+        
+        allColumns.forEach(column => {
+            // ตรวจสอบว่าคอลัมน์นี้ผ่านการกรองหรือไม่
+            const columnNameLower = column.toLowerCase();
+            const isSelected = selectedColumns.includes(column);
+            const matchesSearch = searchTerm === '' || columnNameLower.includes(searchTerm);
+            
+            // ตรวจสอบประเภทคอลัมน์
+            let columnType = '';
+            let columnClass = '';
+            
+            if (columnNameLower.includes('ประเภทอ้อย') || columnNameLower.includes('sugarcane') || 
+                columnNameLower.includes('พันธุ์') || columnNameLower.includes('type')) {
+                columnType = 'ข้อมูลอ้อย';
+                columnClass = 'sugarcane';
+            } else if (columnNameLower.includes('อายุ') || columnNameLower.includes('age') ||
+                      columnNameLower.includes('งวด') || columnNameLower.includes('period') ||
+                      columnNameLower.includes('กิจกรรม') || columnNameLower.includes('activity')) {
+                columnType = 'กิจกรรมงวด';
+                columnClass = 'activity';
+            } else if (columnNameLower.includes('โครงการ') || columnNameLower.includes('project')) {
+                columnType = 'โครงการ';
+                columnClass = 'project';
+            } else if (columnNameLower.includes('ปุ๋ย') || columnNameLower.includes('fertilizer') ||
+                      columnNameLower.includes('ยา') || columnNameLower.includes('chemical')) {
+                columnType = 'ปุ๋ย';
+                columnClass = 'fertilizer';
+            } else if (columnNameLower.includes('วันที่') || columnNameLower.includes('date')) {
+                columnType = 'วันที่';
+            } else if (columnNameLower.includes('รหัส') || columnNameLower.includes('code') || 
+                      columnNameLower.includes('id') || columnNameLower.includes('หมายเลข')) {
+                columnType = 'รหัส';
+            } else if (columnNameLower.includes('จำนวน') || columnNameLower.includes('quantity') ||
+                      columnNameLower.includes('ปริมาณ') || columnNameLower.includes('amount') ||
+                      columnNameLower.includes('พื้นที่') || columnNameLower.includes('area')) {
+                columnType = 'จำนวน';
+            } else if (columnNameLower === 'lat' || columnNameLower === 'latitude') {
+                columnType = 'พิกัด lat';
+                columnClass = 'sugarcane';
+            } else if (columnNameLower === 'long' || columnNameLower === 'longitude') {
+                columnType = 'พิกัด long';
+                columnClass = 'sugarcane';
+            } else {
+                columnType = 'ข้อมูลทั่วไป';
+            }
+            
+            // ตรวจสอบว่าควรแสดงคอลัมน์นี้ตาม filter ปัจจุบันหรือไม่
+            let shouldShow = matchesSearch;
+            
+            if (currentColumnFilter === 'selected') {
+                shouldShow = shouldShow && isSelected;
+            } else if (currentColumnFilter === 'unselected') {
+                shouldShow = shouldShow && !isSelected;
+            } else if (currentColumnFilter !== 'all') {
+                shouldShow = shouldShow && columnClass === currentColumnFilter;
+            }
+            
+            // ตรวจสอบว่าคอลัมน์นี้มีข้อมูลหรือไม่ (ตัวอย่าง 5 แถวแรก)
+            const sampleValues = filteredData.slice(0, 5).map(row => row[column]);
+            const emptyCount = sampleValues.filter(v => v === '').length;
+            const fillRate = ((sampleValues.length - emptyCount) / sampleValues.length * 100).toFixed(0);
+            
+            const columnItem = document.createElement('div');
+            columnItem.className = `column-item ${columnClass} ${isSelected ? 'selected' : ''}`;
+            columnItem.style.display = shouldShow ? 'flex' : 'none';
+            
+            columnItem.innerHTML = `
+                <input type="checkbox" class="column-checkbox" ${isSelected ? 'checked' : ''} data-column="${column}">
+                <div class="column-info">
+                    <div class="column-name" title="${column}">${column}</div>
+                    <span class="column-type">${columnType}</span>
+                    <div class="column-stats">
+                        <i class="fas fa-database"></i> มีข้อมูล ${fillRate}%
+                    </div>
+                </div>
+            `;
+            
+            columnsGrid.appendChild(columnItem);
+            
+            // เพิ่ม event listener สำหรับ checkbox
+            const checkbox = columnItem.querySelector('.column-checkbox');
+            checkbox.addEventListener('change', function() {
+                const columnName = this.dataset.column;
+                
+                if (this.checked) {
+                    if (!selectedColumns.includes(columnName)) {
+                        selectedColumns.push(columnName);
+                    }
+                } else {
+                    const index = selectedColumns.indexOf(columnName);
+                    if (index > -1) {
+                        selectedColumns.splice(index, 1);
+                    }
+                }
+                
+                // อัพเดต UI
+                columnItem.classList.toggle('selected', this.checked);
+                updateColumnStats();
+                
+                // เปิด/ปิดใช้งานปุ่มต่อไป
+                nextToStep4.disabled = selectedColumns.length === 0;
+            });
+        });
+        
+        // อัพเดตจำนวนคอลัมน์ที่แสดง
+        updateFilteredCount();
+    }
+    
+    function updateColumnStats() {
+        selectedCount.textContent = selectedColumns.length;
+        selectedSummaryCount.textContent = selectedColumns.length;
+        
+        if (selectedColumns.length === 0) {
+            selectedColumnsList.textContent = 'ยังไม่ได้เลือกคอลัมน์';
+        } else {
+            const displayedColumns = selectedColumns.slice(0, 3);
+            const moreCount = selectedColumns.length - 3;
+            selectedColumnsList.textContent = displayedColumns.join(', ') + 
+                (moreCount > 0 ? ` และอีก ${moreCount} คอลัมน์...` : '');
+        }
+    }
+    
+    function updateFilteredCount() {
+        const visibleColumns = Array.from(columnsGrid.querySelectorAll('.column-item'))
+            .filter(item => item.style.display !== 'none');
+        filteredCount.textContent = visibleColumns.length;
+    }
+    
+    // Search functionality
+    columnSearch.addEventListener('input', function() {
+        renderColumnGrid();
+    });
+    
+    // Column filter buttons
+    columnFilterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // อัพเดตปุ่มที่ active
+            columnFilterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // ตั้งค่าตัวกรอง
+            currentColumnFilter = this.dataset.filter;
+            
+            // กรองคอลัมน์
+            renderColumnGrid();
+        });
+    });
+    
+    // Select all / Deselect all
+    selectAllBtn.addEventListener('click', function() {
+        const visibleColumns = Array.from(columnsGrid.querySelectorAll('.column-item'))
+            .filter(item => item.style.display !== 'none');
+        
+        visibleColumns.forEach(item => {
+            const checkbox = item.querySelector('.column-checkbox');
+            const columnName = checkbox.dataset.column;
+            
+            if (!checkbox.checked) {
+                checkbox.checked = true;
+                if (!selectedColumns.includes(columnName)) {
+                    selectedColumns.push(columnName);
+                }
+                item.classList.add('selected');
+            }
+        });
+        
+        updateColumnStats();
+        nextToStep4.disabled = selectedColumns.length === 0;
+    });
+    
+    deselectAllBtn.addEventListener('click', function() {
+        const visibleColumns = Array.from(columnsGrid.querySelectorAll('.column-item'))
+            .filter(item => item.style.display !== 'none');
+        
+        visibleColumns.forEach(item => {
+            const checkbox = item.querySelector('.column-checkbox');
+            const columnName = checkbox.dataset.column;
+            
+            if (checkbox.checked) {
+                checkbox.checked = false;
+                const index = selectedColumns.indexOf(columnName);
+                if (index > -1) {
+                    selectedColumns.splice(index, 1);
+                }
+                item.classList.remove('selected');
+            }
+        });
+        
+        updateColumnStats();
+        nextToStep4.disabled = selectedColumns.length === 0;
+    });
+    
+    // ============================================
+    // ขั้นตอนที่ 4: ตรวจสอบประเภทข้อมูล
+    // ============================================
+    nextToStep4.addEventListener('click', function() {
+        if (selectedColumns.length === 0) {
+            alert('กรุณาเลือกคอลัมน์ที่ต้องการตรวจสอบ');
+            return;
+        }
+        
+        // ไปยังขั้นตอนที่ 4
+        goToStep(4);
+    });
+</script>
