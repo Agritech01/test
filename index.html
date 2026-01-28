@@ -6974,8 +6974,74 @@
         
         result.push(current);
         return result;
+  }
+    // ============================================
+// เรียกใช้งานฟังก์ชันตั้งค่าเริ่มต้น
+// ============================================
+
+// ตั้งค่า Event Listeners สำหรับการนำทาง
+nextToStep2.addEventListener('click', function() {
+    if (!uploadedData) {
+        alert('กรุณาอัปโหลดไฟล์ก่อน');
+        return;
     }
     
+    // เตรียมระบบกรองข้อมูล
+    prepareFilteringSystem();
+    
+    // ไปยังขั้นตอนที่ 2
+    goToStep(2);
+});
+
+nextToStep3.addEventListener('click', function() {
+    if (!filteredData || filteredData.length === 0) {
+        alert('กรุณากรองข้อมูลก่อน');
+        return;
+    }
+    
+    // เตรียมข้อมูลคอลัมน์ทั้งหมดจากข้อมูลที่กรองแล้ว
+    prepareColumnSelection();
+    
+    // ไปยังขั้นตอนที่ 3
+    goToStep(3);
+});
+
+nextToStep4.addEventListener('click', function() {
+    if (selectedColumns.length === 0) {
+        alert('กรุณาเลือกคอลัมน์ที่ต้องการตรวจสอบ');
+        return;
+    }
+    
+    // ไปยังขั้นตอนที่ 4
+    goToStep(4);
+});
+
+nextToStep5.addEventListener('click', function() {
+    // ไปยังขั้นตอนที่ 5
+    goToStep(5);
+});
+
+nextToStep6.addEventListener('click', function() {
+    // ไปยังขั้นตอนที่ 6
+    goToStep(6);
+});
+
+// ตั้งค่า event listeners สำหรับปุ่มย้อนกลับ
+backToStep1.addEventListener('click', () => goToStep(1));
+backToStep2.addEventListener('click', () => goToStep(2));
+backToStep3.addEventListener('click', () => goToStep(3));
+backToStep4.addEventListener('click', () => goToStep(4));
+backToStep5.addEventListener('click', () => goToStep(5));
+
+// ตั้งค่า Event Listeners สำหรับระบบต่างๆ
+setupEnhancedEventListeners();
+
+// เริ่มต้นใช้งาน
+console.log('✅ ระบบ Clean Data สำหรับข้อมูลอ้อยพร้อมใช้งานแล้ว!');
+console.log('วิธีการใช้งาน:');
+console.log('1. คลิกที่พื้นที่อัปโหลดหรือปุ่ม "เลือกไฟล์ CSV"');
+console.log('2. เลือกไฟล์ CSV ที่ต้องการ');
+console.log('3. ระบบจะประมวลผลและแสดงข้อมูล');
     // ============================================
     // เรียกใช้งานฟังก์ชันตั้งค่าเริ่มต้น
     // ============================================
