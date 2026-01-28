@@ -1725,10 +1725,107 @@
     </div>
 </div>
             
-            <!-- Step 5: Condition Checking -->
-            <div class="step-panel" id="panel5">
-                <!-- Step 5 Content จะเพิ่มที่นี่ -->
+           <!-- แทนที่เนื้อหาใน panel5 -->
+<div class="step-panel" id="panel5">
+    <div class="panel-header">
+        <h2><i class="fas fa-search"></i> ตรวจสอบเงื่อนไขข้อมูลอ้อย</h2>
+        <p>เลือกเงื่อนไขที่ต้องการตรวจสอบ และดูผลการตรวจสอบในตารางด้านล่าง</p>
+    </div>
+    
+    <!-- ปุ่มเลือกเงื่อนไข -->
+    <div class="condition-selection">
+        <h3><i class="fas fa-filter"></i> เลือกเงื่อนไขที่ต้องการตรวจสอบ</h3>
+        <div class="condition-buttons">
+            <button class="condition-select-btn active" data-condition="sugarcane">
+                <i class="fas fa-seedling"></i> ประเภทอ้อย
+                <span class="condition-desc">(ต้องมีคอลัมน์: ชื่อประเภทอ้อย, วันที่ปลูก)</span>
+            </button>
+            <button class="condition-select-btn" data-condition="fertilizer">
+                <i class="fas fa-prescription-bottle"></i> ปุ๋ย
+                <span class="condition-desc">(ต้องมีคอลัมน์ที่เกี่ยวข้องกับปุ๋ย)</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- ข้อมูลการตรวจสอบ -->
+    <div class="checking-controls">
+        <div class="checking-info">
+            <h4><i class="fas fa-info-circle"></i> สถานะการตรวจสอบ</h4>
+            <div class="checking-stats">
+                <span>เงื่อนไขที่เลือก: <strong id="selectedCondition">ประเภทอ้อย</strong></span>
+                <span>ตรวจพบ: <strong id="foundIssues">0</strong> ปัญหา</span>
+                <span>ผ่าน: <strong id="passedChecks">0</strong> รายการ</span>
+                <span>ไม่ผ่าน: <strong id="failedChecks">0</strong> รายการ</span>
+                <span>แสดง: <strong id="checkingRowsCount">0</strong> แถวทั้งหมด</span>
             </div>
+        </div>
+        <div class="checking-actions">
+            <button class="btn btn-primary" id="runSelectedCheck">
+                <i class="fas fa-play"></i> เริ่มตรวจสอบเงื่อนไขที่เลือก
+            </button>
+            <button class="btn btn-success" id="runAllChecks">
+                <i class="fas fa-play-circle"></i> ตรวจสอบเงื่อนไขทั้งหมด
+            </button>
+            <button class="btn btn-outline" id="exportCheckResults">
+                <i class="fas fa-download"></i> ส่งออกผลตรวจสอบ
+            </button>
+        </div>
+    </div>
+    
+    <!-- ตารางแสดงข้อมูลและผลตรวจสอบ -->
+    <div class="checking-table-container">
+        <div class="table-controls">
+            <div class="table-info">
+                <span><i class="fas fa-table"></i> ตารางผลการตรวจสอบเงื่อนไข</span>
+                <span id="scrollHint" style="color: var(--accent-color); font-size: 0.9rem; margin-left: 15px;">
+                    <i class="fas fa-arrow-right"></i> เลื่อนเพื่อดูสถานะและหมายเหตุ
+                </span>
+            </div>
+            <div class="table-actions">
+                <button class="btn btn-outline btn-sm" id="showOnlyFailed">
+                    <i class="fas fa-filter"></i> แสดงเฉพาะที่ไม่ผ่าน
+                </button>
+                <button class="btn btn-outline btn-sm active" id="showAllResults">
+                    <i class="fas fa-list"></i> แสดงทั้งหมด
+                </button>
+            </div>
+        </div>
+        
+        <div class="checking-table-wrapper">
+            <table class="checking-table" id="checkingTable">
+                <thead id="checkingTableHeader">
+                    <!-- Headers will be populated by JavaScript based on condition -->
+                </thead>
+                <tbody id="checkingTableBody">
+                    <!-- ข้อมูลจะถูกเพิ่มโดย JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- รายละเอียดการตรวจสอบ -->
+    <div class="checking-details">
+        <h4><i class="fas fa-list-alt"></i> รายละเอียดผลการตรวจสอบ</h4>
+        <div class="checking-results" id="checkingResults">
+            <div class="result-summary">
+                <p><i class="fas fa-info-circle"></i> กดปุ่มด้านบนเพื่อเริ่มตรวจสอบเงื่อนไข</p>
+                <p class="result-note">เงื่อนไข "ประเภทอ้อย" ต้องการคอลัมน์: <strong>ชื่อประเภทอ้อย</strong> และ <strong>วันที่ปลูก</strong></p>
+                <p class="result-note" style="background: #e8f5e9; color: #2e7d32; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i> วันที่ปลูกที่รองรับ: YYYY/MM/DD, YYYY/M/D, YYYY-MM-DD, DD/MM/YYYY
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="navigation-buttons">
+        <button class="btn btn-outline" id="backToStep4">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+        </button>
+        <button class="btn btn-success" id="nextToStep6">
+            <i class="fas fa-arrow-right"></i> ดำเนินการต่อ
+        </button>
+    </div>
+</div>
             
             <!-- Step 6: Export Selection -->
             <div class="step-panel" id="panel6">
