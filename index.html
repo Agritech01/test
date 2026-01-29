@@ -1716,7 +1716,335 @@
             gap: 15px;
             justify-content: flex-end;
         }
-        
+        /* สไตล์สำหรับขั้นตอนที่ 4 */
+.condition-selection {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.condition-selection h3 {
+    color: var(--secondary-color);
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.condition-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.condition-select-btn {
+    padding: 20px 15px;
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.condition-select-btn:hover {
+    background-color: #e9ecef;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.condition-select-btn.active {
+    background-color: rgba(67, 97, 238, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.condition-select-btn[data-condition="sugarcane"].active {
+    background-color: rgba(34, 139, 34, 0.1);
+    border-color: var(--sugarcane-color);
+    color: var(--sugarcane-color);
+}
+
+.condition-select-btn[data-condition="activity"].active {
+    background-color: rgba(76, 201, 240, 0.1);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.condition-select-btn[data-condition="project"].active {
+    background-color: rgba(255, 87, 34, 0.1);
+    border-color: var(--project-color);
+    color: var(--project-color);
+}
+
+.condition-select-btn[data-condition="fertilizer"].active {
+    background-color: rgba(156, 39, 176, 0.1);
+    border-color: var(--fertilizer-color);
+    color: var(--fertilizer-color);
+}
+
+.condition-select-btn i {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.condition-desc {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.checking-controls {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.checking-info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.checking-info h4 {
+    color: var(--secondary-color);
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.checking-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.checking-stats span {
+    background: #f8f9fa;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.checking-stats strong {
+    color: var(--primary-color);
+}
+
+.checking-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.checking-table-container {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    overflow: hidden;
+}
+
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table-info {
+    display: flex;
+    gap: 20px;
+    color: #6c757d;
+    font-size: 0.9rem;
+    align-items: center;
+}
+
+.checking-table-wrapper {
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.checking-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.checking-table th {
+    background: var(--primary-color);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.checking-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.checking-table tr:hover td {
+    background: #f8f9fa;
+}
+
+.checking-details {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.checking-details h4 {
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checking-results {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.result-summary {
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.result-summary p {
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.result-note {
+    background: #fff3e0;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #e65100;
+}
+
+.result-item {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.result-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+
+.result-item.error {
+    border-left-color: var(--danger-color);
+    background: rgba(247, 37, 133, 0.05);
+}
+
+.result-item.warning {
+    border-left-color: var(--warning-color);
+    background: rgba(255, 152, 0, 0.05);
+}
+
+.result-item.success {
+    border-left-color: var(--success-color);
+    background: rgba(76, 175, 80, 0.05);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.result-condition {
+    font-weight: 500;
+    color: var(--secondary-color);
+}
+
+.result-count {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.result-details {
+    font-size: 0.9rem;
+    color: #495057;
+    margin-top: 5px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+    min-width: 80px;
+}
+
+.status-valid {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-warning {
+    background: rgba(255, 152, 0, 0.1);
+    color: var(--warning-color);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.status-error {
+    background: rgba(247, 37, 133, 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(247, 37, 133, 0.3);
+}
+
+.status-info {
+    background: rgba(67, 97, 238, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(67, 97, 238, 0.3);
+}
+
+/* สำหรับแถวที่ไม่มีข้อมูลวันที่ปลูก */
+.checking-table tr.warning-row {
+    background-color: rgba(255, 248, 225, 0.7) !important;
+    border-left: 4px solid var(--warning-color) !important;
+}
+
+.checking-table tr.warning-row:hover td {
+    background-color: rgba(255, 248, 225, 0.9) !important;
+}
         /* Step 5: Column Selection for Export */
         .export-column-selection {
             background: white;
@@ -4799,1483 +5127,1140 @@
         // ระบบตรวจสอบเงื่อนไข (Step 4) - แก้ไขทั้งหมดตามข้อกำหนด
         // ============================================
         
-        function initConditionChecking() {
-            if (!uploadedData || !selectedColumns) {
-                document.getElementById('checkingResults').innerHTML = `
-                    <div class="result-summary">
-                        <p><i class="fas fa-exclamation-triangle"></i> ยังไม่มีข้อมูล กรุณาไปที่ขั้นตอนที่ 1-3 ก่อน</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // ตั้งค่า event listeners
-            setupConditionCheckingSystem();
-            
-            // เตรียมตารางสำหรับเงื่อนไขที่เลือก (แสดงทั้งหมด)
-            prepareCheckingTable();
-            
-            // เพิ่มข้อมูลสำหรับเงื่อนไขปุ๋ย
-            if (currentCondition === "fertilizer") {
-                // เตรียมข้อมูลเบื้องต้นสำหรับการตรวจสอบปุ๋ย
-                setTimeout(() => {
-                    const resultsContainer = document.getElementById('checkingResults');
-                    if (resultsContainer.querySelector('.result-summary')) {
-                        const summary = resultsContainer.querySelector('.result-summary');
-                        summary.innerHTML += `
-                            <div style="margin-top: 15px; background: #fff3e0; padding: 10px; border-radius: 6px; border-left: 4px solid #ff9800;">
-                                <p><strong><i class="fas fa-lightbulb"></i> คำแนะนำสำหรับการตรวจสอบปุ๋ย:</strong></p>
-                                <ol style="font-size: 0.9em; margin-left: 20px;">
-                                    <li>ระบบจะตรวจสอบความถูกต้องของสูตรปุ๋ย (รูปแบบ XX-XX-XX)</li>
-                                    <li>ตรวจสอบประเภทการใส่ปุ๋ย (หว่าน, โรยข้างแถว, รองก้นหลุม, พ่นทางใบ)</li>
-                                    <li>ตรวจสอบว่ามีการระบุทั้งประเภทและสูตรปุ๋ยคู่กันหรือไม่</li>
-                                    <li>ตรวจสอบอายุอ้อย (ต้องเป็นตัวเลข ไม่ติดลบ)</li>
-                                </ol>
-                            </div>
-                        `;
-                    }
-                }, 100);
-            }
-        }
-        
-        function setupConditionCheckingSystem() {
-            // ปุ่มเลือกเงื่อนไข
-            document.querySelectorAll('.condition-select-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    // เอา active class ออกจากปุ่มทั้งหมด
-                    document.querySelectorAll('.condition-select-btn').forEach(b => {
-                        b.classList.remove('active');
-                    });
-                    
-                    // เพิ่ม active class ให้ปุ่มที่เลือก
-                    this.classList.add('active');
-                    
-                    // ตั้งค่าเงื่อนไขปัจจุบัน
-                    currentCondition = this.dataset.condition;
-                    
-                    // อัพเดต UI
-                    document.getElementById('selectedCondition').textContent = 
-                        getConditionDisplayName(currentCondition);
-                    
-                    // เตรียมตารางตามเงื่อนไขที่เลือก
-                    prepareCheckingTable();
-                });
-            });
-            
-            // ✅ แก้ไข: ปุ่มเริ่มตรวจสอบเงื่อนไขที่เลือก
-            document.getElementById('runSelectedCheck').addEventListener('click', function() {
-                if (!checkingTableData || checkingTableData.length === 0) {
-                    alert('กรุณาเตรียมข้อมูลก่อนเริ่มตรวจสอบ');
-                    return;
-                }
-                
-                // เรียกใช้ฟังก์ชันตรวจสอบตามเงื่อนไขปัจจุบัน
-                if (currentCondition === "sugarcane") {
-                    const results = performSugarcaneConditionCheck();
-                    updateCheckingTableWithResults(results, currentCondition);
-                    updateCheckingStats(results);
-                    displayCheckingResults(results, currentCondition);
-                    
-                    // แสดงผล
-                    const message = `✅ ตรวจสอบเงื่อนไข "${getConditionDisplayName(currentCondition)}" เสร็จสิ้น\n\n` +
-                                   `ตรวจทั้งหมด: ${results.totalRows} แถว\n` +
-                                   `ผ่าน: ${results.passed} แถว\n` +
-                                   `ไม่ผ่าน: ${results.failed} แถว\n` +
-                                   (results.warnings > 0 ? `ต้องตรวจสอบ: ${results.warnings} แถว\n` : '');
-                    alert(message);
-                } else if (currentCondition === "fertilizer") {
-                    const results = performFertilizerConditionCheck();
-                    updateCheckingTableWithResults(results, currentCondition);
-                    updateCheckingStats(results);
-                    displayCheckingResults(results, currentCondition);
-                    
-                    // แสดงผล
-                    const message = `✅ ตรวจสอบเงื่อนไข "${getConditionDisplayName(currentCondition)}" เสร็จสิ้น\n\n` +
-                                   `ตรวจทั้งหมด: ${results.totalRows} แถว\n` +
-                                   `ผ่าน: ${results.passed} แถว\n` +
-                                   `ไม่ผ่าน: ${results.failed} แถว\n`;
-                    alert(message);
-                }
-            });
-            
-            // ปุ่มตรวจสอบเงื่อนไขทั้งหมด
-            document.getElementById('runAllChecks').addEventListener('click', function() {
-                runAllConditionChecks();
-            });
-            
-            // ปุ่มส่งออกผลตรวจสอบ
-            document.getElementById('exportCheckResults').addEventListener('click', exportCheckingResultsWithColors);
-            
-            // ปุ่มแสดงเฉพาะที่ไม่ผ่าน
-            document.getElementById('showOnlyFailed').addEventListener('click', function() {
-                showOnlyFailed = true;
-                this.classList.add('active');
-                document.getElementById('showAllResults').classList.remove('active');
-                renderCheckingTableFiltered();
-            });
-            
-            // ปุ่มแสดงทั้งหมด
-            document.getElementById('showAllResults').addEventListener('click', function() {
-                showOnlyFailed = false;
-                this.classList.add('active');
-                document.getElementById('showOnlyFailed').classList.remove('active');
-                renderCheckingTableFiltered();
-            });
-        }
-        
-        function getConditionDisplayName(condition) {
-            const names = {
-                "sugarcane": "ประเภทอ้อย",
-                "fertilizer": "ปุ๋ย"
-            };
-            return names[condition] || condition;
-        }
-        
-        // ฟังก์ชันช่วยหาคอลัมน์จากรายการชื่อ
-        function findColumnByName(columns, possibleNames) {
-            for (const column of columns) {
-                const columnLower = column.toLowerCase().trim();
-                for (const name of possibleNames) {
-                    if (columnLower.includes(name.toLowerCase())) {
-                        return column;
-                    }
-                }
-            }
-            return null;
-        }
-        
-        function prepareCheckingTable() {
-            const tableBody = document.getElementById('checkingTableBody');
-            tableBody.innerHTML = '';
-            
-            if (!uploadedData || !selectedColumns || selectedColumns.length === 0) {
-                console.error('No uploaded data or selected columns');
-                return;
-            }
-            
-            // เตรียมตารางตามเงื่อนไขที่เลือก
-            if (currentCondition === "sugarcane") {
-                prepareSugarcaneCheckingTable();
-            } else if (currentCondition === "fertilizer") {
-                prepareFertilizerCheckingTable();
-            } else {
-                prepareGeneralCheckingTable();
+      // ============================================
+// ขั้นตอนที่ 4: ตรวจสอบเงื่อนไขข้อมูลอ้อย
+// ============================================
+
+// กำหนดค่าคงที่สำหรับการตรวจสอบ
+const sugarcaneTypes = [
+    "ปลายฝนขยาย", "ปลายฝนรื้อตอ", "ต้นฝนขยาย", "ต้นฝนรื้อตอ",
+    "ตอ1", "ตอ2", "ตอ3", ">ตอ3", "พันธุ์อ้อย", "ปลายฝน", "ต้นฝน", "บำรุงตอ"
+];
+
+// ช่วงวันที่สำหรับแต่ละประเภทอ้อย
+const sugarcaneDateRanges = {
+    // ช่วงปี 2568-2569
+    "ปลายฝนขยาย": [
+        { start: "2025-10-01", end: "2026-02-28", description: "ตุลาคม 2568 - กุมภาพันธ์ 2569", year: "2568-2569" },
+        { start: "2024-10-01", end: "2025-01-31", description: "ตุลาคม 2567 - มกราคม 2568", year: "2567-2568" }
+    ],
+    "ปลายฝนรื้อตอ": [
+        { start: "2025-10-01", end: "2026-02-28", description: "ตุลาคม 2568 - กุมภาพันธ์ 2569", year: "2568-2569" },
+        { start: "2024-10-01", end: "2025-01-31", description: "ตุลาคม 2567 - มกราคม 2568", year: "2567-2568" }
+    ],
+    "ปลายฝน": [
+        { start: "2025-10-01", end: "2026-02-28", description: "ตุลาคม 2568 - กุมภาพันธ์ 2569", year: "2568-2569" },
+        { start: "2024-10-01", end: "2025-01-31", description: "ตุลาคม 2567 - มกราคม 2568", year: "2567-2568" }
+    ],
+    "ต้นฝนขยาย": [
+        { start: "2026-03-01", end: "2026-06-30", description: "มีนาคม 2569 - มิถุนายน 2569", year: "2569" },
+        { start: "2024-02-01", end: "2025-05-31", description: "กุมภาพันธ์ 2567 - พฤษภาคม 2568", year: "2567-2568" }
+    ],
+    "ต้นฝนรื้อตอ": [
+        { start: "2026-03-01", end: "2026-06-30", description: "มีนาคม 2569 - มิถุนายน 2569", year: "2569" },
+        { start: "2024-02-01", end: "2025-05-31", description: "กุมภาพันธ์ 2567 - พฤษภาคม 2568", year: "2567-2568" }
+    ],
+    "ต้นฝน": [
+        { start: "2026-03-01", end: "2026-06-30", description: "มีนาคม 2569 - มิถุนายน 2569", year: "2569" },
+        { start: "2024-02-01", end: "2025-05-31", description: "กุมภาพันธ์ 2567 - พฤษภาคม 2568", year: "2567-2568" }
+    ],
+    "พันธุ์อ้อย": [
+        { start: "2026-06-01", end: "2026-07-31", description: "มิถุนายน 2569 - กรกฎาคม 2569", year: "2569" },
+        { start: "2024-06-01", end: "2024-06-30", description: "1 มิถุนายน 2567 - 30 มิถุนายน 2567", year: "2567" }
+    ],
+    "ตอ1": [
+        { start: "2025-12-01", end: "2026-03-31", description: "ธันวาคม 2568 - มีนาคม 2569", year: "2568-2569" },
+        { start: "2024-12-01", end: "2025-03-31", description: "ธันวาคม 2567 - มีนาคม 2568", year: "2567-2568" }
+    ],
+    "ตอ2": [
+        { start: "2025-12-01", end: "2026-03-31", description: "ธันวาคม 2568 - มีนาคม 2569", year: "2568-2569" },
+        { start: "2024-12-01", end: "2025-03-31", description: "ธันวาคม 2567 - มีนาคม 2568", year: "2567-2568" }
+    ],
+    "ตอ3": [
+        { start: "2025-12-01", end: "2026-03-31", description: "ธันวาคม 2568 - มีนาคม 2569", year: "2568-2569" },
+        { start: "2024-12-01", end: "2025-03-31", description: "ธันวาคม 2567 - มีนาคม 2568", year: "2567-2568" }
+    ],
+    ">ตอ3": [
+        { start: "2025-12-01", end: "2026-03-31", description: "ธันวาคม 2568 - มีนาคม 2569", year: "2568-2569" },
+        { start: "2024-12-01", end: "2025-03-31", description: "ธันวาคม 2567 - มีนาคม 2568", year: "2567-2568" }
+    ],
+    "บำรุงตอ": [
+        { start: "2025-12-01", end: "2026-03-31", description: "ธันวาคม 2568 - มีนาคม 2569", year: "2568-2569" },
+        { start: "2024-12-01", end: "2025-03-31", description: "ธันวาคม 2567 - มีนาคม 2568", year: "2567-2568" }
+    ]
+};
+
+// ฟังก์ชันแสดงชื่อเงื่อนไข
+function getConditionDisplayName(condition) {
+    const names = {
+        "sugarcane": "ประเภทอ้อย",
+        "fertilizer": "ปุ๋ย"
+    };
+    return names[condition] || condition;
+}
+
+// ฟังก์ชันค้นหาคอลัมน์จากรายชื่อ
+function findColumnByName(columns, possibleNames) {
+    for (const column of columns) {
+        const columnLower = column.toLowerCase().trim();
+        for (const name of possibleNames) {
+            if (columnLower.includes(name.toLowerCase())) {
+                return column;
             }
         }
+    }
+    return null;
+}
+
+// ฟังก์ชันแปลงวันที่
+function parseDateString(dateStr) {
+    if (!dateStr || dateStr.trim() === '') return null;
+    
+    try {
+        const trimmedStr = dateStr.trim();
+        let date;
         
-        function prepareGeneralCheckingTable() {
-            // สำหรับเงื่อนไขอื่นๆ
-            const tableBody = document.getElementById('checkingTableBody');
-            tableBody.innerHTML = '';
+        // รองรับรูปแบบ DD/MM/YYYY หรือ D/M/YYYY
+        if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(trimmedStr)) {
+            const parts = trimmedStr.split('/');
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
+            const year = parseInt(parts[2]);
             
-            // หาคอลัมน์ที่เกี่ยวข้องกับเงื่อนไข
-            const conditionColumns = {
-                "fertilizer": ["ปุ๋ย", "fertilizer", "ยา", "chemical"]
-            };
+            date = new Date(year, month, day);
             
-            const keywords = conditionColumns[currentCondition] || [];
-            const foundColumns = [];
-            
-            keywords.forEach(keyword => {
-                const foundColumn = findColumnByName(selectedColumns, [keyword]);
-                if (foundColumn && !foundColumns.includes(foundColumn)) {
-                    foundColumns.push(foundColumn);
-                }
-            });
-            
-            if (foundColumns.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="8" style="text-align: center; padding: 40px; background: #ffebee;">
-                            <div style="color: #d32f2f; font-size: 1.2rem; margin-bottom: 15px;">
-                                <i class="fas fa-exclamation-triangle"></i> <strong>ไม่พบคอลัมน์ที่เกี่ยวข้อง</strong>
-                            </div>
-                            <p>ไม่พบคอลัมน์ที่เกี่ยวข้องกับเงื่อนไข "${getConditionDisplayName(currentCondition)}"</p>
-                            <p>กรุณาเลือกคอลัมน์ที่เกี่ยวข้องในขั้นตอนที่ 2</p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            // กรองข้อมูล
-            const intechColumn = findColumnByName(selectedColumns, ["แปลงintech", "แปลง intech"]);
-            const filteredData = uploadedData.data.filter(row => {
-                if (intechColumn) {
-                    const intechValue = row[intechColumn] || '';
-                    return intechValue.trim() !== '';
-                }
-                return true;
-            });
-            
-            checkingTableData = [];
-            
-            filteredData.forEach((row, index) => {
-                const rowData = {
-                    id: index + 1,
-                    intechPlot: intechColumn ? row[intechColumn] || '' : '',
-                    condition: getConditionDisplayName(currentCondition),
-                    status: "รอตรวจสอบ",
-                    notes: "ยังไม่ได้ตรวจสอบ",
-                    passed: false,
-                    failedCells: {}
-                };
-                
-                // เพิ่มข้อมูลสำหรับคอลัมน์ที่พบ
-                foundColumns.forEach(col => {
-                    rowData[col] = row[col] || '';
-                });
-                
-                checkingTableData.push(rowData);
-            });
-            
-            // สร้าง header ตาราง
-            const tableHeader = document.getElementById('checkingTableHeader');
-            tableHeader.innerHTML = '';
-            
-            const headerRow = document.createElement('tr');
-            
-            // คอลัมน์พื้นฐาน
-            const baseHeaders = ["ลำดับ", "เลขแปลงintech"];
-            
-            baseHeaders.forEach(header => {
-                const th = document.createElement('th');
-                th.textContent = header;
-                headerRow.appendChild(th);
-            });
-            
-            // คอลัมน์ข้อมูล
-            foundColumns.forEach(col => {
-                const th = document.createElement('th');
-                th.textContent = col;
-                headerRow.appendChild(th);
-            });
-            
-            // คอลัมน์เพิ่มเติม
-            const extraHeaders = ["เงื่อนไขที่ตรวจ", "สถานะ", "หมายเหตุ"];
-            extraHeaders.forEach(header => {
-                const th = document.createElement('th');
-                th.textContent = header;
-                headerRow.appendChild(th);
-            });
-            
-            tableHeader.appendChild(headerRow);
-            
-            // แสดงตาราง
-            renderGeneralCheckingTable();
-            
-            // อัพเดตจำนวนแถว
-            document.getElementById('checkingRowsCount').textContent = checkingTableData.length;
-            
-            // แสดงข้อความแจ้งเตือนสำเร็จ
-            const resultsContainer = document.getElementById('checkingResults');
-            resultsContainer.innerHTML = `
-                <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
-                    <p><i class="fas fa-check-circle"></i> <strong>เตรียมตารางตรวจสอบ "${getConditionDisplayName(currentCondition)}" เสร็จเรียบร้อย</strong></p>
-                    <p>พบข้อมูลทั้งหมด: <strong>${filteredData.length} แถว</strong></p>
-                    <p>พบคอลัมน์: ${foundColumns.join(', ')}</p>
-                    <p style="margin-top: 15px;">
-                        <button class="btn btn-primary" id="startGeneralCheckBtn">
-                            <i class="fas fa-play"></i> เริ่มตรวจสอบ
-                        </button>
-                    </p>
-                </div>
-            `;
-            
-            // เพิ่ม event listener ให้ปุ่มเริ่มตรวจสอบ
-            document.getElementById('startGeneralCheckBtn').addEventListener('click', function() {
-                runConditionCheck(currentCondition);
-            });
-        }
-        
-        function renderGeneralCheckingTable() {
-            const tableBody = document.getElementById('checkingTableBody');
-            tableBody.innerHTML = '';
-            
-            let displayedRows = 0;
-            
-            checkingTableData.forEach(rowData => {
-                // กรองแสดงเฉพาะที่ไม่ผ่านถ้าเลือก
-                if (showOnlyFailed && rowData.status === "ผ่าน") {
-                    return;
-                }
-                
-                displayedRows++;
-                
-                const tr = document.createElement('tr');
-                
-                // สร้างเซลล์ตามโครงสร้าง header
-                const tableHeader = document.getElementById('checkingTableHeader');
-                const headerRow = tableHeader.querySelector('tr');
-                const cells = [];
-                
-                // คอลัมน์ลำดับ
-                cells.push(rowData.id);
-                
-                // คอลัมน์เลขแปลงintech
-                cells.push(rowData.intechPlot || '(ไม่พบข้อมูล)');
-                
-                // คอลัมน์ข้อมูล
-                for (let i = 2; i < headerRow.cells.length - 3; i++) {
-                    const headerCell = headerRow.cells[i];
-                    const columnName = headerCell.textContent;
-                    const cellValue = rowData[columnName] || '';
-                    cells.push(cellValue);
-                }
-                
-                // คอลัมน์เงื่อนไขที่ตรวจ
-                cells.push(rowData.condition);
-                
-                // คอลัมน์สถานะ
-                cells.push(createStatusBadge(rowData.status));
-                
-                // คอลัมน์หมายเหตุ
-                cells.push(rowData.notes || '');
-                
-                // เพิ่มเซลล์ลงในแถว
-                cells.forEach((cellContent, cellIndex) => {
-                    const td = document.createElement('td');
-                    
-                    if (typeof cellContent === 'string' && cellContent.includes('status-badge')) {
-                        td.innerHTML = cellContent;
-                    } else {
-                        td.textContent = cellContent;
-                        
-                        // ตรวจสอบค่าว่าง - แสดงเป็นสีเทา
-                        if (cellContent === '') {
-                            td.style.color = '#999';
-                            td.style.fontStyle = 'italic';
-                        }
-                        
-                        // ตรวจสอบข้อผิดพลาดในคอลัมน์
-                        if (rowData.failedCells && rowData.failedCells[cellIndex]) {
-                            td.style.color = 'var(--danger-color)';
-                            td.style.fontWeight = 'bold';
-                            td.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
-                        }
-                    }
-                    
-                    tr.appendChild(td);
-                });
-                
-                tableBody.appendChild(tr);
-            });
-            
-            // อัพเดตจำนวนแถวที่แสดง
-            document.getElementById('checkingRowsCount').textContent = displayedRows;
-        }
-        
-        function renderCheckingTableFiltered() {
-            const tableBody = document.getElementById('checkingTableBody');
-            tableBody.innerHTML = '';
-            
-            let displayedRows = 0;
-            
-            checkingTableData.forEach(rowData => {
-                // กรองแสดงเฉพาะที่ไม่ผ่านถ้าเลือก
-                if (showOnlyFailed && rowData.status === "ผ่าน") {
-                    return;
-                }
-                
-                displayedRows++;
-                
-                const tr = document.createElement('tr');
-                
-                // ✅ แก้ไข: เพิ่มเงื่อนไขสำหรับแสดงสีพื้นหลังแถบสีเหลืองสำหรับแถวที่ไม่มีข้อมูลวันที่ปลูก
-                if (rowData.status === "ไม่มีข้อมูลวันที่ปลูก") {
-                    tr.classList.add('warning-row');
-                }
-                
-                // ฟังก์ชันช่วยจัดรูปแบบวันที่ปลูก
-                const formatPlantingDate = (dateStr) => {
-                    if (!dateStr || dateStr.trim() === '') return '';
-                    
-                    const dateStrTrimmed = dateStr.trim();
-                    
-                    // ลดความยาววันที่หากยาวเกิน
-                    if (dateStrTrimmed.length > 15) {
-                        // แปลงรูปแบบวันที่ให้สั้นลง
-                        const dateMatch = dateStrTrimmed.match(/(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
-                        if (dateMatch) {
-                            const year = dateMatch[1];
-                            const month = dateMatch[2];
-                            const day = dateMatch[3];
-                            
-                            // ใช้รูปแบบ YYYY/MM/DD ที่สั้นกว่า
-                            return `${year}/${month}/${day}`;
-                        }
-                        
-                        // ถ้าแปลงไม่ได้ ให้ตัดข้อความ
-                        return dateStrTrimmed.length > 20 ? 
-                            dateStrTrimmed.substring(0, 17) + '...' : 
-                            dateStrTrimmed;
-                    }
-                    
-                    return dateStrTrimmed;
-                };
-                
-                const formattedPlantingDate = formatPlantingDate(rowData.plantingDate);
-                
-                // สร้างเซลล์สำหรับแต่ละคอลัมน์
-                const cells = [
-                    rowData.id,
-                    rowData.intechPlot || '(ไม่พบข้อมูล)',
-                    rowData.sugarcaneType || '(ไม่พบข้อมูล)',
-                    formattedPlantingDate || '(ไม่พบข้อมูล)',
-                    rowData.age || '',
-                    rowData.condition,
-                    createStatusBadge(rowData.status),
-                    rowData.notes
-                ];
-                
-                cells.forEach((cellContent, cellIndex) => {
-                    const td = document.createElement('td');
-                    
-                    if (typeof cellContent === 'string' && cellContent.includes('status-badge')) {
-                        td.innerHTML = cellContent;
-                    } else {
-                        td.textContent = cellContent;
-                        
-                        // สำหรับคอลัมน์วันที่ปลูก (คอลัมน์ที่ 4)
-                        if (cellIndex === 3 && rowData.plantingDate && rowData.plantingDate !== formattedPlantingDate) {
-                            td.title = rowData.plantingDate; // แสดงวันที่เต็มเมื่อ hover
-                            td.classList.add('date-cell-compact');
-                        }
-                        
-                        // ถ้าเป็นเซลล์ที่ตรวจสอบไม่ผ่าน ให้เพิ่มสีแดง
-                        if (rowData.failedCells && rowData.failedCells[cellIndex]) {
-                            td.style.color = 'var(--danger-color)';
-                            td.style.fontWeight = 'bold';
-                            td.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
-                        }
-                        // ถ้าผ่าน ให้เพิ่มสีเขียว (เฉพาะคอลัมน์ประเภทอ้อยและวันที่ปลูก)
-                        else if (rowData.passed && (cellIndex === 2 || cellIndex === 3)) {
-                            td.style.color = 'var(--success-color)';
-                            td.style.fontWeight = 'bold';
-                            td.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
-                        }
-                    }
-                    
-                    tr.appendChild(td);
-                });
-                
-                tableBody.appendChild(tr);
-            });
-            
-            // อัพเดตจำนวนแถวที่แสดง
-            document.getElementById('checkingRowsCount').textContent = displayedRows;
-        }
-        
-        function createStatusBadge(status) {
-            let badgeClass = "status-info";
-            let badgeText = status;
-            
-            if (status === "ผ่าน") {
-                badgeClass = "status-valid";
-                badgeText = "ผ่าน";
-            } else if (status === "ไม่ผ่าน") {
-                badgeClass = "status-error";
-                badgeText = "ไม่ผ่าน";
-            } else if (status === "ต้องตรวจสอบ") {
-                badgeClass = "status-warning";
-                badgeText = "ต้องตรวจสอบ";
-            } else if (status === "รอตรวจสอบ") {
-                badgeClass = "status-warning";
-                badgeText = "รอตรวจสอบ";
-            } else if (status === "ไม่มีข้อมูลวันที่ปลูก") {
-                badgeClass = "status-warning";
-                badgeText = "ไม่มีข้อมูลวันที่ปลูก";
-            }
-            
-            return `<span class="status-badge ${badgeClass}">${badgeText}</span>`;
-        }
-        
-        // ✅ แก้ไขฟังก์ชัน parseDateString สำหรับปัญหา 2
-        function parseDateString(dateStr) {
-            if (!dateStr || dateStr.trim() === '') return null;
-            
-            try {
-                const trimmedStr = dateStr.trim();
-                let date;
-                
-                // ✅ แก้ไขเพิ่มเติม: รองรับรูปแบบ DD/MM/YYYY หรือ D/M/YYYY
-                if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(trimmedStr)) {
-                    const parts = trimmedStr.split('/');
-                    const day = parseInt(parts[0]);
-                    const month = parseInt(parts[1]) - 1; // JavaScript months are 0-based
-                    const year = parseInt(parts[2]);
-                    
-                    // ✅ ตรวจสอบว่าเป็นวันที่ถูกต้อง
-                    date = new Date(year, month, day);
-                    
-                    // ตรวจสอบว่าวันที่ถูกต้อง (ป้องกัน 32/13/2025)
-                    if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
-                        return null;
-                    }
-                }
-                // รูปแบบ: YYYY/MM/DD หรือ YYYY/M/D
-                else if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(trimmedStr)) {
-                    const parts = trimmedStr.split('/');
-                    date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                }
-                // รูปแบบ: YYYY-MM-DD
-                else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(trimmedStr)) {
-                    const parts = trimmedStr.split('-');
-                    date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                }
-                // รูปแบบ: DD-MM-YYYY หรือ D-M-YYYY
-                else if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(trimmedStr)) {
-                    const parts = trimmedStr.split('-');
-                    date = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-                }
-                // รูปแบบอื่นๆ ลองใช้ Date.parse
-                else {
-                    date = new Date(trimmedStr);
-                }
-                
-                // ตรวจสอบว่า date ถูกต้องหรือไม่
-                if (isNaN(date.getTime())) {
-                    return null;
-                }
-                
-                return date;
-            } catch (error) {
-                console.error('Error parsing date:', dateStr, error);
+            if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) {
                 return null;
             }
         }
+        // รูปแบบ YYYY/MM/DD หรือ YYYY/M/D
+        else if (/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(trimmedStr)) {
+            const parts = trimmedStr.split('/');
+            date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        }
+        // รูปแบบ YYYY-MM-DD
+        else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(trimmedStr)) {
+            const parts = trimmedStr.split('-');
+            date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        }
+        // รูปแบบ DD-MM-YYYY หรือ D-M-YYYY
+        else if (/^\d{1,2}-\d{1,2}-\d{4}$/.test(trimmedStr)) {
+            const parts = trimmedStr.split('-');
+            date = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        }
+        // รูปแบบอื่นๆ
+        else {
+            date = new Date(trimmedStr);
+        }
         
-        // ✅ แก้ไขฟังก์ชัน prepareSugarcaneCheckingTable() สำหรับปัญหาการนับแถว
-        function prepareSugarcaneCheckingTable() {
-            const tableBody = document.getElementById('checkingTableBody');
-            tableBody.innerHTML = '';
+        if (isNaN(date.getTime())) {
+            return null;
+        }
+        
+        return date;
+    } catch (error) {
+        console.error('Error parsing date:', dateStr, error);
+        return null;
+    }
+}
+
+// ฟังก์ชันสร้าง Badge สถานะ
+function createStatusBadge(status) {
+    let badgeClass = "status-info";
+    let badgeText = status;
+    
+    if (status === "ผ่าน") {
+        badgeClass = "status-valid";
+        badgeText = "ผ่าน";
+    } else if (status === "ไม่ผ่าน") {
+        badgeClass = "status-error";
+        badgeText = "ไม่ผ่าน";
+    } else if (status === "ต้องตรวจสอบ" || status === "รอตรวจสอบ") {
+        badgeClass = "status-warning";
+        badgeText = "ต้องตรวจสอบ";
+    } else if (status === "ไม่มีข้อมูลวันที่ปลูก") {
+        badgeClass = "status-warning";
+        badgeText = "ไม่มีข้อมูลวันที่ปลูก";
+    }
+    
+    return `<span class="status-badge ${badgeClass}">${badgeText}</span>`;
+}
+
+// ฟังก์ชันเตรียมตารางตรวจสอบประเภทอ้อย
+function prepareSugarcaneCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
+    
+    // คอลัมน์ที่จำเป็น
+    const requiredColumns = [
+        { name: "เลขแปลงintech", keywords: ["แปลงintech", "แปลง intech", "แปลง"] },
+        { name: "ชื่อประเภทอ้อย", keywords: ["ชื่อประเภทอ้อย", "ประเภทอ้อย", "พันธุ์อ้อย"] },
+        { name: "วันที่ปลูก", keywords: ["วันที่ปลูก", "วันปลูก", "planting date"] }
+    ];
+    
+    // หาคอลัมน์
+    const foundColumns = {};
+    
+    requiredColumns.forEach(reqCol => {
+        let foundColumn = null;
+        
+        // ค้นหาด้วยชื่อตรง
+        for (const col of selectedColumns) {
+            const colLower = col.toLowerCase().trim();
+            const reqNameLower = reqCol.name.toLowerCase();
             
-            // ✅ แก้ไข: ใช้คอลัมน์ตามที่กำหนดเท่านั้น และตรวจสอบทุกแถว
-            const requiredColumns = [
-                { name: "เลขแปลงintech", keywords: ["แปลงintech", "แปลง intech", "แปลง"] },
-                { name: "ชื่อประเภทอ้อย", keywords: ["ชื่อประเภทอ้อย", "ประเภทอ้อย", "พันธุ์อ้อย"] },
-                { name: "วันที่ปลูก", keywords: ["วันที่ปลูก", "วันปลูก", "planting date"] },
-                { name: "อายุอ้อย", keywords: ["อายุอ้อย", "อายุ", "age", "วัน"] }
-            ];
+            if (colLower === reqNameLower) {
+                foundColumn = col;
+                break;
+            }
+        }
+        
+        // ค้นหาด้วยคำสำคัญ
+        if (!foundColumn) {
+            foundColumn = findColumnByName(selectedColumns, reqCol.keywords);
+        }
+        
+        foundColumns[reqCol.name] = foundColumn;
+    });
+    
+    // ตรวจสอบคอลัมน์ที่ขาด
+    const missingColumns = [];
+    Object.keys(foundColumns).forEach(key => {
+        if (!foundColumns[key]) {
+            missingColumns.push(key);
+        }
+    });
+    
+    if (missingColumns.length > 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 40px; background: #ffebee;">
+                    <div style="color: #d32f2f; font-size: 1.2rem; margin-bottom: 15px;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>ไม่พบคอลัมน์ที่จำเป็น</strong>
+                    </div>
+                    <p>กรุณาเลือกคอลัมน์เหล่านี้ในขั้นตอนที่ 2:</p>
+                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                        ${missingColumns.map(col => `<li>${col}</li>`).join('')}
+                    </ul>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // สร้างข้อมูลตาราง
+    checkingTableData = [];
+    
+    uploadedData.data.forEach((row, rowIndex) => {
+        const rowData = {
+            id: rowIndex + 1,
+            originalRowIndex: rowIndex,
+            intechPlot: foundColumns["เลขแปลงintech"] ? row[foundColumns["เลขแปลงintech"]] || '' : '',
+            sugarcaneType: foundColumns["ชื่อประเภทอ้อย"] ? row[foundColumns["ชื่อประเภทอ้อย"]] || '' : '',
+            plantingDate: foundColumns["วันที่ปลูก"] ? row[foundColumns["วันที่ปลูก"]] || '' : '',
+            condition: getConditionDisplayName(currentCondition),
+            status: "รอตรวจสอบ",
+            notes: "ยังไม่ได้ตรวจสอบ",
+            passed: false,
+            failedCells: {}
+        };
+        
+        checkingTableData.push(rowData);
+    });
+    
+    // สร้างหัวตาราง
+    const tableHeader = document.getElementById('checkingTableHeader');
+    tableHeader.innerHTML = '';
+    
+    const headerRow = document.createElement('tr');
+    const headers = ["ลำดับ", "เลขแปลงintech", "ชื่อประเภทอ้อย", "วันที่ปลูก", "เงื่อนไขที่ตรวจ", "สถานะ", "หมายเหตุ"];
+    
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    
+    tableHeader.appendChild(headerRow);
+    
+    // แสดงตาราง
+    renderCheckingTable();
+    
+    // อัพเดตจำนวนแถว
+    document.getElementById('checkingRowsCount').textContent = checkingTableData.length;
+    
+    // แสดงข้อความแจ้งเตือน
+    const resultsContainer = document.getElementById('checkingResults');
+    resultsContainer.innerHTML = `
+        <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
+            <p><i class="fas fa-check-circle"></i> <strong>เตรียมตารางตรวจสอบประเภทอ้อยเสร็จเรียบร้อย</strong></p>
+            <p>พบข้อมูลทั้งหมด: <strong>${checkingTableData.length} แถว</strong></p>
+            <p>พบคอลัมน์ที่ใช้ตรวจสอบ:</p>
+            <ul>
+                <li><strong>เลขแปลงintech:</strong> "${foundColumns["เลขแปลงintech"]}"</li>
+                <li><strong>ชื่อประเภทอ้อย:</strong> "${foundColumns["ชื่อประเภทอ้อย"]}"</li>
+                <li><strong>วันที่ปลูก:</strong> "${foundColumns["วันที่ปลูก"]}"</li>
+            </ul>
+            <p style="margin-top: 15px;">
+                <button class="btn btn-primary" id="startSugarcaneCheckBtn">
+                    <i class="fas fa-play"></i> เริ่มตรวจสอบประเภทอ้อย
+                </button>
+            </p>
+        </div>
+    `;
+    
+    // เพิ่ม Event Listener
+    document.getElementById('startSugarcaneCheckBtn').addEventListener('click', function() {
+        const results = performSugarcaneConditionCheck();
+        updateCheckingTableWithResults(results, currentCondition);
+        updateCheckingStats(results);
+        displayCheckingResults(results, currentCondition);
+        
+        alert(`✅ ตรวจสอบเงื่อนไข "ประเภทอ้อย" เสร็จสิ้น\n\nตรวจทั้งหมด: ${results.totalRows} แถว\nผ่าน: ${results.passed} แถว\nไม่ผ่าน: ${results.failed} แถว\nต้องตรวจสอบ: ${results.warnings} แถว`);
+    });
+}
+
+// ฟังก์ชันแสดงตารางตรวจสอบ
+function renderCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
+    
+    let displayedRows = 0;
+    
+    checkingTableData.forEach(rowData => {
+        // กรองแสดงเฉพาะที่ไม่ผ่านถ้าเลือก
+        if (showOnlyFailed && rowData.status === "ผ่าน") {
+            return;
+        }
+        
+        displayedRows++;
+        
+        const tr = document.createElement('tr');
+        
+        // เพิ่มคลาสสำหรับแถวที่ไม่มีข้อมูลวันที่ปลูก
+        if (rowData.status === "ไม่มีข้อมูลวันที่ปลูก") {
+            tr.classList.add('warning-row');
+        }
+        
+        // สร้างเซลล์
+        const cells = [
+            rowData.id,
+            rowData.intechPlot || '(ไม่พบข้อมูล)',
+            rowData.sugarcaneType || '(ไม่พบข้อมูล)',
+            rowData.plantingDate || '(ไม่พบข้อมูล)',
+            rowData.condition,
+            createStatusBadge(rowData.status),
+            rowData.notes
+        ];
+        
+        cells.forEach((cellContent, cellIndex) => {
+            const td = document.createElement('td');
             
-            // หาคอลัมน์ที่ตรงกับความต้องการ
-            const foundColumns = {};
-            
-            requiredColumns.forEach(reqCol => {
-                let foundColumn = null;
+            if (typeof cellContent === 'string' && cellContent.includes('status-badge')) {
+                td.innerHTML = cellContent;
+            } else {
+                td.textContent = cellContent;
                 
-                // ค้นหาด้วยชื่อตรง
-                for (const col of selectedColumns) {
-                    const colLower = col.toLowerCase().trim();
-                    const reqNameLower = reqCol.name.toLowerCase();
+                // ตรวจสอบค่าว่าง
+                if (cellContent === '' || cellContent === '(ไม่พบข้อมูล)') {
+                    td.style.color = '#999';
+                    td.style.fontStyle = 'italic';
+                }
+                
+                // ตรวจสอบข้อผิดพลาด
+                if (rowData.failedCells && rowData.failedCells[cellIndex]) {
+                    td.style.color = 'var(--danger-color)';
+                    td.style.fontWeight = 'bold';
+                    td.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+                }
+                
+                // ถ้าผ่าน ให้เพิ่มสีเขียว
+                if (rowData.passed && (cellIndex === 2 || cellIndex === 3)) {
+                    td.style.color = 'var(--success-color)';
+                    td.style.fontWeight = 'bold';
+                    td.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+                }
+            }
+            
+            tr.appendChild(td);
+        });
+        
+        tableBody.appendChild(tr);
+    });
+    
+    // อัพเดตจำนวนแถวที่แสดง
+    document.getElementById('checkingRowsCount').textContent = displayedRows;
+}
+
+// ฟังก์ชันตรวจสอบเงื่อนไขประเภทอ้อย
+function performSugarcaneConditionCheck() {
+    const results = {
+        condition: "sugarcane",
+        totalRows: checkingTableData.length,
+        passed: 0,
+        failed: 0,
+        warnings: 0,
+        pending: 0,
+        issues: []
+    };
+    
+    checkingTableData.forEach((rowData, index) => {
+        let passed = true;
+        let issues = [];
+        let failedCells = {};
+        
+        // ตรวจสอบ 1: ประเภทอ้อย
+        const sugarcaneType = rowData.sugarcaneType ? rowData.sugarcaneType.trim() : '';
+        if (!sugarcaneType) {
+            issues.push('ไม่มีข้อมูลประเภทอ้อย');
+            passed = false;
+            failedCells[2] = true;
+        } else if (!sugarcaneTypes.includes(sugarcaneType)) {
+            issues.push(`ประเภทอ้อย "${sugarcaneType}" ไม่ตรงกับค่ามาตรฐาน`);
+            passed = false;
+            failedCells[2] = true;
+        }
+        
+        // ตรวจสอบ 2: วันที่ปลูก
+        const plantingDateStr = rowData.plantingDate ? rowData.plantingDate.trim() : '';
+        if (!plantingDateStr) {
+            // ไม่มีข้อมูลวันที่ปลูก
+            rowData.status = "ไม่มีข้อมูลวันที่ปลูก";
+            rowData.notes = "ยังไม่ได้ทำกิจกรรมงวด 1";
+            failedCells[3] = true;
+            results.warnings++;
+            results.issues.push({
+                row: rowData.originalRowIndex + 1,
+                intech: rowData.intechPlot,
+                issues: ['ไม่มีข้อมูลวันที่ปลูก'],
+                status: "ไม่มีข้อมูลวันที่ปลูก"
+            });
+            
+            // ยังไม่ตัดสินใจผ่านหรือไม่ผ่าน
+            rowData.passed = false;
+            rowData.failedCells = failedCells;
+            return;
+        }
+        
+        // แปลงวันที่
+        const plantingDate = parseDateString(plantingDateStr);
+        if (!plantingDate) {
+            issues.push(`รูปแบบวันที่ปลูกไม่ถูกต้อง: "${plantingDateStr}"`);
+            passed = false;
+            failedCells[3] = true;
+        } else if (sugarcaneType && sugarcaneTypes.includes(sugarcaneType)) {
+            // ตรวจสอบความสัมพันธ์ระหว่างประเภทอ้อยและวันที่ปลูก
+            const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", 
+                              "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            const plantingMonth = monthNames[plantingDate.getMonth()];
+            const plantingYear = plantingDate.getFullYear() + 543;
+            
+            // หาประเภทอ้อยที่ตรง
+            let matchedType = null;
+            let matchedRanges = null;
+            
+            for (const [typeKey, ranges] of Object.entries(sugarcaneDateRanges)) {
+                if (sugarcaneType.includes(typeKey) || typeKey.includes(sugarcaneType)) {
+                    matchedType = typeKey;
+                    matchedRanges = ranges;
+                    break;
+                }
+            }
+            
+            // ถ้าไม่เจอตรงๆ ให้ตรวจสอบประเภทหลัก
+            if (!matchedRanges) {
+                if (sugarcaneType.includes("ปลายฝน")) {
+                    matchedType = "ปลายฝน";
+                    matchedRanges = sugarcaneDateRanges["ปลายฝน"];
+                } else if (sugarcaneType.includes("ต้นฝน")) {
+                    matchedType = "ต้นฝน";
+                    matchedRanges = sugarcaneDateRanges["ต้นฝน"];
+                } else if (sugarcaneType.includes("พันธุ์")) {
+                    matchedType = "พันธุ์อ้อย";
+                    matchedRanges = sugarcaneDateRanges["พันธุ์อ้อย"];
+                } else if (sugarcaneType.includes("ตอ") || sugarcaneType.includes(">ตอ3") || sugarcaneType.includes("บำรุง")) {
+                    matchedType = "ตอ1";
+                    matchedRanges = sugarcaneDateRanges["ตอ1"];
+                }
+            }
+            
+            if (matchedRanges && matchedRanges.length > 0) {
+                // ตรวจสอบกับทุกช่วงวันที่
+                let isInAnyRange = false;
+                let matchedRangeDescription = "";
+                
+                for (const range of matchedRanges) {
+                    const startDate = new Date(range.start);
+                    const endDate = new Date(range.end);
                     
-                    if (colLower === reqNameLower) {
-                        foundColumn = col;
+                    if (plantingDate >= startDate && plantingDate <= endDate) {
+                        isInAnyRange = true;
+                        matchedRangeDescription = range.description;
                         break;
                     }
                 }
                 
-                // ถ้าไม่เจอชื่อตรง ให้ค้นหาด้วยคำสำคัญ
-                if (!foundColumn) {
-                    for (const col of selectedColumns) {
-                        const colLower = col.toLowerCase();
-                        for (const keyword of reqCol.keywords) {
-                            if (colLower.includes(keyword.toLowerCase())) {
-                                foundColumn = col;
-                                break;
-                            }
-                        }
-                        if (foundColumn) break;
-                    }
-                }
-                
-                foundColumns[reqCol.name] = foundColumn;
-            });
-            
-            // แสดงคอลัมน์ที่พบ
-            console.log('Found columns for checking:', foundColumns);
-            
-            // ตรวจสอบว่ามีคอลัมน์ที่จำเป็นหรือไม่
-            const missingColumns = [];
-            Object.keys(foundColumns).forEach(key => {
-                if (!foundColumns[key]) {
-                    missingColumns.push(key);
-                }
-            });
-            
-            if (missingColumns.length > 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="8" style="text-align: center; padding: 40px; background: #ffebee;">
-                            <div style="color: #d32f2f; font-size: 1.2rem; margin-bottom: 15px;">
-                                <i class="fas fa-exclamation-triangle"></i> <strong>ไม่พบคอลัมน์ที่จำเป็น</strong>
-                            </div>
-                            <p>กรุณาเลือกคอลัมน์เหล่านี้ในขั้นตอนที่ 2:</p>
-                            <ul style="text-align: left; display: inline-block; margin-top: 10px;">
-                                ${missingColumns.map(col => `<li>${col}</li>`).join('')}
-                            </ul>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-            
-            // ✅ แก้ไข: ใช้ข้อมูลทั้งหมด ไม่ต้องกรอง
-            const totalRows = uploadedData.data.length;
-            const hasHeaderRow = 1; // ถ้านับรวมหัวตาราง
-            
-            checkingTableData = [];
-            
-            // ✅ แก้ไข: ใช้ข้อมูลทั้งหมดจาก uploadedData
-            uploadedData.data.forEach((row, rowIndex) => {
-                // ตรวจสอบว่ามีเลขแปลงintech หรือไม่
-                const intechValue = foundColumns["เลขแปลงintech"] ? row[foundColumns["เลขแปลงintech"]] || '' : '';
-                const hasIntech = intechValue.trim() !== '';
-                
-                // สร้าง object สำหรับข้อมูลแถวนี้
-                const rowData = {
-                    id: rowIndex + 1, // หมายเลขแถว (เริ่มจาก 1)
-                    originalRowIndex: rowIndex, // เก็บดัชนีแถวเดิม
-                    hasIntech: hasIntech,
-                    intechPlot: intechValue,
-                    sugarcaneType: foundColumns["ชื่อประเภทอ้อย"] ? row[foundColumns["ชื่อประเภทอ้อย"]] || '' : '',
-                    plantingDate: foundColumns["วันที่ปลูก"] ? row[foundColumns["วันที่ปลูก"]] || '' : '',
-                    age: foundColumns["อายุอ้อย"] ? row[foundColumns["อายุอ้อย"]] || '' : '',
-                    condition: getConditionDisplayName(currentCondition),
-                    status: "รอตรวจสอบ",
-                    notes: "ยังไม่ได้ตรวจสอบ",
-                    passed: false,
-                    failedCells: {}
-                };
-                
-                checkingTableData.push(rowData);
-            });
-            
-            // นับสถิติ
-            const rowsWithIntech = checkingTableData.filter(row => row.hasIntech).length;
-            const rowsWithoutIntech = checkingTableData.filter(row => !row.hasIntech).length;
-            
-            // สร้าง header ตาราง
-            const tableHeader = document.getElementById('checkingTableHeader');
-            tableHeader.innerHTML = '';
-            
-            const headerRow = document.createElement('tr');
-            const headers = ["ลำดับ", "เลขแปลงintech", "ชื่อประเภทอ้อย", "วันที่ปลูก", "อายุอ้อย (วัน)", "เงื่อนไขที่ตรวจ", "สถานะ", "หมายเหตุ"];
-            
-            headers.forEach(header => {
-                const th = document.createElement('th');
-                th.textContent = header;
-                headerRow.appendChild(th);
-            });
-            
-            tableHeader.appendChild(headerRow);
-            
-            // แสดงตาราง
-            renderCheckingTableFiltered();
-            
-            // ✅ แก้ไข: อัพเดตจำนวนแถวที่แสดงอย่างถูกต้อง
-            const checkingRowsCountElement = document.getElementById('checkingRowsCount');
-            if (checkingRowsCountElement) {
-                checkingRowsCountElement.textContent = totalRows;
-            }
-            
-            // ✅ แก้ไข: แสดงข้อความที่ถูกต้อง
-            const resultsContainer = document.getElementById('checkingResults');
-            resultsContainer.innerHTML = `
-                <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
-                    <p><i class="fas fa-check-circle"></i> <strong>เตรียมตารางตรวจสอบประเภทอ้อยเสร็จเรียบร้อย</strong></p>
-                    <p>ไฟล์ CSV ทั้งหมด: <strong>${totalRows + hasHeaderRow} แถว</strong> (รวมหัวตาราง)</p>
-                    <p>ข้อมูลทั้งหมด (ไม่รวมหัวตาราง): <strong>${totalRows} แถว</strong></p>
-                    <p>แถวที่มีเลขแปลงintech: <strong>${rowsWithIntech} แถว</strong></p>
-                    <p>แถวที่ไม่มีเลขแปลงintech: <strong>${rowsWithoutIntech} แถว</strong></p>
-                    <p>พบคอลัมน์ที่ใช้ตรวจสอบ:</p>
-                    <ul>
-                        <li><strong>เลขแปลงintech:</strong> "${foundColumns["เลขแปลงintech"]}"</li>
-                        <li><strong>ชื่อประเภทอ้อย:</strong> "${foundColumns["ชื่อประเภทอ้อย"]}"</li>
-                        <li><strong>วันที่ปลูก:</strong> "${foundColumns["วันที่ปลูก"]}"</li>
-                        <li><strong>อายุอ้อย:</strong> "${foundColumns["อายุอ้อย"]}"</li>
-                    </ul>
-                    <p style="margin-top: 15px;">
-                        <button class="btn btn-primary" id="startSugarcaneCheckBtn">
-                            <i class="fas fa-play"></i> เริ่มตรวจสอบประเภทอ้อย
-                        </button>
-                    </p>
-                </div>
-            `;
-            
-            // เพิ่ม event listener ให้ปุ่มเริ่มตรวจสอบ
-            document.getElementById('startSugarcaneCheckBtn').addEventListener('click', function() {
-                // เรียกใช้ฟังก์ชันตรวจสอบตามเงื่อนไขปัจจุบัน
-                if (currentCondition === "sugarcane") {
-                    const results = performSugarcaneConditionCheck();
-                    updateCheckingTableWithResults(results, currentCondition);
-                    updateCheckingStats(results);
-                    displayCheckingResults(results, currentCondition);
+                if (isInAnyRange) {
+                    // ถูกต้อง
+                    rowData.notes = `✓ ถูกต้อง: ประเภทอ้อย "${sugarcaneType}" ปลูกเดือน ${plantingMonth} ${plantingYear} สอดคล้องกับช่วง ${matchedRangeDescription}`;
+                } else {
+                    // ไม่อยู่ในช่วงที่กำหนด
+                    passed = false;
+                    const allRangesDesc = matchedRanges.map(r => `${r.description} (ปี ${r.year})`).join(" หรือ ");
+                    issues.push(`ปลูกเดือน ${plantingMonth} ${plantingYear} ไม่อยู่ในช่วงที่กำหนดสำหรับ "${sugarcaneType}"`);
+                    failedCells[2] = true;
+                    failedCells[3] = true;
                     
-                    // ✅ แก้ไข: แสดงผลสรุปที่ถูกต้อง
-                    const message = `✅ ตรวจสอบเงื่อนไข "${getConditionDisplayName(currentCondition)}" เสร็จสิ้น\n\n` +
-                                   `ไฟล์ทั้งหมด: ${totalRows + hasHeaderRow} แถว\n` +
-                                   `ข้อมูลทั้งหมด: ${totalRows} แถว\n` +
-                                   `ตรวจทั้งหมด: ${results.totalRows} แถว\n` +
-                                   `ผ่าน: ${results.passed} แถว\n` +
-                                   `ไม่ผ่าน: ${results.failed} แถว\n` +
-                                   (results.warnings > 0 ? `ต้องตรวจสอบ: ${results.warnings} แถว\n` : '');
-                    alert(message);
+                    rowData.notes = `⏳ ต้องตรวจสอบ: ปลูกเดือน ${plantingMonth} ${plantingYear} ไม่อยู่ในช่วงที่กำหนด | ช่วงที่กำหนด: ${allRangesDesc}`;
                 }
+            } else {
+                // ไม่พบช่วงวันที่สำหรับประเภทนี้
+                passed = false;
+                issues.push(`ประเภทอ้อย "${sugarcaneType}" ไม่มีช่วงวันที่กำหนดในระบบ`);
+                failedCells[2] = true;
+                rowData.notes = `⏳ ต้องตรวจสอบ: ประเภทอ้อย "${sugarcaneType}" ไม่มีช่วงวันที่กำหนด`;
+            }
+        }
+        
+        // กำหนดสถานะ
+        if (passed && issues.length === 0) {
+            results.passed++;
+            rowData.status = "ผ่าน";
+            rowData.passed = true;
+        } else if (issues.length > 0 && rowData.notes.includes("ต้องตรวจสอบ")) {
+            results.warnings++;
+            rowData.status = "ต้องตรวจสอบ";
+            rowData.passed = false;
+            results.issues.push({
+                row: rowData.originalRowIndex + 1,
+                intech: rowData.intechPlot,
+                issues: issues,
+                status: "ต้องตรวจสอบ"
+            });
+        } else {
+            results.failed++;
+            rowData.status = "ไม่ผ่าน";
+            rowData.passed = false;
+            results.issues.push({
+                row: rowData.originalRowIndex + 1,
+                intech: rowData.intechPlot,
+                issues: issues
             });
         }
         
-        // ✅ แก้ไขฟังก์ชัน performSugarcaneConditionCheck() สำหรับปัญหา 2
-        function performSugarcaneConditionCheck() {
-            const results = {
-                condition: "sugarcane",
-                totalRows: checkingTableData.length,
-                passed: 0,
-                failed: 0,
-                warnings: 0,
-                pending: 0, // ✅ เพิ่ม: นับจำนวนที่รอตรวจสอบ
-                issues: []
-            };
-            
-            // ตรวจสอบแต่ละแถว
-            checkingTableData.forEach((rowData, index) => {
-                    let passed = true;
-            let issues = [];
-            let warningNotes = [];
-            let hasWarning = false;
-            
-            // ✅ ตรวจสอบ 1: เลขแปลงintech
-            if (!rowData.hasIntech) {
-                issues.push('ไม่มีเลขแปลงintech');
-                passed = false;
-                rowData.failedCells[1] = true; // คอลัมน์ที่ 1 (เลขแปลงintech)
-            }
-            
-            // ✅ ตรวจสอบ 2: ชื่อประเภทอ้อย
-            const caneType = rowData.sugarcaneType ? rowData.sugarcaneType.trim() : '';
-            if (!caneType) {
-                issues.push('ไม่มีชื่อประเภทอ้อย');
-                passed = false;
-                rowData.failedCells[2] = true; // คอลัมน์ที่ 2 (ชื่อประเภทอ้อย)
-            } else if (!ALLOWED_CANE_TYPES.includes(caneType)) {
-                issues.push(`ชื่อประเภทอ้อย "${caneType}" ไม่ตรงกับค่าที่กำหนด`);
-                passed = false;
-                rowData.failedCells[2] = true;
-            }
-            
-            // ✅ ตรวจสอบ 3: วันที่ปลูก
-            const plantingDate = rowData.plantingDate ? rowData.plantingDate.trim() : '';
-            if (!plantingDate) {
-                issues.push('ไม่มีข้อมูลวันที่ปลูก');
-                hasWarning = true;
-                warningNotes.push('ไม่มีข้อมูลวันที่ปลูก');
-                rowData.status = "ไม่มีข้อมูลวันที่ปลูก";
-            } else {
-                const parsedDate = parseDateString(plantingDate);
-                if (!parsedDate) {
-                    issues.push(`รูปแบบวันที่ปลูกไม่ถูกต้อง: "${plantingDate}"`);
-                    passed = false;
-                    rowData.failedCells[3] = true; // คอลัมน์ที่ 3 (วันที่ปลูก)
-                } else {
-                    // ตรวจสอบว่าเป็นวันที่ในอดีตหรืออนาคต
-                    const today = new Date();
-                    if (parsedDate > today) {
-                        warningNotes.push('วันที่ปลูกเป็นวันที่ในอนาคต');
-                        hasWarning = true;
-                    }
-                    
-                    // ตรวจสอบว่าเป็นวันที่สมเหตุสมผล (ไม่เก่าเกิน 10 ปี)
-                    const tenYearsAgo = new Date();
-                    tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
-                    if (parsedDate < tenYearsAgo) {
-                        warningNotes.push('วันที่ปลูกเก่าเกิน 10 ปี');
-                        hasWarning = true;
-                    }
-                }
-            }
-            
-            // ✅ ตรวจสอบ 4: อายุอ้อย
-            const age = rowData.age ? rowData.age.toString().trim() : '';
-            if (age) {
-                const ageNum = parseInt(age);
-                if (isNaN(ageNum)) {
-                    issues.push(`อายุอ้อยไม่ใช่ตัวเลข: "${age}"`);
-                    passed = false;
-                    rowData.failedCells[4] = true; // คอลัมน์ที่ 4 (อายุอ้อย)
-                } else if (ageNum < 0) {
-                    issues.push(`อายุอ้อยติดลบ: "${age}"`);
-                    passed = false;
-                    rowData.failedCells[4] = true;
-                } else if (ageNum > 400) {
-                    warningNotes.push(`อายุอ้อยเกิน 400 วัน: "${age}"`);
-                    hasWarning = true;
-                }
-                
-                // ✅ เพิ่ม: ตรวจสอบความสัมพันธ์ระหว่างวันที่ปลูกและอายุอ้อย
-                if (plantingDate && !isNaN(ageNum)) {
-                    const parsedDate = parseDateString(plantingDate);
-                    if (parsedDate) {
-                        const calculatedAge = calculateAgeFromDate(parsedDate);
-                        const ageDiff = Math.abs(calculatedAge - ageNum);
-                        
-                        if (ageDiff > 30) { // อนุญาตความคลาดเคลื่อน 30 วัน
-                            warningNotes.push(`อายุอ้อย (${ageNum}) ไม่สอดคล้องกับวันที่ปลูก (ควรประมาณ ${calculatedAge} วัน)`);
-                            hasWarning = true;
-                        }
-                    }
-                }
-            }
-            
-            // ✅ อัพเดตสถานะแถว
-            if (!passed) {
-                rowData.status = "ไม่ผ่าน";
-                rowData.passed = false;
-                rowData.notes = issues.join('; ');
-                results.failed++;
-                results.issues.push({
-                    row: rowData.id,
-                    intech: rowData.intechPlot,
-                    issues: issues
-                });
-            } else if (hasWarning) {
-                rowData.status = "ต้องตรวจสอบ";
-                rowData.passed = true;
-                rowData.notes = warningNotes.join('; ');
-                results.warnings++;
-            } else {
-                rowData.status = "ผ่าน";
-                rowData.passed = true;
-                rowData.notes = "ตรวจสอบแล้ว - ผ่านเกณฑ์ทั้งหมด";
-                results.passed++;
-            }
-        });
-        
-        // ✅ อัพเดต pending count
-        results.pending = checkingTableData.filter(row => row.status === "รอตรวจสอบ").length;
-        
-        return results;
-    }
+        rowData.failedCells = failedCells;
+    });
     
-    // ✅ เพิ่มฟังก์ชันคำนวณอายุจากวันที่ปลูก
-    function calculateAgeFromDate(plantingDate) {
-        const today = new Date();
-        const diffTime = Math.abs(today - plantingDate);
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays;
-    }
+    return results;
+}
+
+// ฟังก์ชันเตรียมตารางตรวจสอบปุ๋ย
+function prepareFertilizerCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
     
-    // ✅ แก้ไขฟังก์ชัน prepareFertilizerCheckingTable()
-    function prepareFertilizerCheckingTable() {
-        const tableBody = document.getElementById('checkingTableBody');
-        tableBody.innerHTML = '';
+    // คอลัมน์ปุ๋ย
+    const fertilizerColumns = [
+        { name: "เลขแปลงintech", keywords: ["แปลงintech", "แปลง intech", "แปลง"] },
+        { name: "ชื่อประเภทอ้อย", keywords: ["ชื่อประเภทอ้อย", "ประเภทอ้อย", "พันธุ์อ้อย"] },
+        { name: "อายุอ้อย", keywords: ["อายุอ้อย", "อายุ", "age", "วัน"] },
+        { name: "ประเภทการใส่ปุ๋ยงวด 1", keywords: ["ประเภทการใส่ปุ๋ยงวด 1", "ประเภทปุ๋ยงวด1", "ปุ๋ยงวด1"] },
+        { name: "สูตรปุ๋ยเคมีครั้งที่1", keywords: ["สูตรปุ๋ยเคมีครั้งที่1", "สูตรปุ๋ย1", "ปุ๋ยเคมี1"] },
+        { name: "ประเภทการใส่ปุ๋ยงวด 2", keywords: ["ประเภทการใส่ปุ๋ยงวด 2", "ประเภทปุ๋ยงวด2", "ปุ๋ยงวด2"] },
+        { name: "ปุ๋ยเคมีงวด2", keywords: ["ปุ๋ยเคมีงวด2", "สูตรปุ๋ย2", "ปุ๋ยเคมี2"] },
+        { name: "ประเภทการใส่ปุ๋ยงวด 3", keywords: ["ประเภทการใส่ปุ๋ยงวด 3", "ประเภทปุ๋ยงวด3", "ปุ๋ยงวด3"] },
+        { name: "ปุ๋ยเคมีงวด 3", keywords: ["ปุ๋ยเคมีงวด 3", "สูตรปุ๋ย3", "ปุ๋ยเคมี3"] }
+    ];
+    
+    // หาคอลัมน์
+    const foundColumns = {};
+    
+    fertilizerColumns.forEach(colDef => {
+        let foundColumn = null;
         
-        // ค้นหาคอลัมน์ที่เกี่ยวข้องกับปุ๋ย
-        const fertilizerColumns = {
-            "fertilizerType": ["ประเภทปุ๋ย", "ชนิดปุ๋ย", "fertilizer type"],
-            "fertilizerFormula": ["สูตรปุ๋ย", "fertilizer formula", "สูตร"],
-            "applicationMethod": ["วิธีการใช้", "วิธีใส่", "application method"],
-            "applicationDate": ["วันที่ใส่", "วันที่ให้ปุ๋ย", "application date"],
-            "quantity": ["ปริมาณ", "จำนวน", "quantity", "อัตราใช้"],
-            "unit": ["หน่วย", "unit"],
-            "sugarcaneType": ["ชื่อประเภทอ้อย", "ประเภทอ้อย", "พันธุ์อ้อย"],
-            "plantingDate": ["วันที่ปลูก", "วันปลูก", "planting date"],
-            "age": ["อายุอ้อย", "อายุ", "age", "วัน"]
+        // ค้นหาด้วยชื่อตรง
+        for (const col of selectedColumns) {
+            const colLower = col.toLowerCase().trim();
+            const reqNameLower = colDef.name.toLowerCase();
+            
+            if (colLower === reqNameLower) {
+                foundColumn = col;
+                break;
+            }
+        }
+        
+        // ค้นหาด้วยคำสำคัญ
+        if (!foundColumn) {
+            foundColumn = findColumnByName(selectedColumns, colDef.keywords);
+        }
+        
+        foundColumns[colDef.name] = foundColumn;
+    });
+    
+    // สร้างข้อมูลตาราง
+    checkingTableData = [];
+    
+    uploadedData.data.forEach((row, rowIndex) => {
+        const rowData = {
+            id: rowIndex + 1,
+            originalRowIndex: rowIndex,
+            intechPlot: foundColumns["เลขแปลงintech"] ? row[foundColumns["เลขแปลงintech"]] || '' : '',
+            sugarcaneType: foundColumns["ชื่อประเภทอ้อย"] ? row[foundColumns["ชื่อประเภทอ้อย"]] || '' : '',
+            age: foundColumns["อายุอ้อย"] ? row[foundColumns["อายุอ้อย"]] || '' : '',
+            fertilizerType1: foundColumns["ประเภทการใส่ปุ๋ยงวด 1"] ? row[foundColumns["ประเภทการใส่ปุ๋ยงวด 1"]] || '' : '',
+            fertilizerFormula1: foundColumns["สูตรปุ๋ยเคมีครั้งที่1"] ? row[foundColumns["สูตรปุ๋ยเคมีครั้งที่1"]] || '' : '',
+            fertilizerType2: foundColumns["ประเภทการใส่ปุ๋ยงวด 2"] ? row[foundColumns["ประเภทการใส่ปุ๋ยงวด 2"]] || '' : '',
+            fertilizerFormula2: foundColumns["ปุ๋ยเคมีงวด2"] ? row[foundColumns["ปุ๋ยเคมีงวด2"]] || '' : '',
+            fertilizerType3: foundColumns["ประเภทการใส่ปุ๋ยงวด 3"] ? row[foundColumns["ประเภทการใส่ปุ๋ยงวด 3"]] || '' : '',
+            fertilizerFormula3: foundColumns["ปุ๋ยเคมีงวด 3"] ? row[foundColumns["ปุ๋ยเคมีงวด 3"]] || '' : '',
+            condition: getConditionDisplayName(currentCondition),
+            status: "รอตรวจสอบ",
+            notes: "ยังไม่ได้ตรวจสอบ",
+            passed: false,
+            failedCells: {}
         };
         
-        const foundColumns = {};
+        checkingTableData.push(rowData);
+    });
+    
+    // สร้างหัวตาราง
+    const tableHeader = document.getElementById('checkingTableHeader');
+    tableHeader.innerHTML = '';
+    
+    const headerRow = document.createElement('tr');
+    const headers = [
+        "ลำดับ",
+        "เลขแปลงintech", 
+        "ชื่อประเภทอ้อย",
+        "อายุอ้อย",
+        "ประเภทการใส่ปุ๋ยงวด 1",
+        "สูตรปุ๋ยเคมีครั้งที่1",
+        "ประเภทการใส่ปุ๋ยงวด 2",
+        "ปุ๋ยเคมีงวด2",
+        "ประเภทการใส่ปุ๋ยงวด 3",
+        "ปุ๋ยเคมีงวด 3",
+        "สถานะ",
+        "หมายเหตุ"
+    ];
+    
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    
+    tableHeader.appendChild(headerRow);
+    
+    // แสดงตาราง
+    renderFertilizerCheckingTable();
+    
+    // อัพเดตจำนวนแถว
+    document.getElementById('checkingRowsCount').textContent = checkingTableData.length;
+    
+    // แสดงข้อความแจ้งเตือน
+    const resultsContainer = document.getElementById('checkingResults');
+    
+    const foundCount = Object.values(foundColumns).filter(col => col !== null).length;
+    const totalColumns = fertilizerColumns.length;
+    
+    resultsContainer.innerHTML = `
+        <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
+            <p><i class="fas fa-check-circle"></i> <strong>เตรียมตารางตรวจสอบ "${getConditionDisplayName(currentCondition)}" เสร็จเรียบร้อย</strong></p>
+            <p>พบข้อมูลทั้งหมด: <strong>${checkingTableData.length} แถว</strong></p>
+            <p>พบคอลัมน์ปุ๋ย: ${foundCount}/${totalColumns} คอลัมน์</p>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary" id="startFertilizerCheckBtn">
+                    <i class="fas fa-play"></i> เริ่มตรวจสอบปุ๋ย
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // เพิ่ม Event Listener
+    document.getElementById('startFertilizerCheckBtn').addEventListener('click', function() {
+        const results = performFertilizerConditionCheck();
+        updateCheckingTableWithResults(results, currentCondition);
+        updateCheckingStats(results);
+        displayCheckingResults(results, currentCondition);
         
-        Object.keys(fertilizerColumns).forEach(key => {
-            const foundColumn = findColumnByName(selectedColumns, fertilizerColumns[key]);
-            if (foundColumn) {
-                foundColumns[key] = foundColumn;
-            }
-        });
+        alert(`✅ ตรวจสอบเงื่อนไข "ปุ๋ย" เสร็จสิ้น\n\nตรวจทั้งหมด: ${results.totalRows} แถว\nผ่าน: ${results.passed} แถว\nไม่ผ่าน: ${results.failed} แถว\nต้องตรวจสอบ: ${results.warnings} แถว`);
+    });
+}
+
+// ฟังก์ชันแสดงตารางตรวจสอบปุ๋ย
+function renderFertilizerCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
+    
+    let displayedRows = 0;
+    
+    checkingTableData.forEach(rowData => {
+        if (showOnlyFailed && rowData.status === "ผ่าน") {
+            return;
+        }
         
-        console.log('Found fertilizer columns:', foundColumns);
+        displayedRows++;
         
-        // ✅ แก้ไข: ใช้ข้อมูลทั้งหมด
-        const totalRows = uploadedData.data.length;
-        checkingTableData = [];
+        const tr = document.createElement('tr');
         
-        uploadedData.data.forEach((row, rowIndex) => {
-            const rowData = {
-                id: rowIndex + 1,
-                intechPlot: foundColumns.sugarcaneType ? (row[foundColumns.sugarcaneType] || '') : '',
-                fertilizerType: foundColumns.fertilizerType ? row[foundColumns.fertilizerType] || '' : '',
-                fertilizerFormula: foundColumns.fertilizerFormula ? row[foundColumns.fertilizerFormula] || '' : '',
-                applicationMethod: foundColumns.applicationMethod ? row[foundColumns.applicationMethod] || '' : '',
-                applicationDate: foundColumns.applicationDate ? row[foundColumns.applicationDate] || '' : '',
-                quantity: foundColumns.quantity ? row[foundColumns.quantity] || '' : '',
-                unit: foundColumns.unit ? row[foundColumns.unit] || '' : '',
-                sugarcaneType: foundColumns.sugarcaneType ? row[foundColumns.sugarcaneType] || '' : '',
-                plantingDate: foundColumns.plantingDate ? row[foundColumns.plantingDate] || '' : '',
-                age: foundColumns.age ? row[foundColumns.age] || '' : '',
-                condition: getConditionDisplayName(currentCondition),
-                status: "รอตรวจสอบ",
-                notes: "ยังไม่ได้ตรวจสอบ",
-                passed: false,
-                failedCells: {}
-            };
-            
-            checkingTableData.push(rowData);
-        });
-        
-        // สร้าง header ตารางสำหรับปุ๋ย
-        const tableHeader = document.getElementById('checkingTableHeader');
-        tableHeader.innerHTML = '';
-        
-        const headerRow = document.createElement('tr');
-        const headers = [
-            "ลำดับ", "เลขแปลงintech", "ประเภทปุ๋ย", "สูตรปุ๋ย", 
-            "วิธีการใช้", "วันที่ใส่", "ปริมาณ", "หน่วย",
-            "ชื่อประเภทอ้อย", "วันที่ปลูก", "อายุอ้อย",
-            "เงื่อนไขที่ตรวจ", "สถานะ", "หมายเหตุ"
+        const cells = [
+            rowData.id,
+            rowData.intechPlot || '(ไม่พบข้อมูล)',
+            rowData.sugarcaneType || '(ไม่พบข้อมูล)',
+            rowData.age || '',
+            rowData.fertilizerType1 || '',
+            rowData.fertilizerFormula1 || '',
+            rowData.fertilizerType2 || '',
+            rowData.fertilizerFormula2 || '',
+            rowData.fertilizerType3 || '',
+            rowData.fertilizerFormula3 || '',
+            createStatusBadge(rowData.status),
+            rowData.notes || ''
         ];
         
-        headers.forEach(header => {
-            const th = document.createElement('th');
-            th.textContent = header;
-            headerRow.appendChild(th);
+        cells.forEach((cellContent, cellIndex) => {
+            const td = document.createElement('td');
+            
+            if (typeof cellContent === 'string' && cellContent.includes('status-badge')) {
+                td.innerHTML = cellContent;
+            } else {
+                td.textContent = cellContent;
+                
+                // ตรวจสอบค่าว่าง
+                if (cellContent === '' || cellContent === '(ไม่พบข้อมูล)') {
+                    td.style.color = '#999';
+                    td.style.fontStyle = 'italic';
+                }
+                
+                // ตรวจสอบข้อผิดพลาด
+                if (rowData.failedCells && rowData.failedCells[cellIndex]) {
+                    td.style.color = 'var(--danger-color)';
+                    td.style.fontWeight = 'bold';
+                    td.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+                }
+                
+                // ถ้าผ่าน ให้เพิ่มสีเขียว
+                if (rowData.passed && cellIndex > 0 && cellIndex < 10) {
+                    td.style.color = 'var(--success-color)';
+                    td.style.fontWeight = 'bold';
+                    td.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+                }
+            }
+            
+            tr.appendChild(td);
         });
         
-        tableHeader.appendChild(headerRow);
+        tableBody.appendChild(tr);
+    });
+    
+    document.getElementById('checkingRowsCount').textContent = displayedRows;
+}
+
+// ฟังก์ชันตรวจสอบเงื่อนไขปุ๋ย
+function performFertilizerConditionCheck() {
+    const results = {
+        condition: "fertilizer",
+        totalRows: checkingTableData.length,
+        passed: 0,
+        failed: 0,
+        warnings: 0,
+        issues: []
+    };
+
+    const validFertilizerTypes = ["รองพื้น", "แต่งหน้าครั้งที่1", "แต่งหน้าครั้งที่2", "แต่งหน้าครั้งที่3"];
+
+    checkingTableData.forEach((rowData, index) => {
+        let passed = true;
+        let notes = [];
+        let failedCells = {};
         
-        // แสดงตาราง
+        let ageValue = null;
+        if (rowData.age && rowData.age.trim() !== '') {
+            ageValue = parseFloat(rowData.age);
+        }
+
+        const sugarcaneType = rowData.sugarcaneType ? rowData.sugarcaneType.trim() : '';
+        
+        // ตรวจสอบประเภทปุ๋ยงวด 1
+        if (rowData.fertilizerType1 && rowData.fertilizerType1.trim() !== '') {
+            const fertilizerType1 = rowData.fertilizerType1.trim();
+            if (!validFertilizerTypes.includes(fertilizerType1)) {
+                passed = false;
+                notes.push("ประเภทการใส่ปุ๋ยงวด 1 ไม่ถูกต้อง");
+                failedCells[4] = true;
+            }
+        }
+
+        // ตรวจสอบประเภทปุ๋ยงวด 2
+        if (rowData.fertilizerType2 && rowData.fertilizerType2.trim() !== '') {
+            const fertilizerType2 = rowData.fertilizerType2.trim();
+            if (!validFertilizerTypes.includes(fertilizerType2)) {
+                passed = false;
+                notes.push("ประเภทการใส่ปุ๋ยงวด 2 ไม่ถูกต้อง");
+                failedCells[6] = true;
+            }
+        }
+
+        // ตรวจสอบประเภทปุ๋ยงวด 3
+        if (rowData.fertilizerType3 && rowData.fertilizerType3.trim() !== '') {
+            const fertilizerType3 = rowData.fertilizerType3.trim();
+            if (!validFertilizerTypes.includes(fertilizerType3)) {
+                passed = false;
+                notes.push("ประเภทการใส่ปุ๋ยงวด 3 ไม่ถูกต้อง");
+                failedCells[8] = true;
+            }
+        }
+
+        if (passed && notes.length === 0) {
+            results.passed++;
+            rowData.status = "ผ่าน";
+            rowData.notes = "✓ ปุ๋ยตรงตามเงื่อนไข";
+        } else if (sugarcaneType === '' || ageValue === null || isNaN(ageValue)) {
+            results.warnings++;
+            rowData.status = "รอตรวจสอบ";
+            rowData.notes = notes.join('; ') || "ไม่มีข้อมูลประเภทอ้อยหรืออายุ";
+        } else {
+            results.failed++;
+            rowData.status = "ไม่ผ่าน";
+            rowData.notes = notes.join('; ');
+            results.issues.push({
+                row: index + 1,
+                message: notes.join('; '),
+                intechPlot: rowData.intechPlot,
+                sugarcaneType: rowData.sugarcaneType,
+                age: rowData.age
+            });
+        }
+
+        rowData.passed = passed;
+        rowData.failedCells = failedCells;
+    });
+
+    return results;
+}
+
+// ฟังก์ชันอัพเดตตารางผลลัพธ์
+function updateCheckingTableWithResults(results, condition) {
+    checkingTableData.forEach((rowData) => {
+        rowData.condition = getConditionDisplayName(condition);
+    });
+    
+    if (condition === "fertilizer") {
         renderFertilizerCheckingTable();
-        
-        // อัพเดตจำนวนแถว
-        document.getElementById('checkingRowsCount').textContent = totalRows;
-        
-        // แสดงข้อความแจ้งเตือน
-        const resultsContainer = document.getElementById('checkingResults');
-        resultsContainer.innerHTML = `
-            <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
-                <p><i class="fas fa-check-circle"></i> <strong>เตรียมตารางตรวจสอบปุ๋ยเสร็จเรียบร้อย</strong></p>
-                <p>พบข้อมูลทั้งหมด: <strong>${totalRows} แถว</strong></p>
-                <p>คอลัมน์ที่พบ: ${Object.keys(foundColumns).length} คอลัมน์</p>
-                ${Object.keys(foundColumns).length > 0 ? 
-                    `<p>รายการคอลัมน์: ${Object.values(foundColumns).join(', ')}</p>` : 
-                    '<p style="color: #d32f2f;">⚠️ ไม่พบคอลัมน์เกี่ยวกับปุ๋ย กรุณาตรวจสอบข้อมูล</p>'
-                }
-                <p style="margin-top: 15px;">
-                    <button class="btn btn-primary" id="startFertilizerCheckBtn">
-                        <i class="fas fa-play"></i> เริ่มตรวจสอบปุ๋ย
-                    </button>
+    } else if (condition === "sugarcane") {
+        renderCheckingTable();
+    }
+}
+
+// ฟังก์ชันอัพเดตสถิติ
+function updateCheckingStats(results) {
+    document.getElementById('foundIssues').textContent = results.failed + results.warnings;
+    document.getElementById('passedChecks').textContent = results.passed;
+    document.getElementById('failedChecks').textContent = results.failed;
+}
+
+// ฟังก์ชันแสดงผลการตรวจสอบ
+function displayCheckingResults(results, condition) {
+    const resultsContainer = document.getElementById('checkingResults');
+    
+    let html = `
+        <div class="result-summary">
+            <p><i class="fas fa-check-circle" style="color: #4caf50;"></i> ตรวจสอบเงื่อนไข "<strong>${getConditionDisplayName(condition)}</strong>" เรียบร้อยแล้ว</p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p><strong><i class="fas fa-info-circle"></i> สรุปผลการตรวจสอบ:</strong></p>
+                <ul style="margin-top: 5px;">
+                    <li>ตรวจทั้งหมด: <strong>${results.totalRows}</strong> แถว</li>
+                    <li>ผ่าน: <strong>${results.passed}</strong> แถว</li>
+                    <li>ไม่ผ่าน: <strong>${results.failed}</strong> แถว</li>
+                    ${results.warnings > 0 ? `<li>ต้องตรวจสอบ: <strong>${results.warnings}</strong> แถว</li>` : ''}
+                </ul>
+            </div>
+    `;
+    
+    if (condition === "sugarcane") {
+        html += `
+            <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 6px;">
+                <p><strong><i class="fas fa-calendar-alt"></i> ช่วงวันที่ที่กำหนดสำหรับแต่ละประเภทอ้อย:</strong></p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <h4 style="color: #4361ee; margin-bottom: 5px;">ปี 2568-2569</h4>
+                        <ul style="font-size: 0.9em;">
+                            <li><strong>ปลายฝน</strong> (ปลายฝนขยาย/ปลายฝนรื้อตอ): ตุลาคม 2568 - กุมภาพันธ์ 2569</li>
+                            <li><strong>ต้นฝน</strong> (ต้นฝนขยาย/ต้นฝนรื้อตอ): มีนาคม 2569 - มิถุนายน 2569</li>
+                            <li><strong>พันธุ์อ้อย</strong>: มิถุนายน 2569 - กรกฎาคม 2569</li>
+                            <li><strong>ตอ/บำรุงตอ</strong> (ตอ1, ตอ2, ตอ3, >ตอ3): ธันวาคม 2568 - มีนาคม 2569</li>
+                        </ul>
+                    </div>
+                    <div style="background: white; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <h4 style="color: #3a0ca3; margin-bottom: 5px;">ปี 2567-2568</h4>
+                        <ul style="font-size: 0.9em;">
+                            <li><strong>ปลายฝน</strong> (ปลายฝนขยาย/ปลายฝนรื้อตอ): ตุลาคม 2567 - มกราคม 2568</li>
+                            <li><strong>ต้นฝน</strong> (ต้นฝนขยาย/ต้นฝนรื้อตอ): กุมภาพันธ์ 2567 - พฤษภาคม 2568</li>
+                            <li><strong>พันธุ์อ้อย</strong>: 1 มิถุนายน 2567 - 30 มิถุนายน 2567</li>
+                            <li><strong>ตอ/บำรุงตอ</strong> (ตอ1, ตอ2, ตอ3, >ตอ3): ธันวาคม 2567 - มีนาคม 2568</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                    <i class="fas fa-info-circle"></i> <strong>สีในตาราง:</strong>
+                    <span style="color: #4CAF50;">เขียว</span> = ผ่าน, 
+                    <span style="color: #F44336;">แดง</span> = ไม่ผ่าน, 
+                    <span style="color: #FF9800;">เหลือง</span> = รอตรวจสอบ/ไม่มีข้อมูลวันที่ปลูก
                 </p>
             </div>
         `;
+    }
+    
+    if (condition === "fertilizer") {
+        html += `
+            <div style="margin-top: 15px; padding: 10px; background: #e3f2fd; border-radius: 6px; border-left: 4px solid #2196f3;">
+                <p><strong><i class="fas fa-info-circle"></i> มาตรฐานการตรวจสอบปุ๋ย:</strong></p>
+                <div style="background: white; padding: 10px; border-radius: 5px; margin-top: 10px; border: 1px solid #ddd;">
+                    <h4 style="color: #2196f3; margin-bottom: 5px;">ประเภทการใส่ปุ๋ยที่รับรอง</h4>
+                    <ul style="font-size: 0.9em;">
+                        <li><strong>รองพื้น</strong></li>
+                        <li><strong>แต่งหน้าครั้งที่1</strong></li>
+                        <li><strong>แต่งหน้าครั้งที่2</strong></li>
+                        <li><strong>แต่งหน้าครั้งที่3</strong></li>
+                    </ul>
+                </div>
+            </div>
+        `;
+    }
+    
+    html += `</div>`;
+    
+    resultsContainer.innerHTML = html;
+}
+
+// ฟังก์ชันเตรียมตารางตามเงื่อนไข
+function prepareCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
+    
+    if (!uploadedData || !selectedColumns || selectedColumns.length === 0) {
+        console.error('No uploaded data or selected columns');
+        return;
+    }
+    
+    if (currentCondition === "sugarcane") {
+        prepareSugarcaneCheckingTable();
+    } else if (currentCondition === "fertilizer") {
+        prepareFertilizerCheckingTable();
+    }
+}
+
+// ฟังก์ชันตั้งค่าระบบตรวจสอบเงื่อนไข
+function setupConditionCheckingSystem() {
+    // ปุ่มเลือกเงื่อนไข
+    document.querySelectorAll('.condition-select-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.condition-select-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            
+            this.classList.add('active');
+            currentCondition = this.dataset.condition;
+            document.getElementById('selectedCondition').textContent = getConditionDisplayName(currentCondition);
+            prepareCheckingTable();
+        });
+    });
+    
+    // ปุ่มเริ่มตรวจสอบเงื่อนไขที่เลือก
+    document.getElementById('runSelectedCheck').addEventListener('click', function() {
+        if (!checkingTableData || checkingTableData.length === 0) {
+            alert('กรุณาเตรียมข้อมูลก่อนเริ่มตรวจสอบ');
+            return;
+        }
         
-        document.getElementById('startFertilizerCheckBtn').addEventListener('click', function() {
+        if (currentCondition === "sugarcane") {
+            const results = performSugarcaneConditionCheck();
+            updateCheckingTableWithResults(results, currentCondition);
+            updateCheckingStats(results);
+            displayCheckingResults(results, currentCondition);
+        } else if (currentCondition === "fertilizer") {
             const results = performFertilizerConditionCheck();
             updateCheckingTableWithResults(results, currentCondition);
             updateCheckingStats(results);
             displayCheckingResults(results, currentCondition);
-            
-            const message = `✅ ตรวจสอบเงื่อนไข "ปุ๋ย" เสร็จสิ้น\n\n` +
-                           `ตรวจทั้งหมด: ${results.totalRows} แถว\n` +
-                           `ผ่าน: ${results.passed} แถว\n` +
-                           `ไม่ผ่าน: ${results.failed} แถว\n` +
-                           `ต้องตรวจสอบ: ${results.warnings} แถว`;
-            alert(message);
-        });
-    }
-    
-    function renderFertilizerCheckingTable() {
-        const tableBody = document.getElementById('checkingTableBody');
-        tableBody.innerHTML = '';
-        
-        let displayedRows = 0;
-        
-        checkingTableData.forEach(rowData => {
-            if (showOnlyFailed && rowData.status === "ผ่าน") {
-                return;
-            }
-            
-            displayedRows++;
-            
-            const tr = document.createElement('tr');
-            
-            const cells = [
-                rowData.id,
-                rowData.intechPlot || '(ไม่พบข้อมูล)',
-                rowData.fertilizerType || '',
-                rowData.fertilizerFormula || '',
-                rowData.applicationMethod || '',
-                rowData.applicationDate || '',
-                rowData.quantity || '',
-                rowData.unit || '',
-                rowData.sugarcaneType || '',
-                rowData.plantingDate || '',
-                rowData.age || '',
-                rowData.condition,
-                createStatusBadge(rowData.status),
-                rowData.notes
-            ];
-            
-            cells.forEach((cellContent, cellIndex) => {
-                const td = document.createElement('td');
-                
-                if (typeof cellContent === 'string' && cellContent.includes('status-badge')) {
-                    td.innerHTML = cellContent;
-                } else {
-                    td.textContent = cellContent;
-                    
-                    // ตรวจสอบค่าว่าง
-                    if (cellContent === '' && cellIndex > 0) {
-                        td.style.color = '#999';
-                        td.style.fontStyle = 'italic';
-                    }
-                    
-                    // ตรวจสอบข้อผิดพลาด
-                    if (rowData.failedCells && rowData.failedCells[cellIndex]) {
-                        td.style.color = 'var(--danger-color)';
-                        td.style.fontWeight = 'bold';
-                        td.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
-                    } else if (rowData.passed && cellIndex >= 2 && cellIndex <= 10) {
-                        td.style.color = 'var(--success-color)';
-                        td.style.fontWeight = 'bold';
-                        td.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
-                    }
-                }
-                
-                tr.appendChild(td);
-            });
-            
-            tableBody.appendChild(tr);
-        });
-        
-        document.getElementById('checkingRowsCount').textContent = displayedRows;
-    }
-    
-    function performFertilizerConditionCheck() {
-        const results = {
-            condition: "fertilizer",
-            totalRows: checkingTableData.length,
-            passed: 0,
-            failed: 0,
-            warnings: 0,
-            pending: 0,
-            issues: []
-        };
-        
-        checkingTableData.forEach((rowData, index) => {
-            let passed = true;
-            let issues = [];
-            let warningNotes = [];
-            let hasWarning = false;
-            
-            // ✅ ตรวจสอบ 1: ประเภทปุ๋ย
-            const fertilizerType = rowData.fertilizerType ? rowData.fertilizerType.trim() : '';
-            if (fertilizerType && !fertilizerTypes.includes(fertilizerType)) {
-                issues.push(`ประเภทปุ๋ย "${fertilizerType}" ไม่ถูกต้อง`);
-                passed = false;
-                rowData.failedCells[2] = true;
-            }
-            
-            // ✅ ตรวจสอบ 2: สูตรปุ๋ย (รูปแบบ XX-XX-XX)
-            const formula = rowData.fertilizerFormula ? rowData.fertilizerFormula.trim() : '';
-            if (formula && !/^\d{1,2}-\d{1,2}-\d{1,2}$/.test(formula)) {
-                issues.push(`สูตรปุ๋ย "${formula}" ไม่ถูกต้อง (ควรเป็นรูปแบบ XX-XX-XX)`);
-                passed = false;
-                rowData.failedCells[3] = true;
-            }
-            
-            // ✅ ตรวจสอบ 3: วิธีการใช้
-            const method = rowData.applicationMethod ? rowData.applicationMethod.trim() : '';
-            const validMethods = ["หว่าน", "โรยข้างแถว", "รองก้นหลุม", "พ่นทางใบ"];
-            if (method && !validMethods.includes(method)) {
-                warningNotes.push(`วิธีการใช้ปุ๋ย "${method}" อาจไม่ถูกต้อง`);
-                hasWarning = true;
-            }
-            
-            // ✅ ตรวจสอบ 4: วันที่ใส่ปุ๋ย
-            const appDate = rowData.applicationDate ? rowData.applicationDate.trim() : '';
-            if (appDate) {
-                const parsedDate = parseDateString(appDate);
-                if (!parsedDate) {
-                    issues.push(`รูปแบบวันที่ใส่ปุ๋ยไม่ถูกต้อง: "${appDate}"`);
-                    passed = false;
-                    rowData.failedCells[5] = true;
-                }
-            }
-            
-            // ✅ ตรวจสอบ 5: ปริมาณและหน่วย
-            const quantity = rowData.quantity ? rowData.quantity.toString().trim() : '';
-            const unit = rowData.unit ? rowData.unit.trim() : '';
-            
-            if (quantity && isNaN(parseFloat(quantity))) {
-                issues.push(`ปริมาณปุ๋ยไม่ใช่ตัวเลข: "${quantity}"`);
-                passed = false;
-                rowData.failedCells[6] = true;
-            }
-            
-            if (quantity && !unit) {
-                warningNotes.push('มีปริมาณแต่ไม่มีหน่วย');
-                hasWarning = true;
-            }
-            
-            if (unit && !quantity) {
-                warningNotes.push('มีหน่วยแต่ไม่มีปริมาณ');
-                hasWarning = true;
-            }
-            
-            // ✅ ตรวจสอบ 6: ความสัมพันธ์กับประเภทอ้อย (ถ้ามีข้อมูล)
-            const caneType = rowData.sugarcaneType ? rowData.sugarcaneType.trim() : '';
-            const plantingDate = rowData.plantingDate ? rowData.plantingDate.trim() : '';
-            const age = rowData.age ? rowData.age.toString().trim() : '';
-            
-            if (caneType && fertilizerType) {
-                // ตรวจสอบความเหมาะสมของปุ๋ยกับประเภทอ้อย
-                if (caneType.includes("ตอ") && fertilizerType === "ปุ๋ยรองพื้น") {
-                    warningNotes.push('อ้อยตอไม่ควรใช้ปุ๋ยรองพื้น');
-                    hasWarning = true;
-                }
-            }
-            
-            // ✅ ตรวจสอบ 7: ตรวจสอบความสัมพันธ์ระหว่างวันที่ปลูก วันที่ใส่ปุ๋ย และอายุ
-            if (plantingDate && appDate && age) {
-                const plantingParsed = parseDateString(plantingDate);
-                const appParsed = parseDateString(appDate);
-                const ageNum = parseInt(age);
-                
-                if (plantingParsed && appParsed && !isNaN(ageNum)) {
-                    // วันที่ใส่ปุ๋ยต้องไม่เร็วกว่าวันที่ปลูก
-                    if (appParsed < plantingParsed) {
-                        issues.push('วันที่ใส่ปุ๋ยเร็วกว่าวันที่ปลูก');
-                        passed = false;
-                        rowData.failedCells[5] = true;
-                    }
-                    
-                    // คำนวณอายุจริงจากวันที่ปลูกถึงวันที่ใส่ปุ๋ย
-                    const actualAge = Math.floor((appParsed - plantingParsed) / (1000 * 60 * 60 * 24));
-                    const ageDiff = Math.abs(actualAge - ageNum);
-                    
-                    if (ageDiff > 30) {
-                        warningNotes.push(`อายุอ้อย (${ageNum}) ไม่สอดคล้องกับระยะห่างระหว่างปลูกและใส่ปุ๋ย (ควรประมาณ ${actualAge} วัน)`);
-                        hasWarning = true;
-                    }
-                }
-            }
-            
-            // ✅ อัพเดตสถานะแถว
-            if (!passed) {
-                rowData.status = "ไม่ผ่าน";
-                rowData.passed = false;
-                rowData.notes = issues.join('; ');
-                results.failed++;
-                results.issues.push({
-                    row: rowData.id,
-                    intech: rowData.intechPlot,
-                    issues: issues
-                });
-            } else if (hasWarning) {
-                rowData.status = "ต้องตรวจสอบ";
-                rowData.passed = true;
-                rowData.notes = warningNotes.join('; ');
-                results.warnings++;
-            } else {
-                rowData.status = "ผ่าน";
-                rowData.passed = true;
-                rowData.notes = "ตรวจสอบแล้ว - ผ่านเกณฑ์ทั้งหมด";
-                results.passed++;
-            }
-        });
-        
-        results.pending = checkingTableData.filter(row => row.status === "รอตรวจสอบ").length;
-        return results;
-    }
-    
-    function updateCheckingTableWithResults(results, condition) {
-        // อัพเดต UI ตาราง
-        if (condition === "sugarcane") {
-            renderCheckingTableFiltered();
-        } else if (condition === "fertilizer") {
-            renderFertilizerCheckingTable();
-        } else {
-            renderGeneralCheckingTable();
         }
-    }
+    });
     
-    function updateCheckingStats(results) {
-        document.getElementById('foundIssues').textContent = results.failed;
-        document.getElementById('passedChecks').textContent = results.passed;
-        document.getElementById('failedChecks').textContent = results.failed;
-        
-        // อัพเดตจำนวนแถวทั้งหมดที่ตรวจสอบ
-        const checkingRowsElement = document.getElementById('checkingRowsCount');
-        if (checkingRowsElement) {
-            checkingRowsElement.textContent = results.totalRows;
-        }
-    }
+    // ปุ่มตรวจสอบเงื่อนไขทั้งหมด
+    document.getElementById('runAllChecks').addEventListener('click', function() {
+        runAllConditionChecks();
+    });
     
-    function displayCheckingResults(results, condition) {
-        const resultsContainer = document.getElementById('checkingResults');
-        
-        let resultsHTML = `
-            <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
-                <p><i class="fas fa-chart-bar"></i> <strong>สรุปผลการตรวจสอบ "${getConditionDisplayName(condition)}"</strong></p>
-                <p><i class="fas fa-table"></i> ตรวจทั้งหมด: <strong>${results.totalRows}</strong> แถว</p>
-                <p><i class="fas fa-check-circle" style="color: #4caf50;"></i> ผ่าน: <strong>${results.passed}</strong> แถว</p>
-                <p><i class="fas fa-times-circle" style="color: #f44336;"></i> ไม่ผ่าน: <strong>${results.failed}</strong> แถว</p>
-                ${results.warnings > 0 ? `<p><i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i> ต้องตรวจสอบ: <strong>${results.warnings}</strong> แถว</p>` : ''}
-                ${results.pending > 0 ? `<p><i class="fas fa-clock" style="color: #2196f3;"></i> รอตรวจสอบ: <strong>${results.pending}</strong> แถว</p>` : ''}
-            </div>
-        `;
-        
-        if (results.issues.length > 0) {
-            resultsHTML += `<div style="margin-top: 20px;"><h5><i class="fas fa-exclamation-triangle"></i> รายการที่ต้องแก้ไข</h5>`;
-            
-            // จัดกลุ่มปัญหาตามประเภท
-            const issueGroups = {};
-            results.issues.forEach(issue => {
-                issue.issues.forEach(singleIssue => {
-                    if (!issueGroups[singleIssue]) {
-                        issueGroups[singleIssue] = [];
-                    }
-                    issueGroups[singleIssue].push(issue.row);
-                });
-            });
-            
-            Object.keys(issueGroups).forEach(issueType => {
-                const rows = issueGroups[issueType];
-                resultsHTML += `
-                    <div class="result-item error">
-                        <div class="result-header">
-                            <span class="result-condition">${issueType}</span>
-                            <span class="result-count">${rows.length} รายการ</span>
-                        </div>
-                        <div class="result-details">
-                            <p>แถวที่: ${rows.slice(0, 10).join(', ')}${rows.length > 10 ? ` และอีก ${rows.length - 10} รายการ` : ''}</p>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            resultsHTML += `</div>`;
-        }
-        
-        if (results.warnings > 0) {
-            resultsHTML += `
-                <div style="margin-top: 20px;">
-                    <div class="result-note" style="background: #fff3e0; color: #e65100;">
-                        <i class="fas fa-lightbulb"></i> <strong>คำแนะนำ:</strong> มี ${results.warnings} แถวที่ต้องตรวจสอบเพิ่มเติม กรุณาตรวจสอบข้อมูลในคอลัมน์หมายเหตุ
-                    </div>
-                </div>
-            `;
-        }
-        
-        if (results.passed === results.totalRows) {
-            resultsHTML += `
-                <div style="margin-top: 20px;">
-                    <div class="result-note" style="background: #e8f5e9; color: #2e7d32;">
-                        <i class="fas fa-check-circle"></i> <strong>ยอดเยี่ยม!</strong> ข้อมูลทั้งหมดผ่านการตรวจสอบเงื่อนไข "${getConditionDisplayName(condition)}"
-                    </div>
-                </div>
-            `;
-        }
-        
-        resultsContainer.innerHTML = resultsHTML;
-    }
+    // ปุ่มส่งออกผลตรวจสอบ
+    document.getElementById('exportCheckResults').addEventListener('click', exportCheckingResultsWithColors);
+}
+
+// ฟังก์ชันตรวจสอบเงื่อนไขทั้งหมด
+function runAllConditionChecks() {
+    const conditions = ["sugarcane", "fertilizer"];
+    const allResults = [];
     
-    function runAllConditionChecks() {
-        const conditions = ["sugarcane", "fertilizer"];
-        const allResults = [];
-        
-        // รันการตรวจสอบทุกเงื่อนไข
-        conditions.forEach(condition => {
+    document.getElementById('runAllChecks').disabled = true;
+    document.getElementById('runAllChecks').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบทั้งหมด...';
+    
+    let completedChecks = 0;
+    
+    conditions.forEach(condition => {
+        setTimeout(() => {
             currentCondition = condition;
-            document.getElementById('selectedCondition').textContent = getConditionDisplayName(condition);
+            prepareCheckingTable();
             
-            // เตรียมตารางใหม่สำหรับเงื่อนไขนี้
-            if (condition === "sugarcane") {
-                prepareSugarcaneCheckingTable();
-                const results = performSugarcaneConditionCheck();
-                allResults.push(results);
-            } else if (condition === "fertilizer") {
-                prepareFertilizerCheckingTable();
-                const results = performFertilizerConditionCheck();
-                allResults.push(results);
-            }
-        });
-        
-        // แสดงผลสรุปรวม
-        displayAllConditionResults(allResults);
-        
-        // กลับไปที่เงื่อนไขแรก
-        currentCondition = "sugarcane";
-        document.querySelectorAll('.condition-select-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.condition === "sugarcane") {
-                btn.classList.add('active');
-            }
-        });
-        document.getElementById('selectedCondition').textContent = getConditionDisplayName("sugarcane");
-        prepareSugarcaneCheckingTable();
-    }
+            setTimeout(() => {
+                let results;
+                
+                switch(condition) {
+                    case "sugarcane":
+                        results = performSugarcaneConditionCheck();
+                        break;
+                    case "fertilizer":
+                        results = performFertilizerConditionCheck();
+                        break;
+                }
+                
+                if (results) {
+                    allResults.push(results);
+                }
+                
+                completedChecks++;
+                
+                if (completedChecks === conditions.length) {
+                    displayAllConditionResults(allResults);
+                    document.getElementById('runAllChecks').disabled = false;
+                    document.getElementById('runAllChecks').innerHTML = '<i class="fas fa-play-circle"></i> ตรวจสอบเงื่อนไขทั้งหมด';
+                }
+            }, 500);
+        }, 1000 * conditions.indexOf(condition));
+    });
+}
+
+// ฟังก์ชันแสดงผลการตรวจสอบทั้งหมด
+function displayAllConditionResults(allResults) {
+    const resultsContainer = document.getElementById('checkingResults');
     
-    function displayAllConditionResults(allResults) {
-        let totalPassed = 0;
-        let totalFailed = 0;
-        let totalWarnings = 0;
-        let totalRows = 0;
-        
-        allResults.forEach(result => {
-            totalPassed += result.passed;
-            totalFailed += result.failed;
-            totalWarnings += result.warnings;
-            totalRows += result.totalRows;
-        });
-        
-        const resultsContainer = document.getElementById('checkingResults');
-        resultsContainer.innerHTML = `
-            <div class="result-summary" style="background: #e3f2fd; border-left-color: #2196f3;">
-                <p><i class="fas fa-chart-pie"></i> <strong>สรุปผลการตรวจสอบทั้งหมด</strong></p>
-                <p><i class="fas fa-table"></i> ตรวจทั้งหมด: <strong>${totalRows}</strong> แถว (${allResults.length} เงื่อนไข)</p>
-                <p><i class="fas fa-check-circle" style="color: #4caf50;"></i> ผ่านทั้งหมด: <strong>${totalPassed}</strong> แถว</p>
-                <p><i class="fas fa-times-circle" style="color: #f44336;"></i> ไม่ผ่านทั้งหมด: <strong>${totalFailed}</strong> แถว</p>
-                <p><i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i> ต้องตรวจสอบทั้งหมด: <strong>${totalWarnings}</strong> แถว</p>
+    let totalPassed = 0;
+    let totalFailed = 0;
+    let totalWarnings = 0;
+    let totalRows = 0;
+    
+    allResults.forEach(result => {
+        totalPassed += result.passed;
+        totalFailed += result.failed;
+        totalWarnings += result.warnings;
+        totalRows += result.totalRows;
+    });
+    
+    let html = `
+        <div class="result-summary" style="background: #e3f2fd; border-left-color: #2196f3;">
+            <p><i class="fas fa-chart-pie"></i> <strong>สรุปผลการตรวจสอบทั้งหมด</strong></p>
+            <p><i class="fas fa-table"></i> ตรวจทั้งหมด: <strong>${totalRows}</strong> แถว (${allResults.length} เงื่อนไข)</p>
+            <p><i class="fas fa-check-circle" style="color: #4caf50;"></i> ผ่านทั้งหมด: <strong>${totalPassed}</strong> แถว</p>
+            <p><i class="fas fa-times-circle" style="color: #f44336;"></i> ไม่ผ่านทั้งหมด: <strong>${totalFailed}</strong> แถว</p>
+            <p><i class="fas fa-exclamation-triangle" style="color: #ff9800;"></i> ต้องตรวจสอบทั้งหมด: <strong>${totalWarnings}</strong> แถว</p>
+        </div>
+    `;
+    
+    allResults.forEach((result, index) => {
+        const conditionName = getConditionDisplayName(result.condition);
+        html += `
+            <div class="result-item ${result.failed > 0 || result.warnings > 0 ? 'error' : 'success'}" style="margin-top: 10px;">
+                <div class="result-header">
+                    <span class="result-condition">${conditionName}</span>
+                    <span class="result-count">${result.passed}/${result.totalRows} ผ่าน</span>
+                </div>
+                <div class="result-details">
+                    <p>ผ่าน: ${result.passed} | ไม่ผ่าน: ${result.failed} | ต้องตรวจสอบ: ${result.warnings}</p>
+                </div>
             </div>
         `;
-        
-        allResults.forEach((result, index) => {
-            const conditionName = getConditionDisplayName(result.condition);
-            resultsContainer.innerHTML += `
-                <div class="result-item ${result.failed > 0 ? 'error' : 'success'}" style="margin-top: 10px;">
-                    <div class="result-header">
-                        <span class="result-condition">${conditionName}</span>
-                        <span class="result-count">${result.passed}/${result.totalRows} ผ่าน</span>
-                    </div>
-                    <div class="result-details">
-                        <p>ผ่าน: ${result.passed} | ไม่ผ่าน: ${result.failed} | ต้องตรวจสอบ: ${result.warnings}</p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        // แสดงผลแจ้งเตือน
-        const message = `✅ ตรวจสอบเงื่อนไขทั้งหมดเสร็จสิ้น\n\n` +
-                       `ตรวจทั้งหมด: ${allResults.length} เงื่อนไข\n` +
-                       `แถวทั้งหมด: ${totalRows} แถว\n` +
-                       `ผ่านทั้งหมด: ${totalPassed} แถว\n` +
-                       `ไม่ผ่านทั้งหมด: ${totalFailed} แถว\n` +
-                       `ต้องตรวจสอบทั้งหมด: ${totalWarnings} แถว`;
-        alert(message);
+    });
+    
+    resultsContainer.innerHTML = html;
+    
+    alert(`✅ ตรวจสอบเงื่อนไขทั้งหมดเสร็จสิ้น\n\nตรวจทั้งหมด: ${allResults.length} เงื่อนไข\nแถวทั้งหมด: ${totalRows} แถว\nผ่านทั้งหมด: ${totalPassed} แถว\nไม่ผ่านทั้งหมด: ${totalFailed} แถว\nต้องตรวจสอบทั้งหมด: ${totalWarnings} แถว`);
+}
+
+// ฟังก์ชันเริ่มต้นระบบตรวจสอบเงื่อนไข
+function initConditionChecking() {
+    if (!uploadedData || !selectedColumns) {
+        document.getElementById('checkingResults').innerHTML = `
+            <div class="result-summary">
+                <p><i class="fas fa-exclamation-triangle"></i> ยังไม่มีข้อมูล กรุณาไปที่ขั้นตอนที่ 1-3 ก่อน</p>
+            </div>
+        `;
+        return;
     }
     
-    // ✅ แก้ไขฟังก์ชัน exportCheckingResultsWithColors()
-    function exportCheckingResultsWithColors() {
-        if (!checkingTableData || checkingTableData.length === 0) {
-            alert('ไม่มีข้อมูลผลการตรวจสอบที่จะส่งออก');
-            return;
-        }
+    setupConditionCheckingSystem();
+    prepareCheckingTable();
+}
+
+// ฟังก์ชันส่งออกผลการตรวจสอบ
+function exportCheckingResultsWithColors() {
+    if (!checkingTableData || checkingTableData.length === 0) {
+        alert('ไม่มีข้อมูลผลการตรวจสอบที่จะส่งออก');
+        return;
+    }
+    
+    // สร้าง CSV content
+    let csvContent = '\ufeff';
+    
+    const tableHeader = document.getElementById('checkingTableHeader');
+    const headerRow = tableHeader.querySelector('tr');
+    const headers = [];
+    
+    for (let i = 0; i < headerRow.cells.length; i++) {
+        headers.push(headerRow.cells[i].textContent);
+    }
+    
+    csvContent += headers.join(',') + '\n';
+    
+    checkingTableData.forEach(rowData => {
+        const rowValues = [];
         
-        // สร้าง CSV content
-        let csvContent = '\ufeff'; // BOM สำหรับ UTF-8
-        
-        // สร้าง headers
-        const tableHeader = document.getElementById('checkingTableHeader');
-        const headerRow = tableHeader.querySelector('tr');
-        const headers = [];
-        
-        for (let i = 0; i < headerRow.cells.length; i++) {
-            headers.push(headerRow.cells[i].textContent);
-        }
-        
-        csvContent += headers.join(',') + '\n';
-        
-        // เพิ่มข้อมูลแต่ละแถว
-        checkingTableData.forEach(rowData => {
-            const rowValues = [];
+        for (let i = 0; i < headers.length; i++) {
+            const header = headers[i];
+            let value = '';
             
-            // เก็บค่าตามคอลัมน์ใน headers
-            for (let i = 0; i < headers.length; i++) {
-                let value = '';
-                
-                switch(i) {
-                    case 0: value = rowData.id; break;
-                    case 1: value = rowData.intechPlot || ''; break;
-                    case 2: 
-                        if (currentCondition === "sugarcane") {
-                            value = rowData.sugarcaneType || '';
-                        } else if (currentCondition === "fertilizer") {
-                            value = rowData.fertilizerType || '';
-                        }
-                        break;
-                    case 3:
-                        if (currentCondition === "sugarcane") {
-                            value = rowData.plantingDate || '';
-                        } else if (currentCondition === "fertilizer") {
-                            value = rowData.fertilizerFormula || '';
-                        }
-                        break;
-                    case 4:
-                        if (currentCondition === "sugarcane") {
-                            value = rowData.age || '';
-                        } else if (currentCondition === "fertilizer") {
-                            value = rowData.applicationMethod || '';
-                        }
-                        break;
-                    case 5:
-                        if (currentCondition === "fertilizer") {
-                            value = rowData.applicationDate || '';
-                        } else {
-                            value = rowData.condition;
-                        }
-                        break;
-                    case 6:
-                        if (currentCondition === "fertilizer") {
-                            value = rowData.quantity || '';
-                        } else {
-                            value = rowData.status;
-                        }
-                        break;
-                    case 7:
-                        if (currentCondition === "fertilizer") {
-                            value = rowData.unit || '';
-                        } else {
-                            value = rowData.notes;
-                        }
-                        break;
-                    default:
-                        if (currentCondition === "fertilizer") {
-                            switch(i) {
-                                case 8: value = rowData.sugarcaneType || ''; break;
-                                case 9: value = rowData.plantingDate || ''; break;
-                                case 10: value = rowData.age || ''; break;
-                                case 11: value = rowData.condition; break;
-                                case 12: value = rowData.status; break;
-                                case 13: value = rowData.notes; break;
-                            }
-                        }
-                }
-                
-                // Escape commas and quotes
-                if (typeof value === 'string') {
-                    value = value.replace(/"/g, '""');
-                    if (value.includes(',') || value.includes('\n') || value.includes('"')) {
-                        value = `"${value}"`;
-                    }
-                }
-                
-                rowValues.push(value);
+            if (header === "ลำดับ") {
+                value = rowData.id;
+            } else if (header === "สถานะ") {
+                value = rowData.status;
+            } else if (header === "หมายเหตุ") {
+                value = rowData.notes || '';
+            } else if (header === "เงื่อนไขที่ตรวจ") {
+                value = rowData.condition || '';
+            } else {
+                value = rowData[header] || '';
             }
             
-            csvContent += rowValues.join(',') + '\n';
-        });
+            value = value.toString().replace(/"/g, '""');
+            if (value.includes(',') || value.includes('\n') || value.includes('"')) {
+                value = `"${value}"`;
+            }
+            
+            rowValues.push(value);
+        }
         
-        // สร้าง blob และดาวน์โหลด
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', `condition_check_results_${currentCondition}_${new Date().toISOString().slice(0,10)}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        alert(`✅ ดาวน์โหลดผลการตรวจสอบเงื่อนไข "${getConditionDisplayName(currentCondition)}" เรียบร้อย!\nจำนวนแถว: ${checkingTableData.length}`);
-    }
+        csvContent += rowValues.join(',') + '\n';
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `condition_check_results_${currentCondition}_${new Date().toISOString().slice(0,10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert(`✅ ดาวน์โหลดผลการตรวจสอบเงื่อนไข "${getConditionDisplayName(currentCondition)}" เรียบร้อย!\nจำนวนแถว: ${checkingTableData.length}`);
+}
     
     // ============================================
     // ขั้นตอนที่ 5: เลือกคอลัมน์สำหรับส่งออก
