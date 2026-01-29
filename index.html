@@ -6093,6 +6093,9 @@ function prepareCheckingTable() {
     } else if (currentCondition === "fertilizer") {
         prepareFertilizerCheckingTable();
     }
+      else if (currentCondition === "project") {
+        prepareProjectCheckingTable(); // ✅ เพิ่มบรรทัดนี้
+    }
 }
 
 // ในฟังก์ชัน setupConditionCheckingSystem() ให้เพิ่มเงื่อนไขโครงการ
@@ -6112,7 +6115,7 @@ function setupConditionCheckingSystem() {
     });
     
     // ปุ่มเริ่มตรวจสอบเงื่อนไขที่เลือก
-    document.getElementById('runSelectedCheck').addEventListener('click', function() {
+  document.getElementById('runSelectedCheck').addEventListener('click', function() {
         if (!checkingTableData || checkingTableData.length === 0) {
             alert('กรุณาเตรียมข้อมูลก่อนเริ่มตรวจสอบ');
             return;
@@ -6129,12 +6132,13 @@ function setupConditionCheckingSystem() {
             updateCheckingStats(results);
             displayCheckingResults(results, currentCondition);
         } else if (currentCondition === "project") {
-            const results = performProjectConditionCheck();
+            const results = performProjectConditionCheck(); // ✅ เพิ่มบรรทัดนี้
             updateCheckingTableWithResults(results, currentCondition);
             updateCheckingStats(results);
             displayCheckingResults(results, currentCondition);
         }
     });
+}
     
     // ปุ่มตรวจสอบเงื่อนไขทั้งหมด
     document.getElementById('runAllChecks').addEventListener('click', function() {
@@ -6147,7 +6151,7 @@ function setupConditionCheckingSystem() {
 
 // ฟังก์ชันตรวจสอบเงื่อนไขทั้งหมด
 function runAllConditionChecks() {
-    const conditions = ["sugarcane", "fertilizer"];
+    const conditions = ["sugarcane", "fertilizer", "project"]; // ✅ เพิ่ม "project"
     const allResults = [];
     
     document.getElementById('runAllChecks').disabled = true;
@@ -6707,7 +6711,49 @@ function renderProjectCheckingTable() {
     
     document.getElementById('checkingRowsCount').textContent = displayedRows;
 }
-
+function displayAllConditionResults(allResults) {
+    const resultsContainer = document.getElementById('checkingResults');
+    let html = '<div class="result-summary" style="background: #fff3e0; border-left-color: #ff9800;">';
+    html += '<h4><i class="fas fa-clipboard-check"></i> สรุปผลการตรวจสอบทั้งหมด</h4>';
+    
+    let totalRows = 0;
+    let totalPassed = 0;
+    let totalFailed = 0;
+    let totalWarnings = 0;
+    
+    allResults.forEach((result, index) => {
+        totalRows = Math.max(totalRows, result.totalRows);
+        totalPassed += result.passed;
+        totalFailed += result.failed;
+        totalWarnings += result.warnings;
+        
+        html += `
+            <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 5px;">
+                <p><strong>${getConditionDisplayName(result.condition)}:</strong></p>
+                <div style="display: flex; gap: 15px; font-size: 0.9em;">
+                    <span>ผ่าน: ${result.passed}</span>
+                    <span>ไม่ผ่าน: ${result.failed}</span>
+                    <span>ต้องตรวจสอบ: ${result.warnings}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `
+        <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 5px;">
+            <p><strong><i class="fas fa-chart-bar"></i> สรุปทั้งหมด:</strong></p>
+            <p>ตรวจทั้งหมด: ${totalRows} แถว</p>
+            <p>ผ่านทั้งหมด: ${totalPassed} แถว</p>
+            <p>ไม่ผ่านทั้งหมด: ${totalFailed} แถว</p>
+            <p>ต้องตรวจสอบทั้งหมด: ${totalWarnings} แถว</p>
+        </div>
+    `;
+    
+    html += '</div>';
+    resultsContainer.innerHTML = html;
+    
+    alert(`✅ ตรวจสอบเงื่อนไขทั้งหมดเสร็จสิ้น\n\nตรวจทั้งหมด: ${allResults.length} เงื่อนไข\nแถวทั้งหมด: ${totalRows} แถว\nผ่านทั้งหมด: ${totalPassed} แถว\nไม่ผ่านทั้งหมด: ${totalFailed} แถว\nต้องตรวจสอบทั้งหมด: ${totalWarnings} แถว`);
+}
 // อัพเดตฟังก์ชัน displayCheckingResults() สำหรับโครงการ
 function displayCheckingResults(results, condition) {
     const resultsContainer = document.getElementById('checkingResults');
@@ -6726,12 +6772,13 @@ function displayCheckingResults(results, condition) {
             </div>
     `;
     
-    if (condition === "sugarcane") {
-        // ...โค้ดเดิม...
+   if (currentCondition === "sugarcane") {
+        prepareSugarcaneCheckingTable();
     } else if (condition === "fertilizer") {
-        // ...โค้ดเดิม...
+        prepareFertilizerCheckingTable();
     } else if (condition === "project") {
-        // วิเคราะห์ผลลัพธ์เพิ่มเติม
+        prepareProjectCheckingTable(); // ✅ เพิ่มบรรทัดนี้
+    }
         const notInProjectRows = results.issues.filter(issue => issue.message === "ไม่เข้าโครงการในทุกคอลัมน์").length;
         const appliedProjectsRows = results.passed - (results.totalRows - results.passed - notInProjectRows);
         const noProjectsRows = results.totalRows - results.passed - notInProjectRows;
