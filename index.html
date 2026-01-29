@@ -2045,6 +2045,52 @@
 .checking-table tr.warning-row:hover td {
     background-color: rgba(255, 248, 225, 0.9) !important;
 }
+/* เพิ่มสไตล์สำหรับตารางโครงการ */
+.checking-table tr.project-row-warning {
+    background-color: rgba(255, 248, 225, 0.7) !important;
+    border-left: 4px solid var(--warning-color) !important;
+}
+
+.checking-table tr.project-row-error {
+    background-color: rgba(255, 235, 238, 0.7) !important;
+    border-left: 4px solid var(--danger-color) !important;
+}
+
+.checking-table tr.project-row-success {
+    background-color: rgba(232, 245, 233, 0.7) !important;
+    border-left: 4px solid var(--success-color) !important;
+}
+
+/* สไตล์สำหรับเซลล์โครงการ */
+.project-cell {
+    position: relative;
+}
+
+.project-cell.not-in-project {
+    color: #757575 !important;
+    font-style: italic !important;
+    background-color: #f5f5f5 !important;
+}
+
+.project-cell.applied {
+    color: var(--success-color) !important;
+    font-weight: bold !important;
+    background-color: rgba(76, 175, 80, 0.1) !important;
+}
+
+.project-cell.error {
+    color: var(--danger-color) !important;
+    font-weight: bold !important;
+    background-color: rgba(247, 37, 133, 0.1) !important;
+    border: 1px solid var(--danger-color) !important;
+}
+
+/* Badge สถานะสำหรับโครงการ */
+.status-not-in-project {
+    background: rgba(117, 117, 117, 0.1) !important;
+    color: #757575 !important;
+    border: 1px solid rgba(117, 117, 117, 0.3) !important;
+}        
         /* Step 5: Column Selection for Export */
         .export-column-selection {
             background: white;
@@ -2718,20 +2764,22 @@
                     <p>เลือกเงื่อนไขที่ต้องการตรวจสอบ และดูผลการตรวจสอบในตารางด้านล่าง</p>
                 </div>
                 
-                <!-- ปุ่มเลือกเงื่อนไข -->
-                <div class="condition-selection">
-                    <h3><i class="fas fa-filter"></i> เลือกเงื่อนไขที่ต้องการตรวจสอบ</h3>
-                    <div class="condition-buttons">
-                        <button class="condition-select-btn active" data-condition="sugarcane">
-                            <i class="fas fa-seedling"></i> ประเภทอ้อย
-                            <span class="condition-desc">(ต้องมีคอลัมน์: ชื่อประเภทอ้อย, วันที่ปลูก)</span>
-                        </button>
-                        <button class="condition-select-btn" data-condition="fertilizer">
-                            <i class="fas fa-prescription-bottle"></i> ปุ๋ย
-                            <span class="condition-desc">(ต้องมีคอลัมน์ที่เกี่ยวข้องกับปุ๋ย)</span>
-                        </button>
-                    </div>
-                </div>
+               <!-- ในขั้นตอนที่ 4: เพิ่มปุ่มเลือกเงื่อนไข "โครงการ" -->
+<div class="condition-buttons">
+    <button class="condition-select-btn active" data-condition="sugarcane">
+        <i class="fas fa-seedling"></i> ประเภทอ้อย
+        <span class="condition-desc">(ต้องมีคอลัมน์: ชื่อประเภทอ้อย, วันที่ปลูก)</span>
+    </button>
+    <button class="condition-select-btn" data-condition="fertilizer">
+        <i class="fas fa-prescription-bottle"></i> ปุ๋ย
+        <span class="condition-desc">(ต้องมีคอลัมน์ที่เกี่ยวข้องกับปุ๋ย)</span>
+    </button>
+    <!-- เพิ่มปุ่มตรวจสอบโครงการ -->
+    <button class="condition-select-btn" data-condition="project">
+        <i class="fas fa-project-diagram"></i> โครงการ
+        <span class="condition-desc">(ตรวจสอบโครงการซ้ำและเงื่อนไขพิเศษ)</span>
+    </button>
+</div>
                 
                 <!-- ข้อมูลการตรวจสอบ -->
                 <div class="checking-controls">
@@ -5121,13 +5169,8 @@
                 if (i > 0) costs[s2.length] = lastValue;
             }
             return costs[s2.length];
-        }
-        
-        // ============================================
-        // ระบบตรวจสอบเงื่อนไข (Step 4) - แก้ไขทั้งหมดตามข้อกำหนด
-        // ============================================
-        
-      // ============================================
+        }  
+// ============================================
 // ขั้นตอนที่ 4: ตรวจสอบเงื่อนไขข้อมูลอ้อย
 // ============================================
 
@@ -5264,7 +5307,7 @@ function parseDateString(dateStr) {
     }
 }
 
-// ฟังก์ชันสร้าง Badge สถานะ
+// อัพเดตฟังก์ชันสร้าง Badge สถานะ
 function createStatusBadge(status) {
     let badgeClass = "status-info";
     let badgeText = status;
@@ -5281,11 +5324,13 @@ function createStatusBadge(status) {
     } else if (status === "ไม่มีข้อมูลวันที่ปลูก") {
         badgeClass = "status-warning";
         badgeText = "ไม่มีข้อมูลวันที่ปลูก";
+    } else if (status === "ไม่เข้าโครงการ") {
+        badgeClass = "status-not-in-project";
+        badgeText = "ไม่เข้าโครงการ";
     }
     
     return `<span class="status-badge ${badgeClass}">${badgeText}</span>`;
 }
-
 // ฟังก์ชันเตรียมตารางตรวจสอบประเภทอ้อย
 function prepareSugarcaneCheckingTable() {
     const tableBody = document.getElementById('checkingTableBody');
@@ -6050,7 +6095,7 @@ function prepareCheckingTable() {
     }
 }
 
-// ฟังก์ชันตั้งค่าระบบตรวจสอบเงื่อนไข
+// ในฟังก์ชัน setupConditionCheckingSystem() ให้เพิ่มเงื่อนไขโครงการ
 function setupConditionCheckingSystem() {
     // ปุ่มเลือกเงื่อนไข
     document.querySelectorAll('.condition-select-btn').forEach(btn => {
@@ -6080,6 +6125,11 @@ function setupConditionCheckingSystem() {
             displayCheckingResults(results, currentCondition);
         } else if (currentCondition === "fertilizer") {
             const results = performFertilizerConditionCheck();
+            updateCheckingTableWithResults(results, currentCondition);
+            updateCheckingStats(results);
+            displayCheckingResults(results, currentCondition);
+        } else if (currentCondition === "project") {
+            const results = performProjectConditionCheck();
             updateCheckingTableWithResults(results, currentCondition);
             updateCheckingStats(results);
             displayCheckingResults(results, currentCondition);
@@ -6137,7 +6187,525 @@ function runAllConditionChecks() {
         }, 1000 * conditions.indexOf(condition));
     });
 }
+// เพิ่มข้อมูลโครงการในส่วนที่กำหนดค่าคงที่
+const PROJECT_LIST = [
+    "เปลี่ยนพืชอื่นมาปลูกอ้อย ปี 69/70",
+    "ปลูกอ้อยในนา ปี 69/70",
+    "ผ่ากอ ปี 69/70",
+    "ส่งเสริมระบบน้ำปลอดดอกเบี้ย ปี 69/70",
+    "ส่งเสริมอุปกรณ์ปลอดดอกเบี้ย ปี 69/70",
+    "สร้างความหนาแน่นอ้อยรอบโรงงาน"
+];
 
+// โครงการที่ไม่สามารถสมัครซ้ำได้
+const EXCLUSIVE_PROJECTS = [
+    "เปลี่ยนพืชอื่นมาปลูกอ้อย ปี 69/70",
+    "ปลูกอ้อยในนา ปี 69/70"
+];
+
+// คอลัมน์โครงการที่ต้องตรวจสอบ
+const PROJECT_COLUMNS = [
+    "โครงการ1", "โครงการ2", "โครงการ3", "โครงการ4", "โครงการ5"
+];
+
+// ฟังก์ชันแสดงชื่อเงื่อนไข - เพิ่ม "โครงการ"
+function getConditionDisplayName(condition) {
+    const names = {
+        "sugarcane": "ประเภทอ้อย",
+        "fertilizer": "ปุ๋ย",
+        "project": "โครงการ"
+    };
+    return names[condition] || condition;
+}
+
+// ฟังก์ชันเตรียมตารางตรวจสอบโครงการ
+function prepareProjectCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
+    
+    // คอลัมน์ที่จำเป็นสำหรับการตรวจสอบโครงการ
+    const requiredColumns = [
+        { name: "เลขแปลงintech", keywords: ["แปลงintech", "แปลง intech", "แปลง"] },
+        { name: "โซน", keywords: ["โซน", "zone"] },
+        { name: "รหัสนักเกษตร", keywords: ["รหัสนักเกษตร", "รหัสเกษตร", "farmer code"] }
+    ];
+    
+    // เพิ่มคอลัมน์โครงการ
+    PROJECT_COLUMNS.forEach(projectCol => {
+        requiredColumns.push({ 
+            name: projectCol, 
+            keywords: [projectCol.toLowerCase(), "โครงการ", "project"] 
+        });
+    });
+    
+    // หาคอลัมน์
+    const foundColumns = {};
+    
+    requiredColumns.forEach(colDef => {
+        let foundColumn = null;
+        
+        // ค้นหาด้วยชื่อตรง
+        for (const col of selectedColumns) {
+            const colLower = col.toLowerCase().trim();
+            const reqNameLower = colDef.name.toLowerCase();
+            
+            if (colLower === reqNameLower) {
+                foundColumn = col;
+                break;
+            }
+        }
+        
+        // ค้นหาด้วยคำสำคัญ
+        if (!foundColumn) {
+            foundColumn = findColumnByName(selectedColumns, colDef.keywords);
+        }
+        
+        foundColumns[colDef.name] = foundColumn;
+    });
+    
+    // ตรวจสอบคอลัมน์ที่ขาด
+    const missingRequiredColumns = [];
+    ["เลขแปลงintech", "โซน", "รหัสนักเกษตร"].forEach(key => {
+        if (!foundColumns[key]) {
+            missingRequiredColumns.push(key);
+        }
+    });
+    
+    if (missingRequiredColumns.length > 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="12" style="text-align: center; padding: 40px; background: #ffebee;">
+                    <div style="color: #d32f2f; font-size: 1.2rem; margin-bottom: 15px;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>ไม่พบคอลัมน์ที่จำเป็น</strong>
+                    </div>
+                    <p>กรุณาเลือกคอลัมน์เหล่านี้ในขั้นตอนที่ 2:</p>
+                    <ul style="text-align: left; display: inline-block; margin-top: 10px;">
+                        ${missingRequiredColumns.map(col => `<li>${col}</li>`).join('')}
+                    </ul>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // สร้างข้อมูลตาราง
+    checkingTableData = [];
+    
+    uploadedData.data.forEach((row, rowIndex) => {
+        const rowData = {
+            id: rowIndex + 1,
+            originalRowIndex: rowIndex,
+            intechPlot: foundColumns["เลขแปลงintech"] ? row[foundColumns["เลขแปลงintech"]] || '' : '',
+            zone: foundColumns["โซน"] ? row[foundColumns["โซน"]] || '' : '',
+            farmerCode: foundColumns["รหัสนักเกษตร"] ? row[foundColumns["รหัสนักเกษตร"]] || '' : '',
+            condition: getConditionDisplayName(currentCondition),
+            status: "รอตรวจสอบ",
+            notes: "ยังไม่ได้ตรวจสอบ",
+            passed: false,
+            failedCells: {},
+            projects: {}
+        };
+        
+        // เก็บข้อมูลโครงการ
+        PROJECT_COLUMNS.forEach(projectCol => {
+            const colName = foundColumns[projectCol];
+            if (colName) {
+                rowData[projectCol] = row[colName] || '';
+                rowData.projects[projectCol] = row[colName] || '';
+            } else {
+                rowData[projectCol] = '';
+                rowData.projects[projectCol] = '';
+            }
+        });
+        
+        checkingTableData.push(rowData);
+    });
+    
+    // สร้างหัวตารางสำหรับโครงการ
+    const tableHeader = document.getElementById('checkingTableHeader');
+    tableHeader.innerHTML = '';
+    
+    const headerRow = document.createElement('tr');
+    const headers = [
+        "ลำดับ",
+        "เลขแปลงintech",
+        "โซน", 
+        "รหัสนักเกษตร",
+        "โครงการ1",
+        "โครงการ2",
+        "โครงการ3",
+        "โครงการ4", 
+        "โครงการ5",
+        "สถานะ",
+        "หมายเหตุ"
+    ];
+    
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    
+    tableHeader.appendChild(headerRow);
+    
+    // แสดงตาราง
+    renderProjectCheckingTable();
+    
+    // อัพเดตจำนวนแถว
+    document.getElementById('checkingRowsCount').textContent = checkingTableData.length;
+    
+    // แสดงข้อความแจ้งเตือน
+    const resultsContainer = document.getElementById('checkingResults');
+    resultsContainer.innerHTML = `
+        <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
+            <p><i class="fas fa-check-circle"></i> <strong>เตรียมตารางตรวจสอบ "${getConditionDisplayName(currentCondition)}" เสร็จเรียบร้อย</strong></p>
+            <p>พบข้อมูลทั้งหมด: <strong>${checkingTableData.length} แถว</strong></p>
+            <p>พบคอลัมน์โครงการ: ${PROJECT_COLUMNS.filter(col => foundColumns[col]).length}/5 คอลัมน์</p>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary" id="startProjectCheckBtn">
+                    <i class="fas fa-play"></i> เริ่มตรวจสอบโครงการ
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // เพิ่ม Event Listener สำหรับปุ่มเริ่มตรวจสอบโครงการ
+    document.getElementById('startProjectCheckBtn').addEventListener('click', function() {
+        const results = performProjectConditionCheck();
+        updateCheckingTableWithResults(results, currentCondition);
+        updateCheckingStats(results);
+        displayCheckingResults(results, currentCondition);
+        
+        alert(`✅ ตรวจสอบเงื่อนไข "โครงการ" เสร็จสิ้น\n\nตรวจทั้งหมด: ${results.totalRows} แถว\nผ่าน: ${results.passed} แถว\nไม่ผ่าน: ${results.failed} แถว\nต้องตรวจสอบ: ${results.warnings} แถว`);
+    });
+}
+
+// ฟังก์ชันแสดงตารางตรวจสอบโครงการ
+function renderProjectCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
+    
+    let displayedRows = 0;
+    
+    checkingTableData.forEach(rowData => {
+        if (showOnlyFailed && rowData.status === "ผ่าน") {
+            return;
+        }
+        
+        displayedRows++;
+        
+        const tr = document.createElement('tr');
+        
+        // กำหนดสีแถวตามสถานะ
+        if (rowData.status === "ไม่ผ่าน") {
+            tr.style.backgroundColor = 'rgba(255, 235, 238, 0.5)';
+        } else if (rowData.status === "ต้องตรวจสอบ") {
+            tr.style.backgroundColor = 'rgba(255, 248, 225, 0.5)';
+        } else if (rowData.passed) {
+            tr.style.backgroundColor = 'rgba(232, 245, 233, 0.5)';
+        }
+        
+        const cells = [
+            rowData.id,
+            rowData.intechPlot || '(ไม่พบข้อมูล)',
+            rowData.zone || '(ไม่พบข้อมูล)',
+            rowData.farmerCode || '(ไม่พบข้อมูล)',
+            rowData.projects["โครงการ1"] || '',
+            rowData.projects["โครงการ2"] || '',
+            rowData.projects["โครงการ3"] || '',
+            rowData.projects["โครงการ4"] || '',
+            rowData.projects["โครงการ5"] || '',
+            createStatusBadge(rowData.status),
+            rowData.notes || ''
+        ];
+        
+        cells.forEach((cellContent, cellIndex) => {
+            const td = document.createElement('td');
+            
+            if (typeof cellContent === 'string' && cellContent.includes('status-badge')) {
+                td.innerHTML = cellContent;
+            } else {
+                td.textContent = cellContent;
+                
+                // ตรวจสอบค่าว่าง
+                if (cellContent === '' || cellContent === '(ไม่พบข้อมูล)') {
+                    td.style.color = '#999';
+                    td.style.fontStyle = 'italic';
+                }
+                
+                // ตรวจสอบข้อผิดพลาดในคอลัมน์โครงการ
+                if (cellIndex >= 4 && cellIndex <= 8 && rowData.failedCells && rowData.failedCells[cellIndex]) {
+                    td.style.color = 'var(--danger-color)';
+                    td.style.fontWeight = 'bold';
+                    td.style.backgroundColor = 'rgba(247, 37, 133, 0.2)';
+                    td.style.border = '1px solid var(--danger-color)';
+                }
+                
+                // ถ้าผ่าน ให้เพิ่มสีเขียวในคอลัมน์โครงการ
+                if (rowData.passed && cellIndex >= 4 && cellIndex <= 8 && cellContent !== '') {
+                    td.style.color = 'var(--success-color)';
+                    td.style.fontWeight = 'bold';
+                    td.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                }
+                
+                // ถ้ามีข้อมูล "ไม่เข้าโครงการ" ให้แสดงเป็นสีเทา
+                if (cellIndex >= 4 && cellIndex <= 8 && cellContent === 'ไม่เข้าโครงการ') {
+                    td.style.color = '#757575';
+                    td.style.fontStyle = 'italic';
+                }
+            }
+            
+            tr.appendChild(td);
+        });
+        
+        tableBody.appendChild(tr);
+    });
+    
+    document.getElementById('checkingRowsCount').textContent = displayedRows;
+}
+
+// ฟังก์ชันตรวจสอบเงื่อนไขโครงการ
+function performProjectConditionCheck() {
+    const results = {
+        condition: "project",
+        totalRows: checkingTableData.length,
+        passed: 0,
+        failed: 0,
+        warnings: 0,
+        issues: []
+    };
+
+    checkingTableData.forEach((rowData, index) => {
+        let passed = true;
+        let notes = [];
+        let failedCells = {};
+        let appliedProjects = [];
+        
+        // ตรวจสอบแต่ละคอลัมน์โครงการ
+        PROJECT_COLUMNS.forEach((projectCol, colIndex) => {
+            const projectValue = rowData.projects[projectCol] || '';
+            
+            // ถ้าค่าเป็น "ไม่เข้าโครงการ"
+            if (projectValue.trim() === 'ไม่เข้าโครงการ') {
+                notes.push(`คอลัมน์ ${projectCol}: ไม่เข้าโครงการ`);
+                failedCells[colIndex + 4] = true; // +4 เพราะข้ามคอลัมน์แรกๆ
+                passed = false;
+                return;
+            }
+            
+            // ถ้ามีข้อมูลโครงการ
+            if (projectValue.trim() !== '') {
+                // ตรวจสอบว่าเป็นโครงการที่รู้จักหรือไม่
+                const isKnownProject = PROJECT_LIST.some(proj => 
+                    projectValue.trim().includes(proj) || proj.includes(projectValue.trim())
+                );
+                
+                if (isKnownProject) {
+                    appliedProjects.push(projectValue.trim());
+                } else {
+                    notes.push(`คอลัมน์ ${projectCol}: "${projectValue}" ไม่ใช่โครงการที่รู้จัก`);
+                    failedCells[colIndex + 4] = true;
+                    passed = false;
+                }
+            }
+        });
+        
+        // ตรวจสอบการสมัครโครงการพิเศษซ้ำ
+        const exclusiveProjectsInRow = appliedProjects.filter(proj => 
+            EXCLUSIVE_PROJECTS.some(exProj => proj.includes(exProj) || exProj.includes(proj))
+        );
+        
+        if (exclusiveProjectsInRow.length > 1) {
+            const duplicateProjects = exclusiveProjectsInRow.join(', ');
+            notes.push(`สมัครโครงการพิเศษซ้ำ: ${duplicateProjects} (ไม่สามารถสมัครทั้งสองโครงการได้)`);
+            passed = false;
+            
+            // ระบุคอลัมน์ที่ผิดพลาด
+            PROJECT_COLUMNS.forEach((projectCol, colIndex) => {
+                const projectValue = rowData.projects[projectCol] || '';
+                if (exclusiveProjectsInRow.some(proj => 
+                    projectValue.includes(proj) || proj.includes(projectValue))) {
+                    failedCells[colIndex + 4] = true;
+                }
+            });
+        }
+        
+        // กำหนดสถานะและหมายเหตุ
+        if (passed && appliedProjects.length > 0) {
+            // มีการสมัครโครงการ
+            results.passed++;
+            rowData.status = "ผ่าน";
+            rowData.notes = `สมัครโครงการ: ${appliedProjects.join(', ')}`;
+        } else if (passed && appliedProjects.length === 0) {
+            // ไม่มีการสมัครโครงการ (แต่ไม่ใช่ "ไม่เข้าโครงการ")
+            results.passed++;
+            rowData.status = "ผ่าน";
+            rowData.notes = "ไม่มีโครงการที่สมัคร";
+        } else if (!passed && notes.some(note => note.includes('ไม่เข้าโครงการ'))) {
+            // มี "ไม่เข้าโครงการ" ในคอลัมน์ใดคอลัมน์หนึ่ง
+            results.failed++;
+            rowData.status = "ไม่ผ่าน";
+            rowData.notes = "ไม่เข้าโครงการ";
+            results.issues.push({
+                row: index + 1,
+                message: "ไม่เข้าโครงการ",
+                intechPlot: rowData.intechPlot,
+                farmerCode: rowData.farmerCode
+            });
+        } else {
+            // กรณีอื่นๆ ที่ไม่ผ่าน
+            results.failed++;
+            rowData.status = "ไม่ผ่าน";
+            rowData.notes = notes.join('; ');
+            results.issues.push({
+                row: index + 1,
+                message: notes.join('; '),
+                intechPlot: rowData.intechPlot,
+                farmerCode: rowData.farmerCode
+            });
+        }
+
+        rowData.passed = passed;
+        rowData.failedCells = failedCells;
+    });
+
+    return results;
+}
+
+// ฟังก์ชันอัพเดตตารางผลลัพธ์ - เพิ่มเงื่อนไขโครงการ
+function updateCheckingTableWithResults(results, condition) {
+    checkingTableData.forEach((rowData) => {
+        rowData.condition = getConditionDisplayName(condition);
+    });
+    
+    if (condition === "fertilizer") {
+        renderFertilizerCheckingTable();
+    } else if (condition === "sugarcane") {
+        renderCheckingTable();
+    } else if (condition === "project") {
+        renderProjectCheckingTable();
+    }
+}
+
+// ในฟังก์ชัน prepareCheckingTable() ให้เพิ่มเงื่อนไขโครงการ
+function prepareCheckingTable() {
+    const tableBody = document.getElementById('checkingTableBody');
+    tableBody.innerHTML = '';
+    
+    if (!uploadedData || !selectedColumns || selectedColumns.length === 0) {
+        console.error('No uploaded data or selected columns');
+        return;
+    }
+    
+    if (currentCondition === "sugarcane") {
+        prepareSugarcaneCheckingTable();
+    } else if (currentCondition === "fertilizer") {
+        prepareFertilizerCheckingTable();
+    } else if (currentCondition === "project") {
+        prepareProjectCheckingTable();
+    }
+}
+
+// ในฟังก์ชัน displayCheckingResults() เพิ่มส่วนแสดงผลสำหรับโครงการ
+function displayCheckingResults(results, condition) {
+    const resultsContainer = document.getElementById('checkingResults');
+    
+    let html = `
+        <div class="result-summary">
+            <p><i class="fas fa-check-circle" style="color: #4caf50;"></i> ตรวจสอบเงื่อนไข "<strong>${getConditionDisplayName(condition)}</strong>" เรียบร้อยแล้ว</p>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p><strong><i class="fas fa-info-circle"></i> สรุปผลการตรวจสอบ:</strong></p>
+                <ul style="margin-top: 5px;">
+                    <li>ตรวจทั้งหมด: <strong>${results.totalRows}</strong> แถว</li>
+                    <li>ผ่าน: <strong>${results.passed}</strong> แถว</li>
+                    <li>ไม่ผ่าน: <strong>${results.failed}</strong> แถว</li>
+                    ${results.warnings > 0 ? `<li>ต้องตรวจสอบ: <strong>${results.warnings}</strong> แถว</li>` : ''}
+                </ul>
+            </div>
+    `;
+    
+    if (condition === "sugarcane") {
+        // ...โค้ดเดิม...
+    } else if (condition === "fertilizer") {
+        // ...โค้ดเดิม...
+    } else if (condition === "project") {
+        html += `
+            <div style="margin-top: 15px; padding: 10px; background: #e3f2fd; border-radius: 6px; border-left: 4px solid #2196f3;">
+                <p><strong><i class="fas fa-info-circle"></i> มาตรฐานการตรวจสอบโครงการ:</strong></p>
+                <div style="background: white; padding: 10px; border-radius: 5px; margin-top: 10px; border: 1px solid #ddd;">
+                    <h4 style="color: #2196f3; margin-bottom: 5px;">โครงการที่รับรอง (ต้องมีอย่างน้อย 1 โครงการ)</h4>
+                    <ul style="font-size: 0.9em;">
+                        ${PROJECT_LIST.map(proj => `<li><strong>${proj}</strong></li>`).join('')}
+                    </ul>
+                    
+                    <h4 style="color: #f44336; margin-top: 15px; margin-bottom: 5px;">เงื่อนไขพิเศษ:</h4>
+                    <ul style="font-size: 0.9em;">
+                        <li>ถ้ามีข้อความ "<strong>ไม่เข้าโครงการ</strong>" ในคอลัมน์ใดคอลัมน์หนึ่ง → <span style="color: #f44336;">ไม่ผ่าน</span></li>
+                        <li>โครงการ <strong>${EXCLUSIVE_PROJECTS.join(' และ ')}</strong> ไม่สามารถสมัครซ้ำได้ในแถวเดียวกัน</li>
+                        <li>ถ้าไม่มีโครงการที่สมัครเลย → <span style="color: #4caf50;">ผ่าน</span> (แต่ไม่มีโครงการ)</li>
+                    </ul>
+                </div>
+                
+                <p style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                    <i class="fas fa-info-circle"></i> <strong>สีในตาราง:</strong>
+                    <span style="color: #4CAF50;">เขียว</span> = โครงการที่สมัคร, 
+                    <span style="color: #F44336;">แดง</span> = ไม่ผ่าน/โครงการไม่รู้จัก, 
+                    <span style="color: #757575;">เทา/เอียง</span> = "ไม่เข้าโครงการ"
+                </p>
+            </div>
+        `;
+    }
+    
+    html += `</div>`;
+    
+    resultsContainer.innerHTML = html;
+}
+
+// ในฟังก์ชัน runAllConditionChecks() ให้เพิ่มโครงการ
+function runAllConditionChecks() {
+    const conditions = ["sugarcane", "fertilizer", "project"]; // เพิ่ม "project"
+    const allResults = [];
+    
+    document.getElementById('runAllChecks').disabled = true;
+    document.getElementById('runAllChecks').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบทั้งหมด...';
+    
+    let completedChecks = 0;
+    
+    conditions.forEach(condition => {
+        setTimeout(() => {
+            currentCondition = condition;
+            prepareCheckingTable();
+            
+            setTimeout(() => {
+                let results;
+                
+                switch(condition) {
+                    case "sugarcane":
+                        results = performSugarcaneConditionCheck();
+                        break;
+                    case "fertilizer":
+                        results = performFertilizerConditionCheck();
+                        break;
+                    case "project":
+                        results = performProjectConditionCheck();
+                        break;
+                }
+                
+                if (results) {
+                    allResults.push(results);
+                }
+                
+                completedChecks++;
+                
+                if (completedChecks === conditions.length) {
+                    displayAllConditionResults(allResults);
+                    document.getElementById('runAllChecks').disabled = false;
+                    document.getElementById('runAllChecks').innerHTML = '<i class="fas fa-play-circle"></i> ตรวจสอบเงื่อนไขทั้งหมด';
+                }
+            }, 500);
+        }, 1000 * conditions.indexOf(condition));
+    });
+}
 // ฟังก์ชันแสดงผลการตรวจสอบทั้งหมด
 function displayAllConditionResults(allResults) {
     const resultsContainer = document.getElementById('checkingResults');
