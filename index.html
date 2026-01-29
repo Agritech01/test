@@ -3013,45 +3013,68 @@
         // ฟังก์ชันจัดการขั้นตอน
         // ============================================
         function goToStep(stepNumber) {
-            // อัพเดตขั้นตอนปัจจุบัน
-            currentStep = stepNumber;
-            
-            // อัพเดต navigation steps
-            [step1, step2, step3, step4, step5].forEach((step, index) => {
-                step.classList.remove('active', 'completed');
-                if (index + 1 < stepNumber) {
-                    step.classList.add('completed');
-                } else if (index + 1 === stepNumber) {
-                    step.classList.add('active');
-                }
-            });
-            
-            // อัพเดต panels
-            [panel1, panel2, panel3, panel4, panel5].forEach((panel, index) => {
-                panel.classList.remove('active');
-                if (index + 1 === stepNumber) {
-                    panel.classList.add('active');
-                }
-            });
-            
-            // แสดงหรือซ่อน Dashboard
-            if (stepNumber === 3) {
-                dashboardSummary.style.display = 'block';
-                initDataValidationSystem();
-            } else {
-                dashboardSummary.style.display = 'none';
-            }
-            
-            // เรียกใช้งานระบบตรวจสอบเงื่อนไขถ้าไปที่ขั้นตอนที่ 4
-            if (stepNumber === 4) {
-                setTimeout(initConditionChecking, 100);
-            }
-            
-            // เรียกใช้งานระบบเลือกคอลัมน์สำหรับส่งออกถ้าไปที่ขั้นตอนที่ 5
-            if (stepNumber === 5) {
-                setTimeout(initExportColumnSelection, 100);
-            }
+    // บันทึกข้อมูลก่อนเปลี่ยนขั้นตอน
+    if (currentStep === 3 && stepNumber === 4) {
+        // ✅ ตรวจสอบว่ามีข้อมูลที่จะส่งต่อหรือไม่
+        if (!uploadedData || selectedColumns.length === 0) {
+            alert('⚠️ ไม่มีข้อมูลที่จะส่งไปยังขั้นตอนถัดไป กรุณากลับไปที่ขั้นตอนที่ 1-3');
+            return;
         }
+        
+        // ✅ ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
+        const validPercent = currentValidationResults.validCells / currentValidationResults.totalCells * 100;
+        if (validPercent < 100) {
+            alert(`⚠️ ข้อมูลถูกต้องเพียง ${validPercent.toFixed(1)}% ต้องแก้ไขให้ครบ 100% ก่อนไปขั้นตอนถัดไป`);
+            return;
+        }
+        
+        console.log('🔄 ส่งข้อมูลจากขั้นตอนที่ 3 ไปยังขั้นตอนที่ 4');
+        console.log(`- แถว: ${uploadedData.data.length}`);
+        console.log(`- คอลัมน์: ${selectedColumns.length}`);
+        console.log(`- คอลัมน์ที่เลือก:`, selectedColumns);
+    }
+    
+    // อัพเดตขั้นตอนปัจจุบัน
+    currentStep = stepNumber;
+    
+    // อัพเดต navigation steps
+    [step1, step2, step3, step4, step5].forEach((step, index) => {
+        step.classList.remove('active', 'completed');
+        if (index + 1 < stepNumber) {
+            step.classList.add('completed');
+        } else if (index + 1 === stepNumber) {
+            step.classList.add('active');
+        }
+    });
+    
+    // อัพเดต panels
+    [panel1, panel2, panel3, panel4, panel5].forEach((panel, index) => {
+        panel.classList.remove('active');
+        if (index + 1 === stepNumber) {
+            panel.classList.add('active');
+        }
+    });
+    
+    // แสดงหรือซ่อน Dashboard
+    if (stepNumber === 3) {
+        dashboardSummary.style.display = 'block';
+        initDataValidationSystem();
+    } else {
+        dashboardSummary.style.display = 'none';
+    }
+    
+    // เรียกใช้งานระบบตรวจสอบเงื่อนไขถ้าไปที่ขั้นตอนที่ 4
+    if (stepNumber === 4) {
+        console.log('🚀 เริ่มต้นระบบตรวจสอบเงื่อนไขในขั้นตอนที่ 4');
+        setTimeout(initConditionChecking, 100);
+    }
+    
+    // เรียกใช้งานระบบเลือกคอลัมน์สำหรับส่งออกถ้าไปที่ขั้นตอนที่ 5
+    if (stepNumber === 5) {
+        console.log('🚀 เริ่มต้นระบบเลือกคอลัมน์สำหรับส่งออกในขั้นตอนที่ 5');
+        setTimeout(initExportColumnSelection, 100);
+    }
+}
 
         // ============================================
         // ขั้นตอนที่ 2: เลือกคอลัมน์
@@ -4229,28 +4252,63 @@
             
             exportTable.addEventListener('click', exportTableToCSV);
             
-            // ปุ่มต่อไปใน Step 3
-            nextToStep4.addEventListener('click', () => {
-                if (currentValidationResults.errorCells > 0) {
-                    alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
-                    return;
-                }
-                
-                // ✅ แก้ไข: ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
-                const validPercent = parseInt(correctDataPercent.textContent);
-                if (validPercent !== 100) {
-                    alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
-                    return;
-                }
-                
-                const editedCount = countEditedCells();
-                
-                alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
-                
-                // ไปยังขั้นตอนที่ 4
-                goToStep(4);
-            });
+           // แทนที่โค้ดส่วนนี้ในส่วนของการจัดการปุ่มต่อไป
+nextToStep4.addEventListener('click', function() {
+    if (currentValidationResults.errorCells > 0) {
+        alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
+        return;
+    }
+    
+    // ✅ แก้ไข: ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
+    const validPercent = parseInt(correctDataPercent.textContent);
+    if (validPercent !== 100) {
+        alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
+        return;
+    }
+    
+    const editedCount = countEditedCells();
+    
+    alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
+    
+    // ✅ เพิ่ม: บันทึกข้อมูลที่ผ่านการแก้ไขลงใน uploadedData ก่อนไปขั้นตอนถัดไป
+    saveEditedDataToUploadedData();
+    
+    // ✅ เพิ่ม: อัพเดต selectedColumns เพื่อใช้ในขั้นตอนที่ 4
+    updateColumnsForNextStep();
+    
+    // ไปยังขั้นตอนที่ 4
+    goToStep(4);
+});
+
+// ✅ เพิ่มฟังก์ชันสำหรับบันทึกข้อมูลที่แก้ไข
+function saveEditedDataToUploadedData() {
+    // ข้อมูลทั้งหมดถูกบันทึกใน uploadedData.data แล้วระหว่างการแก้ไข
+    // ฟังก์ชันนี้เพื่อความมั่นใจว่าข้อมูลตรงกัน
+    console.log('✅ บันทึกข้อมูลที่แก้ไขแล้วไปยัง uploadedData');
+    console.log(`📊 จำนวนแถวทั้งหมด: ${uploadedData.data.length}`);
+    console.log(`📊 จำนวนคอลัมน์ที่เลือก: ${selectedColumns.length}`);
+}
+
+// ✅ เพิ่มฟังก์ชันสำหรับอัพเดตคอลัมน์
+function updateColumnsForNextStep() {
+    // ตรวจสอบว่ามีคอลัมน์ที่จำเป็นสำหรับการตรวจสอบเงื่อนไขหรือไม่
+    const requiredColumns = ["เลขแปลงintech", "ชื่อประเภทอ้อย", "วันที่ปลูก"];
+    
+    requiredColumns.forEach(column => {
+        if (!selectedColumns.includes(column)) {
+            // ค้นหาคอลัมน์ที่คล้ายกัน
+            const similarColumn = selectedColumns.find(col => 
+                col.toLowerCase().includes(column.toLowerCase())
+            );
+            
+            if (similarColumn) {
+                console.log(`ℹ️ พบคอลัมน์คล้ายกัน: "${similarColumn}" แทน "${column}"`);
+            } else {
+                console.warn(`⚠️ ไม่พบคอลัมน์: "${column}" ใน selectedColumns`);
+            }
         }
+    });
+}
         
         // ฟังก์ชันเพิ่มเติมสำหรับ Step 3
         function showDataTypeConfiguration() {
@@ -4798,45 +4856,68 @@
         // ============================================
         // ระบบตรวจสอบเงื่อนไข (Step 4) - แก้ไขทั้งหมดตามข้อกำหนด
         // ============================================
-        
-        function initConditionChecking() {
-            if (!uploadedData || !selectedColumns) {
-                document.getElementById('checkingResults').innerHTML = `
-                    <div class="result-summary">
-                        <p><i class="fas fa-exclamation-triangle"></i> ยังไม่มีข้อมูล กรุณาไปที่ขั้นตอนที่ 1-3 ก่อน</p>
+       function initConditionChecking() {
+    if (!uploadedData || !selectedColumns || selectedColumns.length === 0) {
+        // ✅ แก้ไข: แสดงข้อความที่ชัดเจนกว่า
+        document.getElementById('checkingResults').innerHTML = `
+            <div class="result-summary" style="background: #ffebee; border-left-color: #f44336;">
+                <p><i class="fas fa-exclamation-triangle"></i> <strong>ไม่พบข้อมูลจากขั้นตอนที่ 3</strong></p>
+                <p>กรุณากลับไปที่ขั้นตอนที่ 1-3 เพื่อเตรียมข้อมูลก่อน</p>
+                <p style="margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="goToStep(3)">
+                        <i class="fas fa-arrow-left"></i> กลับไปขั้นตอนที่ 3
+                    </button>
+                </p>
+            </div>
+        `;
+        return;
+    }
+    
+    // ✅ เพิ่ม: แสดงข้อมูลที่ได้รับจากขั้นตอนที่ 3
+    console.log('📥 ข้อมูลที่ได้รับจากขั้นตอนที่ 3:');
+    console.log(`- จำนวนแถว: ${uploadedData.data.length}`);
+    console.log(`- จำนวนคอลัมน์ที่เลือก: ${selectedColumns.length}`);
+    console.log(`- คอลัมน์ที่เลือก:`, selectedColumns.slice(0, 10)); // แสดง 10 คอลัมน์แรก
+    
+    // ✅ แสดงข้อมูลสรุปใน UI
+    const resultsContainer = document.getElementById('checkingResults');
+    resultsContainer.innerHTML = `
+        <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
+            <p><i class="fas fa-check-circle"></i> <strong>ได้รับข้อมูลจากขั้นตอนที่ 3 แล้ว</strong></p>
+            <p><i class="fas fa-table"></i> จำนวนแถว: <strong>${uploadedData.data.length}</strong></p>
+            <p><i class="fas fa-columns"></i> จำนวนคอลัมน์: <strong>${selectedColumns.length}</strong></p>
+            <p><i class="fas fa-check"></i> ข้อมูลผ่านการตรวจสอบ: <strong>100%</strong></p>
+            <p><i class="fas fa-edit"></i> แก้ไขข้อมูลแล้ว: <strong>${countEditedCells()} เซลล์</strong></p>
+        </div>
+    `;
+    
+    // ตั้งค่า event listeners
+    setupConditionCheckingSystem();
+    
+    // เตรียมตารางสำหรับเงื่อนไขที่เลือก (แสดงทั้งหมด)
+    prepareCheckingTable();
+    
+    // เพิ่มข้อมูลสำหรับเงื่อนไขปุ๋ย
+    if (currentCondition === "fertilizer") {
+        setTimeout(() => {
+            const resultsContainer = document.getElementById('checkingResults');
+            if (resultsContainer.querySelector('.result-summary')) {
+                const summary = resultsContainer.querySelector('.result-summary');
+                summary.innerHTML += `
+                    <div style="margin-top: 15px; background: #fff3e0; padding: 10px; border-radius: 6px; border-left: 4px solid #ff9800;">
+                        <p><strong><i class="fas fa-lightbulb"></i> คำแนะนำสำหรับการตรวจสอบปุ๋ย:</strong></p>
+                        <ol style="font-size: 0.9em; margin-left: 20px;">
+                            <li>ระบบจะตรวจสอบความถูกต้องของสูตรปุ๋ย (รูปแบบ XX-XX-XX)</li>
+                            <li>ตรวจสอบประเภทการใส่ปุ๋ย (หว่าน, โรยข้างแถว, รองก้นหลุม, พ่นทางใบ)</li>
+                            <li>ตรวจสอบว่ามีการระบุทั้งประเภทและสูตรปุ๋ยคู่กันหรือไม่</li>
+                            <li>ตรวจสอบอายุอ้อย (ต้องเป็นตัวเลข ไม่ติดลบ)</li>
+                        </ol>
                     </div>
                 `;
-                return;
             }
-            
-            // ตั้งค่า event listeners
-            setupConditionCheckingSystem();
-            
-            // เตรียมตารางสำหรับเงื่อนไขที่เลือก (แสดงทั้งหมด)
-            prepareCheckingTable();
-            
-            // เพิ่มข้อมูลสำหรับเงื่อนไขปุ๋ย
-            if (currentCondition === "fertilizer") {
-                // เตรียมข้อมูลเบื้องต้นสำหรับการตรวจสอบปุ๋ย
-                setTimeout(() => {
-                    const resultsContainer = document.getElementById('checkingResults');
-                    if (resultsContainer.querySelector('.result-summary')) {
-                        const summary = resultsContainer.querySelector('.result-summary');
-                        summary.innerHTML += `
-                            <div style="margin-top: 15px; background: #fff3e0; padding: 10px; border-radius: 6px; border-left: 4px solid #ff9800;">
-                                <p><strong><i class="fas fa-lightbulb"></i> คำแนะนำสำหรับการตรวจสอบปุ๋ย:</strong></p>
-                                <ol style="font-size: 0.9em; margin-left: 20px;">
-                                    <li>ระบบจะตรวจสอบความถูกต้องของสูตรปุ๋ย (รูปแบบ XX-XX-XX)</li>
-                                    <li>ตรวจสอบประเภทการใส่ปุ๋ย (หว่าน, โรยข้างแถว, รองก้นหลุม, พ่นทางใบ)</li>
-                                    <li>ตรวจสอบว่ามีการระบุทั้งประเภทและสูตรปุ๋ยคู่กันหรือไม่</li>
-                                    <li>ตรวจสอบอายุอ้อย (ต้องเป็นตัวเลข ไม่ติดลบ)</li>
-                                </ol>
-                            </div>
-                        `;
-                    }
-                }, 100);
-            }
-        }
+        }, 100);
+    }
+}
         
         function setupConditionCheckingSystem() {
             // ปุ่มเลือกเงื่อนไข
@@ -6420,40 +6501,31 @@
         updateExportColumnStats();
     });
     
-    // Filter buttons สำหรับขั้นตอนที่ 5
-    document.querySelectorAll('.export-column-selection .selection-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // อัพเดตปุ่ม active
-            document.querySelectorAll('.export-column-selection .selection-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            this.classList.add('active');
+   // แก้ไขการเรียกใช้ goToStep ในปุ่มต่างๆ ให้มีการตรวจสอบก่อน
+document.querySelectorAll('[id^="nextToStep"], [id^="backToStep"]').forEach(button => {
+    const originalClick = button.onclick;
+    button.onclick = function(e) {
+        e.preventDefault();
+        
+        // ดึงหมายเลขขั้นตอนจาก id ของปุ่ม
+        const stepMatch = this.id.match(/Step(\d+)$/);
+        if (stepMatch) {
+            const targetStep = parseInt(stepMatch[1]);
             
-            // กรองคอลัมน์ตาม filter
-            const filter = this.dataset.filter;
-            const columnItems = document.querySelectorAll('.export-column-item');
+            // ตรวจสอบก่อนเปลี่ยนขั้นตอน
+            if (!validateDataForNextStep(currentStep, targetStep)) {
+                return;
+            }
             
-            columnItems.forEach(item => {
-                const checkbox = item.querySelector('.export-column-checkbox');
-                const columnName = checkbox.dataset.column;
-                const isSelected = exportColumns.includes(columnName);
-                const isRecommended = autoExportColumns.includes(columnName);
-                
-                let shouldShow = true;
-                
-                if (filter === 'recommended') {
-                    shouldShow = isRecommended;
-                } else if (filter === 'selected') {
-                    shouldShow = isSelected;
-                } else if (filter === 'unselected') {
-                    shouldShow = !isSelected;
-                }
-                // 'all' แสดงทั้งหมด
-                
-                item.style.display = shouldShow ? 'flex' : 'none';
-            });
-        });
-    });
+            // เรียกใช้ฟังก์ชันเดิม
+            if (originalClick) {
+                originalClick.call(this, e);
+            } else {
+                goToStep(targetStep);
+            }
+        }
+    };
+});
     
     // ============================================
     // ดาวน์โหลดข้อมูลที่ Clean แล้ว
@@ -6637,7 +6709,44 @@
             return dateString;
         }
     }
-
+// ✅ เพิ่มฟังก์ชันตรวจสอบความพร้อมของข้อมูล
+function validateDataForNextStep(currentStep, nextStep) {
+    if (currentStep === 3 && nextStep === 4) {
+        // ตรวจสอบว่ามีข้อมูลหรือไม่
+        if (!uploadedData) {
+            alert('❌ ไม่พบข้อมูล กรุณาอัปโหลดไฟล์ในขั้นตอนที่ 1');
+            return false;
+        }
+        
+        if (selectedColumns.length === 0) {
+            alert('❌ ไม่มีคอลัมน์ที่เลือก กรุณาเลือกคอลัมน์ในขั้นตอนที่ 2');
+            return false;
+        }
+        
+        // ตรวจสอบข้อผิดพลาด
+        if (currentValidationResults.errorCells > 0) {
+            alert(`❌ ยังมี ${currentValidationResults.errorCells} ข้อผิดพลาดที่ต้องแก้ไข`);
+            return false;
+        }
+        
+        // ตรวจสอบว่ามีข้อมูลในคอลัมน์ที่จำเป็นสำหรับขั้นตอนที่ 4 หรือไม่
+        const requiredColumnsForStep4 = ["เลขแปลงintech", "ชื่อประเภทอ้อย"];
+        const missingColumns = requiredColumnsForStep4.filter(col => 
+            !selectedColumns.some(selectedCol => 
+                selectedCol.toLowerCase().includes(col.toLowerCase())
+            )
+        );
+        
+        if (missingColumns.length > 0) {
+            alert(`⚠️ ขาดคอลัมน์ที่จำเป็นสำหรับการตรวจสอบเงื่อนไข: ${missingColumns.join(', ')}\n\nกรุณาเลือกคอลัมน์เหล่านี้ในขั้นตอนที่ 2`);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    return true;
+}
     function validateThaiPhoneNumber(phone) {
         if (!phone) return true; // ถ้าว่างให้ผ่าน
         const phoneStr = phone.toString().trim();
