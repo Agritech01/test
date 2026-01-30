@@ -6202,7 +6202,14 @@ const EXCLUSIVE_PROJECTS = [
     "เปลี่ยนพืชอื่นมาปลูกอ้อย ปี 69/70",
     "ปลูกอ้อยในนา ปี 69/70"
 ];
-
+// ✅ เพิ่มที่ส่วนบนของฟังก์ชัน หรือในส่วน global variables
+const EXCLUSIVE_PROJECT_PAIRS = [
+    {
+        project1: "เปลี่ยนพืชอื่นมาปลูกอ้อย ปี 69/70",
+        project2: "ปลูกอ้อยในนา ปี 69/70"
+    }
+    // สามารถเพิ่มคู่อื่นๆ ได้ถ้ามี
+];
 // คอลัมน์โครงการที่ต้องตรวจสอบ
 const PROJECT_COLUMNS = [
     "โครงการ1", "โครงการ2", "โครงการ3", "โครงการ4", "โครงการ5"
@@ -6471,7 +6478,6 @@ function renderProjectCheckingTable() {
     
     document.getElementById('checkingRowsCount').textContent = displayedRows;
 }
-// ฟังก์ชันตรวจสอบเงื่อนไขโครงการ (ปรับเงื่อนไขใหม่)
 function performProjectConditionCheck() {
     const results = {
         condition: "project",
@@ -6490,6 +6496,9 @@ function performProjectConditionCheck() {
         let notInProjectCount = 0;
         let totalProjectColumns = 0;
         
+        // ✅ เพิ่มตัวแปรเก็บโครงการที่สมัครในแถวนี้
+        let rowProjects = [];
+        
         // ตรวจสอบแต่ละคอลัมน์โครงการ
         PROJECT_COLUMNS.forEach((projectCol, colIndex) => {
             const projectValue = rowData.projects[projectCol] || '';
@@ -6503,6 +6512,13 @@ function performProjectConditionCheck() {
             
             // ถ้ามีข้อมูลโครงการ (ไม่ใช่ค่าว่างหรือ "ไม่เข้าโครงการ")
             if (projectValue.trim() !== '' && projectValue.trim() !== 'ไม่เข้าโครงการ') {
+                // ✅ เก็บโครงการที่สมัคร
+                rowProjects.push({
+                    column: projectCol,
+                    value: projectValue.trim(),
+                    colIndex: colIndex
+                });
+                
                 // ตรวจสอบว่าเป็นโครงการที่รู้จักหรือไม่
                 const isKnownProject = PROJECT_LIST.some(proj => 
                     projectValue.trim().includes(proj) || proj.includes(projectValue.trim())
@@ -6512,55 +6528,81 @@ function performProjectConditionCheck() {
                     appliedProjects.push(projectValue.trim());
                 } else {
                     notes.push(`คอลัมน์ ${projectCol}: "${projectValue}" ไม่ใช่โครงการที่รู้จัก`);
-                    failedCells[colIndex + 4] = true; // +4 เพราะข้ามคอลัมน์แรกๆ
+                    failedCells[colIndex + 4] = true;
                     passed = false;
                 }
             }
         });
         
-        // ✅ เงื่อนไขผ่าน (สีเขียว):
-        // 1. มีโครงการที่รับรอง ในคอลัมน์ใดคอลัมน์หนึ่ง
-        // 2. มี "ไม่เข้าโครงการ" บางคอลัมน์ แต่ไม่ใช่ทุกคอลัมน์
-        // 3. ค่าว่างทั้งหมด (ไม่มีโครงการใดๆ)
+        // ✅ ตรวจสอบโครงการที่ห้ามสมัครซ้ำ
+        let hasExclusiveConflict = false;
+        let conflictDetails = [];
         
-        // ✅ เงื่อนไขไม่ผ่าน (สีแดง):
-        // มี "ไม่เข้าโครงการ" ในทุกคอลัมน์ (โครงการ1-5)
+        EXCLUSIVE_PROJECT_PAIRS.forEach(pair => {
+            // ตรวจสอบว่ามีทั้งสองโครงการในแถวนี้หรือไม่
+            const hasProject1 = rowProjects.some(p => 
+                p.value.includes(pair.project1) || pair.project1.includes(p.value)
+            );
+            const hasProject2 = rowProjects.some(p => 
+                p.value.includes(pair.project2) || pair.project2.includes(p.value)
+            );
+            
+            if (hasProject1 && hasProject2) {
+                hasExclusiveConflict = true;
+                conflictDetails.push(`${pair.project1} และ ${pair.project2}`);
+                
+                // ✅ ทำเครื่องหมายเซลล์ที่มีปัญหา
+                rowProjects.forEach(p => {
+                    if (p.value.includes(pair.project1) || p.value.includes(pair.project2)) {
+                        failedCells[p.colIndex + 4] = true;
+                    }
+                });
+            }
+        });
         
-        // ตรวจสอบเงื่อนไขไม่ผ่าน: ทุกคอลัมน์เป็น "ไม่เข้าโครงการ"
-        if (notInProjectCount === totalProjectColumns) {
+        // ✅ เงื่อนไขไม่ผ่านถ้ามีโครงการที่ห้ามสมัครซ้ำ
+        if (hasExclusiveConflict) {
             passed = false;
-            rowData.status = "ไม่ผ่าน";
-            rowData.notes = "ไม่เข้าโครงการ (ทุกคอลัมน์)";
             results.failed++;
+            rowData.status = "ไม่ผ่าน";
+            rowData.notes = `ห้ามสมัครซ้ำ: ${conflictDetails.join(', ')}`;
             results.issues.push({
                 row: index + 1,
-                message: "ไม่เข้าโครงการ (ทุกคอลัมน์)",
+                message: `ห้ามสมัครซ้ำ: ${conflictDetails.join(', ')}`,
                 intechPlot: rowData.intechPlot,
-                farmerCode: rowData.farmerCode
+                farmerCode: rowData.farmerCode,
+                conflictProjects: conflictDetails
             });
         }
-        // เงื่อนไขผ่าน: มีโครงการที่รับรอง
+        // ตรวจสอบเงื่อนไขผ่าน: มีโครงการที่รับรอง
         else if (appliedProjects.length > 0) {
             passed = true;
             results.passed++;
             rowData.status = "ผ่าน";
             rowData.notes = `สมัครโครงการ: ${appliedProjects.join(', ')}`;
         }
-        // เงื่อนไขผ่าน: มี "ไม่เข้าโครงการ" บางคอลัมน์ แต่ไม่ใช่ทุกคอลัมน์
+        // ตรวจสอบเงื่อนไขผ่าน: มี "ไม่เข้าโครงการ" ในทุกคอลัมน์
+        else if (notInProjectCount === totalProjectColumns) {
+            passed = true;
+            results.passed++;
+            rowData.status = "ผ่าน";
+            rowData.notes = "ไม่เข้าโครงการ (ทุกคอลัมน์)";
+        }
+        // ตรวจสอบเงื่อนไขผ่าน: มี "ไม่เข้าโครงการ" บางคอลัมน์ แต่ไม่ใช่ทุกคอลัมน์
         else if (notInProjectCount > 0 && notInProjectCount < totalProjectColumns) {
             passed = true;
             results.passed++;
             rowData.status = "ผ่าน";
             rowData.notes = `ไม่เข้าโครงการบางคอลัมน์ (${notInProjectCount}/${totalProjectColumns})`;
         }
-        // เงื่อนไขผ่าน: ค่าว่างทั้งหมด
+        // ตรวจสอบเงื่อนไขผ่าน: ค่าว่างทั้งหมด
         else if (notInProjectCount === 0 && appliedProjects.length === 0) {
             passed = true;
             results.passed++;
             rowData.status = "ผ่าน";
             rowData.notes = "ไม่มีโครงการที่สมัคร";
         }
-        // กรณีอื่นๆ
+        // กรณีอื่นๆ (โครงการไม่รู้จัก)
         else {
             passed = false;
             results.failed++;
