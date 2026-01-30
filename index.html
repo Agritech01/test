@@ -3311,16 +3311,24 @@
             dropZone.style.borderColor = 'var(--accent-color)'; 
             if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); 
         };
-
+// เพิ่ม Event Listener สำหรับการเลือกไฟล์
+fileInput.addEventListener('change', function(e) {
+    console.log('File input changed'); // สำหรับ debug
+    if (e.target.files && e.target.files[0]) {
+        console.log('File selected:', e.target.files[0].name);
+        handleFile(e.target.files[0]);
+    }
+});
         function handleFile(file) {
-            loadingOverlay.style.display = 'flex';
-            appData.fileName = file.name;
+    console.log('Starting file processing...'); // สำหรับ debug
+    loadingOverlay.style.display = 'flex';
+    appData.fileName = file.name;
+    
+    // Set File Meta
+    metaFileName.innerText = file.name;
+    metaFileSize.innerText = formatBytes(file.size);
+    metaProcessTime.innerText = new Date().toLocaleTimeString('th-TH');
             
-            // Set File Meta
-            metaFileName.innerText = file.name;
-            metaFileSize.innerText = formatBytes(file.size);
-            metaProcessTime.innerText = new Date().toLocaleTimeString('th-TH');
-
             Papa.parse(file, {
                 complete: (res) => {
                     setTimeout(() => {
