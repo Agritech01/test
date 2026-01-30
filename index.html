@@ -3296,103 +3296,200 @@
             return `<div class="report-item"><div class="rule-name"><div class="rule-icon"><i class="${icon}"></i></div><span>${text}</span></div><span class="count-badge ${classBadge}">${count.toLocaleString()} ${unit}</span></div>`;
         }
         
-         // --- FILE HANDLING FIXED ---
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        dropZone.onclick = () => fileInput.click();
-        
-        dropZone.ondragover = (e) => { 
-            e.preventDefault(); 
-            dropZone.style.borderColor = 'var(--primary-color)'; 
-        };
-        
-        dropZone.ondragleave = (e) => { 
-            e.preventDefault(); 
-            dropZone.style.borderColor = 'var(--accent-color)'; 
-        };
-        
-        dropZone.ondrop = (e) => { 
-            e.preventDefault(); 
-            dropZone.style.borderColor = 'var(--accent-color)'; 
-            if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); 
-        };
-// เพิ่ม Event Listener สำหรับการเลือกไฟล์
-fileInput.addEventListener('change', function(e) {
-    console.log('File input changed'); // สำหรับ debug
-    if (e.target.files && e.target.files[0]) {
-        console.log('File selected:', e.target.files[0].name);
-        handleFile(e.target.files[0]);
+       // --- ฟังก์ชันดรอปโซน (แก้ไขใหม่) ---
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+// 1. คลิกที่พื้นที่อัปโหลด -> เปิด Dialog เลือกไฟล์
+dropZone.addEventListener('click', () => {
+    console.log('คลิกที่พื้นที่อัปโหลด');
+    fileInput.click();
+});
+
+// 2. ฟังก์ชันสำหรับ Drag & Drop
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = 'var(--primary-color)';
+    dropZone.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+});
+
+dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = 'var(--accent-color)';
+    dropZone.style.backgroundColor = 'rgba(76, 201, 240, 0.05)';
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = 'var(--accent-color)';
+    dropZone.style.backgroundColor = 'rgba(76, 201, 240, 0.05)';
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        console.log('ลากไฟล์มาวาง: ', files[0].name);
+        handleFile(files[0]);
     }
 });
-        function handleFile(file) {
-    console.log('Starting file processing...'); // สำหรับ debug
+
+// 3. ฟังก์ชันสำหรับเลือกไฟล์จาก Dialog
+fileInput.addEventListener('change', (e) => {
+    console.log('เลือกไฟล์จาก Dialog');
+    const files = e.target.files;
+    if (files && files.length > 0) {
+        console.log('ไฟล์ที่เลือก: ', files[0].name);
+        handleFile(files[0]);
+    } else {
+        console.log('ไม่มีไฟล์ถูกเลือก');
+    }
+});
+
+// 4. แสดงสถานะการอัปโหลด
+function showUploadStatus(message, isError = false) {
+    const statusDiv = document.createElement('div');
+    statusDiv.id = 'uploadStatus';
+    statusDiv.style.cssText = `
+        padding: 10px;
+        margin: 10px auto;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 500;
+        max-width: 800px;
+        background-color: ${isError ? '#ffebee' : '#e8f5e9'};
+        color: ${isError ? '#d32f2f' : '#2e7d32'};
+        border: 1px solid ${isError ? '#ffcdd2' : '#c8e6c9'};
+    `;
+    statusDiv.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${message}`;
+    
+    const existingStatus = document.getElementById('uploadStatus');
+    if (existingStatus) {
+        existingStatus.remove();
+    }
+    
+    fileInfo.parentNode.insertBefore(statusDiv, fileInfo);
+}
+       function handleFile(file) {
+    console.log('เริ่มประมวลผลไฟล์: ', file.name);
+    
+    // ตรวจสอบประเภทไฟล์
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+        showUploadStatus('กรุณาเลือกไฟล์ CSV เท่านั้น (.csv)', true);
+        return;
+    }
+    
+    // แสดง loading
     loadingOverlay.style.display = 'flex';
+    showUploadStatus(`กำลังประมวลผลไฟล์: ${file.name}...`, false);
+    
+    // ตั้งข้อมูลไฟล์
     appData.fileName = file.name;
     
     // Set File Meta
     metaFileName.innerText = file.name;
     metaFileSize.innerText = formatBytes(file.size);
     metaProcessTime.innerText = new Date().toLocaleTimeString('th-TH');
+    
+    // อ่านไฟล์ CSV ด้วย PapaParse
+    Papa.parse(file, {
+        encoding: 'UTF-8',
+        complete: (res) => {
+            console.log('อ่านไฟล์เสร็จสิ้น, แถวทั้งหมด:', res.data.length);
             
-            Papa.parse(file, {
-                complete: (res) => {
-                    setTimeout(() => {
-                        const raw = res.data.filter(row => row.length > 1 || (row[0] && row[0].trim() !== ""));
-                        const totalOriginal = raw.length - 1; 
-                        const result = runRev17Detailed(raw);
-                        
-                        // บันทึกข้อมูลสำหรับระบบเดิม
-                        appData.headers = result.headers;
-                        appData.data = result.cleaned;
-                        appData.removedStats = result.stats;
-                        appData.rowMeta = result.rowMetaList;
-                        
-                        // แปลงข้อมูลให้เข้ากับระบบเดิม
-                        uploadedData = {
-                            headers: result.headers,
-                            data: result.cleaned.map(row => {
-                                const obj = {};
-                                result.headers.forEach((header, index) => {
-                                    obj[header] = row[index] || '';
-                                });
-                                return obj;
-                            }),
-                            fileName: file.name,
-                            totalRows: result.cleaned.length,
-                            totalCols: result.headers.length
-                        };
-                        
-                        allColumns = [...result.headers];
-                        selectedColumns = [...result.headers]; // เลือกทั้งหมดโดยอัตโนมัติ
-
-                        metaColCount.innerText = appData.headers.length + " คอลัมน์";
-                        statTotal.innerText = totalOriginal.toLocaleString();
-                        statPass.innerText = appData.data.length.toLocaleString();
-                        statRemoved.innerText = (totalOriginal - appData.data.length).toLocaleString();
-
-                        const s = result.stats;
-                        let rHtml = '';
-                        rHtml += createReportItem('fas fa-id-card-alt', 'กรองเลขโควต้า', s.removedQuota, true);
-                        rHtml += createReportItem('fas fa-leaf', 'กรองชื่อประเภทอ้อย', s.removedCaneType, true);
-                        rHtml += createReportItem('fas fa-eraser', 'ลบ "=" ในพื้นที่เสียหาย', s.cleanedEquals, false);
-                        rHtml += createReportItem('fas fa-calculator', 'กรองพื้นที่สุทธิ (<= 0)', s.removedNetArea, true);
-                        rHtml += createReportItem('fas fa-map-marked-alt', 'กรองเลขแปลง Intech', s.removedIntech, true);
-                        rHtml += createReportItem('fas fa-map-signs', 'แก้ไขชื่อโซน', s.fixedZone, false);
-                        rHtml += createReportItem('fas fa-user-tag', 'เติมศูนย์รหัสเกษตร', s.fixedId, false);
-                        
-                        if(rHtml === '') rHtml = '<div style="padding:20px; text-align:center; color:#888;">ไม่พบการตัดหรือแก้ไขข้อมูล</div>';
-                        detailedReportList.innerHTML = rHtml;
-
-                        dropZone.style.display = 'none';
-                        fileInfo.style.display = 'block';
+            setTimeout(() => {
+                try {
+                    // กรองแถวว่าง
+                    const raw = res.data.filter(row => {
+                        // กรองแถวที่ว่างทั้งหมด หรือมีข้อมูลน้อยเกินไป
+                        return row.length > 1 || (row[0] && row[0].toString().trim() !== "");
+                    });
+                    
+                    const totalOriginal = raw.length - 1;
+                    console.log('แถวหลังกรองว่าง:', totalOriginal);
+                    
+                    if (totalOriginal <= 0) {
+                        showUploadStatus('ไฟล์ CSV นี้ไม่มีข้อมูลหรือรูปแบบไม่ถูกต้อง', true);
                         loadingOverlay.style.display = 'none';
-                        
-                        // เปิดใช้งานปุ่มต่อไป
-                        nextToStep2.disabled = false;
-                    }, 800); 
+                        return;
+                    }
+                    
+                    // รัน REV.17 Logic
+                    const result = runRev17Detailed(raw);
+                    
+                    // บันทึกข้อมูล
+                    appData.headers = result.headers;
+                    appData.data = result.cleaned;
+                    appData.removedStats = result.stats;
+                    appData.rowMeta = result.rowMetaList;
+                    
+                    // แปลงข้อมูลให้เข้ากับระบบเดิม
+                    uploadedData = {
+                        headers: result.headers,
+                        data: result.cleaned.map(row => {
+                            const obj = {};
+                            result.headers.forEach((header, index) => {
+                                obj[header] = row[index] || '';
+                            });
+                            return obj;
+                        }),
+                        fileName: file.name,
+                        totalRows: result.cleaned.length,
+                        totalCols: result.headers.length
+                    };
+                    
+                    allColumns = [...result.headers];
+                    selectedColumns = [...result.headers];
+                    
+                    // อัพเดตข้อมูลแสดงผล
+                    metaColCount.innerText = appData.headers.length + " คอลัมน์";
+                    statTotal.innerText = totalOriginal.toLocaleString();
+                    statPass.innerText = appData.data.length.toLocaleString();
+                    statRemoved.innerText = (totalOriginal - appData.data.length).toLocaleString();
+                    
+                    // สร้างรายงาน
+                    const s = result.stats;
+                    let rHtml = '';
+                    rHtml += createReportItem('fas fa-id-card-alt', 'กรองเลขโควต้า', s.removedQuota, true);
+                    rHtml += createReportItem('fas fa-leaf', 'กรองชื่อประเภทอ้อย', s.removedCaneType, true);
+                    rHtml += createReportItem('fas fa-eraser', 'ลบ "=" ในพื้นที่เสียหาย', s.cleanedEquals, false);
+                    rHtml += createReportItem('fas fa-calculator', 'กรองพื้นที่สุทธิ (<= 0)', s.removedNetArea, true);
+                    rHtml += createReportItem('fas fa-map-marked-alt', 'กรองเลขแปลง Intech', s.removedIntech, true);
+                    rHtml += createReportItem('fas fa-map-signs', 'แก้ไขชื่อโซน', s.fixedZone, false);
+                    rHtml += createReportItem('fas fa-user-tag', 'เติมศูนย์รหัสเกษตร', s.fixedId, false);
+                    
+                    if(rHtml === '') {
+                        rHtml = '<div style="padding:20px; text-align:center; color:#888;">ไม่พบการตัดหรือแก้ไขข้อมูล</div>';
+                    }
+                    
+                    detailedReportList.innerHTML = rHtml;
+                    
+                    // ซ่อน Drop Zone และแสดงข้อมูลไฟล์
+                    dropZone.style.display = 'none';
+                    fileInfo.style.display = 'block';
+                    loadingOverlay.style.display = 'none';
+                    
+                    // แสดงสถานะสำเร็จ
+                    showUploadStatus(`✅ ประมวลผลไฟล์สำเร็จ: ${uploadedData.data.length} แถว, ${uploadedData.headers.length} คอลัมน์`, false);
+                    
+                    // เปิดใช้งานปุ่มต่อไป
+                    nextToStep2.disabled = false;
+                    nextToStep2.innerHTML = '<i class="fas fa-check"></i> ดำเนินการต่อ (ขั้นตอนที่ 2)';
+                    
+                    console.log('ประมวลผลไฟล์สำเร็จ');
+                    
+                } catch (error) {
+                    console.error('เกิดข้อผิดพลาดในการประมวลผลไฟล์:', error);
+                    showUploadStatus(`❌ เกิดข้อผิดพลาด: ${error.message}`, true);
+                    loadingOverlay.style.display = 'none';
                 }
-            });
-        }
+            }, 800);
+        },
+        error: (error) => {
+            console.error('เกิดข้อผิดพลาดในการอ่านไฟล์ CSV:', error);
+            showUploadStatus('❌ อ่านไฟล์ CSV ไม่สำเร็จ: ' + error.message, true);
+            loadingOverlay.style.display = 'none';
+        },
+        skipEmptyLines: true
+    });
+}
         // ============================================
         // ฟังก์ชันจัดการขั้นตอน
         // ============================================
