@@ -3748,6 +3748,68 @@ document.head.appendChild(styleElement);
         console.log(`📊 เซลล์ทั้งหมด: ${uploadedData.data.length * selectedColumns.length} เซลล์`);
     }
 }
+       function runDataValidationFromUploadedData() {
+    if (!uploadedData || selectedColumns.length === 0) return;
+    
+    // ✅ เรียกใช้ debug ก่อน
+    console.log('🔄 Running data validation...');
+    debugValidationCalculation();
+    
+    // ✅ ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
+    const removedCount = removeEmptyRows();
+    if (removedCount > 0) {
+        console.log(`✅ ตัดแถวที่ว่างทั้งหมดออกแล้ว: ${removedCount} แถว`);
+    }
+    
+    // ✅ คำนวณการตรวจสอบจากข้อมูลทั้งหมด
+    currentValidationResults = calculateAllDataValidation();
+    
+    // ✅ ตรวจสอบผลลัพธ์
+    console.log('📊 Validation Results:', currentValidationResults);
+    
+    // สำหรับการแสดงในตาราง ใช้เพียง sample (50 แถว)
+    const sampleRows = uploadedData.data.slice(0, currentRowLimit);
+    
+    // สร้าง cellValidationStatus เฉพาะสำหรับ sample rows
+    cellValidationStatus = {};
+    sampleRows.forEach((row, rowIndex) => {
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            
+            if (!cellValidationStatus[rowIndex]) {
+                cellValidationStatus[rowIndex] = {};
+            }
+            
+            if (cellValue.trim() === '') {
+                cellValidationStatus[rowIndex][colIndex] = {
+                    status: 'valid',
+                    message: 'ค่าว่าง - ผ่าน',
+                    suggestions: [],
+                    dataType: 'text',
+                    edited: false
+                };
+                return;
+            }
+            
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            
+            // ✅ ตรวจสอบว่ามี status
+            if (!validation.status) {
+                console.error(`No status for cell [${rowIndex}, ${colIndex}]: ${columnName} = "${cellValue}"`);
+                validation.status = 'valid';
+            }
+            
+            cellValidationStatus[rowIndex][colIndex] = validation;
+        });
+    });
+    
+    // แสดงข้อมูลในตาราง (เฉพาะ sample)
+    renderDataTableFromUploadedData();
+    
+    // อัพเดต Dashboard จากผลการคำนวณทั้งหมด
+    updateDashboard();
+}
         
        function runDataValidationFromUploadedData() {
     if (!uploadedData || selectedColumns.length === 0) return;
@@ -3797,7 +3859,8 @@ document.head.appendChild(styleElement);
     // อัพเดต Dashboard จากผลการคำนวณทั้งหมด
     updateDashboard();
 }
-      function calculateAllDataValidation() {
+        
+   function calculateAllDataValidation() {
     if (!uploadedData || selectedColumns.length === 0) {
         return {
             totalCells: 0,
@@ -3813,37 +3876,47 @@ document.head.appendChild(styleElement);
         validCells: 0,
         warningCells: 0,
         errorCells: 0,
-        details: {}
+        details: {},
+        // เพิ่มสำหรับ debug
+        debug: {
+            emptyCells: 0,
+            validatedCells: 0
+        }
     };
     
     // ใช้ข้อมูลทั้งหมดในการคำนวณ
     uploadedData.data.forEach((row, rowIndex) => {
         selectedColumns.forEach((columnName, colIndex) => {
-            const cellValue = row[columnName] || '';
+            const cellValue = row[columnName] !== undefined ? row[columnName] : '';
+            results.totalCells++;
             
-            // ถ้าค่าเป็นช่องว่าง ให้ผ่านได้เลย
-            if (cellValue.trim() === '') {
-                results.totalCells++;
-                results.validCells++;
+            // ถ้าค่าเป็นช่องว่างหรือ null/undefined
+            if (cellValue === null || cellValue === undefined || cellValue.toString().trim() === '') {
+                results.validCells++; // ค่าว่างถือว่าผ่าน
+                results.debug.emptyCells++;
                 return;
             }
             
             // ใช้ประเภทข้อมูลที่ผู้ใช้เลือก หรือตรวจจับอัตโนมัติ
             const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
-            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            const validation = validateCellData(columnName, cellValue.toString(), columnType, rowIndex, colIndex);
             
-            // นับสถิติ
-            results.totalCells++;
-            
+            // ✅ แก้ไข: ตรวจสอบ status ให้แน่ใจว่าถูกต้อง
             if (validation.status === 'valid') {
                 results.validCells++;
             } else if (validation.status === 'warning') {
                 results.warningCells++;
             } else if (validation.status === 'error') {
                 results.errorCells++;
+            } else {
+                // ถ้าไม่มี status ให้ถือว่า valid
+                console.warn(`Cell has no status: ${columnName}, value: ${cellValue}`);
+                results.validCells++;
             }
             
-            // บันทึกรายละเอียด
+            results.debug.validatedCells++;
+            
+            // บันทึกรายละเอียด (เฉพาะ error/warning)
             if (validation.status === 'error' || validation.status === 'warning') {
                 if (!results.details[columnName]) {
                     results.details[columnName] = {
@@ -3869,13 +3942,41 @@ document.head.appendChild(styleElement);
         });
     });
     
-    // ✅ ตรวจสอบว่าผลรวมเป็น 100%
-    const totalFromResults = results.validCells + results.warningCells + results.errorCells;
-    if (totalFromResults !== results.totalCells && results.totalCells > 0) {
-        console.warn(`⚠️ ผลรวมเซลล์ไม่ตรงกับ totalCells: ${totalFromResults} vs ${results.totalCells}`);
-        // ปรับค่า validCells ให้ตรงกับ totalCells
+    // ✅ ตรวจสอบความถูกต้องของผลลัพธ์
+    const calculatedTotal = results.validCells + results.warningCells + results.errorCells;
+    
+    if (calculatedTotal !== results.totalCells) {
+        console.error(`❌ Validation calculation error!`);
+        console.error(`Total cells: ${results.totalCells}`);
+        console.error(`Calculated: ${calculatedTotal} (valid: ${results.validCells}, warning: ${results.warningCells}, error: ${results.errorCells})`);
+        console.error(`Empty cells: ${results.debug.emptyCells}, Validated cells: ${results.debug.validatedCells}`);
+        
+        // ปรับแก้ไขให้ถูกต้อง
+        const discrepancy = results.totalCells - calculatedTotal;
+        if (discrepancy > 0) {
+            // เพิ่มเข้า valid cells
+            results.validCells += discrepancy;
+            console.warn(`Adjusted valid cells by +${discrepancy}`);
+        } else if (discrepancy < 0) {
+            // ลด valid cells
+            results.validCells = Math.max(0, results.validCells + discrepancy);
+            console.warn(`Adjusted valid cells by ${discrepancy}`);
+        }
+    }
+    
+    // ✅ ตรวจสอบอีกครั้งว่าผลรวมถูกต้อง
+    const finalCheck = results.validCells + results.warningCells + results.errorCells;
+    if (finalCheck !== results.totalCells) {
+        console.error(`Final check failed! Total: ${results.totalCells}, Sum: ${finalCheck}`);
+        // ปรับสุดท้ายให้ถูกต้อง
         results.validCells = results.totalCells - results.warningCells - results.errorCells;
     }
+    
+    console.log(`✅ Validation Results:`);
+    console.log(`Total cells: ${results.totalCells}`);
+    console.log(`Valid: ${results.validCells} (${Math.round((results.validCells/results.totalCells)*100)}%)`);
+    console.log(`Warning: ${results.warningCells} (${Math.round((results.warningCells/results.totalCells)*100)}%)`);
+    console.log(`Error: ${results.errorCells} (${Math.round((results.errorCells/results.totalCells)*100)}%)`);
     
     return results;
 }
@@ -3979,204 +4080,214 @@ document.head.appendChild(styleElement);
             return 'text';
         }
         
-        function validateCellData(columnName, value, columnType, rowIndex, colIndex) {
-            // ใช้ประเภทที่ผู้ใช้เลือกถ้ามี
-            const effectiveType = userSelectedDataTypes[columnName] || columnType;
-            
-            const result = {
-                status: 'valid',
-                message: '',
-                suggestions: [],
-                dataType: effectiveType,
-                edited: false
-            };
-            
-            // ตรวจสอบค่าว่าง (ผ่านแล้วในขั้นต้น)
-            if (value === '' || value === null || value === undefined) {
-                return result;
-            }
-            
-            // ✅ แก้ไข: คอลัมน์ "เลขแปลงintech" เป็นค่าเริ่มต้น ไม่ต้องตรวจสอบ
-            if (columnName.toLowerCase().includes('แปลงintech')) {
-                return result;
-            }
-            
-            // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
-            if (columnName.toLowerCase() === 'ชื่อประเภทอ้อย') {
-                // ค่าที่แนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
-                const validTypes = ALLOWED_CANE_TYPES;
-                
-                if (!validTypes.includes(value.trim())) {
-                    result.status = 'error';
-                    result.message = `ต้องเป็นหนึ่งใน: ${validTypes.join(', ')}`;
-                    result.suggestions = validTypes;
-                }
-                return result;
-            }
-            
-            // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
-            if (columnName.toLowerCase() === 'ประเภทอ้อย') {
-                // ค่าที่แนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
-                const validNumbers = sugarcaneNumbers;
-                
-                // ตรวจสอบว่าเป็นตัวเลขหรือไม่
-                const numValue = parseFloat(value);
-                if (isNaN(numValue)) {
-                    result.status = 'error';
-                    result.message = 'ต้องเป็นตัวเลข';
-                    result.suggestions = validNumbers;
-                } 
-                // ตรวจสอบว่าตรงกับตัวเลขที่กำหนดหรือไม่
-                else if (!validNumbers.includes(value.trim())) {
-                    result.status = 'error';
-                    result.message = `ต้องเป็นหนึ่งใน: ${validNumbers.join(', ')}`;
-                    result.suggestions = validNumbers;
-                }
-                return result;
-            }
-            
-            // ✅ ตรวจสอบจังหวัดและอำเภอตามข้อมูล THAI_LOCATIONS
-            if (columnName.toLowerCase().includes('จังหวัด')) {
-                if (value !== '' && !THAI_LOCATIONS.hasOwnProperty(value)) {
-                    result.status = 'error';
-                    result.message = `จังหวัด "${value}" ไม่มีในฐานข้อมูลประเทศไทย`;
-                    result.suggestions = Object.keys(THAI_LOCATIONS);
-                }
-                return result;
-            }
-            
-            if (columnName.toLowerCase().includes('อำเภอ')) {
-                // หาจังหวัดจากแถวเดียวกัน
-                const provinceColumn = selectedColumns.find(col => col.toLowerCase().includes('จังหวัด'));
-                if (provinceColumn && uploadedData.data[rowIndex]) {
-                    const provinceValue = uploadedData.data[rowIndex][provinceColumn] || '';
-                    if (provinceValue && THAI_LOCATIONS[provinceValue]) {
-                        const districts = THAI_LOCATIONS[provinceValue];
-                        const cleanDistrict = value.replace(/^อ\./, '').trim();
-                        if (!districts.some(d => d === cleanDistrict || d.includes(cleanDistrict) || cleanDistrict.includes(d))) {
-                            result.status = 'error';
-                            result.message = `อำเภอ "${value}" ไม่มีในจังหวัด "${provinceValue}"`;
-                            result.suggestions = districts;
-                        }
-                    }
-                }
-                return result;
-            }
-            
-            // ตรวจสอบตามประเภทข้อมูล
-            switch(effectiveType) {
-                case 'number':
-                    if (isNaN(value) || value.trim() === '') {
-                        result.status = 'error';
-                        result.message = 'ต้องเป็นตัวเลข';
-                        
-                        if (columnName.toLowerCase() === 'lat') {
-                            result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
-                        } else if (columnName.toLowerCase() === 'long') {
-                            result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
-                        } else if (columnName.includes('พื้นที่')) {
-                            result.suggestions = ['10.0', '15.5', '20.0', '25.5'];
-                        } else if (columnName.includes('อายุ')) {
-                            result.suggestions = ['120', '150', '180', '210'];
-                        } else if (columnName.includes('โควต้า')) {
-                            result.suggestions = ['100', '150', '200', '250'];
-                        } else {
-                            result.suggestions = ['0', '10', '50', '100'];
-                        }
-                    } else {
-                        const numValue = parseFloat(value);
-                        
-                        // ตรวจสอบพิกัด latitude (lat)
-                        if (columnName.toLowerCase() === 'lat') {
-                            if (numValue < -90 || numValue > 90) {
-                                result.status = 'error';
-                                result.message = 'latitude ต้องอยู่ระหว่าง -90 ถึง 90';
-                                result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
-                            } else if (Math.abs(numValue) < 1 || Math.abs(numValue) > 99) {
-                                result.status = 'warning';
-                                result.message = 'latitude มักเป็นเลขหลักสิบ (13-17 สำหรับประเทศไทย)';
-                                result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
-                            }
-                        }
-                        
-                        // ตรวจสอบพิกัด longitude (long)
-                        if (columnName.toLowerCase() === 'long') {
-                            if (numValue < -180 || numValue > 180) {
-                                result.status = 'error';
-                                result.message = 'longitude ต้องอยู่ระหว่าง -180 ถึง 180';
-                                result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
-                            } else if (Math.abs(numValue) < 90 || Math.abs(numValue) > 110) {
-                                result.status = 'warning';
-                                result.message = 'longitude มักเป็นเลขหลักร้อย (100-104 สำหรับประเทศไทย)';
-                                result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
-                            }
-                        }
-                        
-                        // ตรวจสอบค่าติดลบสำหรับบางคอลัมน์
-                        if ((columnName.includes('พื้นที่') || columnName.includes('อายุ') || 
-                             columnName.includes('จำนวน') || columnName.includes('โควต้า')) && numValue < 0) {
-                            result.status = 'error';
-                            result.message = 'ค่าต้องมากกว่าหรือเท่ากับ 0';
-                            result.suggestions = ['0', '1', '10'];
-                        }
-                    }
-                    break;
-                    
-                case 'date':
-                    // ตรวจสอบรูปแบบวันที่ (รองรับ YYYY/MM/DD และ YYYY/M/D)
-                    const datePatterns = [
-                        /^\d{4}-\d{1,2}-\d{1,2}$/,          // YYYY-MM-DD
-                        /^\d{4}\/\d{1,2}\/\d{1,2}$/,       // YYYY/MM/DD หรือ YYYY/M/D
-                        /^\d{1,2}\/\d{1,2}\/\d{4}$/,       // DD/MM/YYYY หรือ D/M/YYYY
-                        /^\d{1,2}-\d{1,2}-\d{4}$/          // DD-MM-YYYY หรือ D-M-YYYY
-                    ];
-                    
-                    const isValidDate = datePatterns.some(pattern => pattern.test(value.trim()));
-                    if (!isValidDate) {
-                        result.status = 'error';
-                        result.message = 'รูปแบบวันที่ไม่ถูกต้อง (รองรับ: YYYY/MM/DD, YYYY/M/D, DD/MM/YYYY)';
-                        result.suggestions = ['2023/01/01', '2023/6/15', '2023/12/31'];
-                    }
-                    break;
-                    
-                case 'enum':
-                    if (columnName.toLowerCase().includes('ใช่/ไม่') || columnName.toLowerCase().includes('yes/no')) {
-                        const validValues = ['ใช่', 'ไม่', 'yes', 'no', 'true', 'false'];
-                        if (!validValues.includes(value.toLowerCase())) {
-                            result.status = 'error';
-                            result.message = 'ต้องเป็น "ใช่" หรือ "ไม่"';
-                            result.suggestions = ['ใช่', 'ไม่'];
-                        }
-                    }
-                    break;
-                    
-                case 'identifier':
-                    if (value.length > 50) {
-                        result.status = 'warning';
-                        result.message = 'รหัสยาวเกินไป';
-                    }
-                    break;
-                    
-                case 'text':
-                    // ✅ แก้ไข: คอลัมน์ "ความเสี่ยงพื้นที่" และ "ความลาดเอียงของพื้นที่" เป็นข้อความ ไม่ต้องตรวจสอบเพิ่มเติม
-                    if (columnName.toLowerCase().includes('ความเสี่ยงพื้นที่') || 
-                        columnName.toLowerCase().includes('ความลาดเอียง')) {
-                        // ไม่ต้องตรวจสอบเพิ่มเติม
-                    } else if (columnName.toLowerCase().includes('แปลงintech')) {
-                        // ตรวจสอบรูปแบบเลขแปลงintech
-                        if (!/^\d+$/.test(value) && value.trim() !== '') {
-                            result.status = 'warning';
-                            result.message = 'เลขแปลงintech ควรเป็นตัวเลข';
-                        }
-                    } else if (value.length < 1 && value.trim() !== '') {
-                        result.status = 'warning';
-                        result.message = 'ข้อความสั้นเกินไป';
-                    }
-                    break;
-            }
-            
-            return result;
+       function validateCellData(columnName, value, columnType, rowIndex, colIndex) {
+    // ใช้ประเภทที่ผู้ใช้เลือกถ้ามี
+    const effectiveType = userSelectedDataTypes[columnName] || columnType;
+    
+    // ✅ เริ่มต้นด้วย status 'valid'
+    const result = {
+        status: 'valid', // ค่าเริ่มต้นเป็น valid
+        message: '',
+        suggestions: [],
+        dataType: effectiveType,
+        edited: false
+    };
+    
+    // ตรวจสอบค่าว่าง (ผ่านแล้วในขั้นต้น)
+    if (value === '' || value === null || value === undefined || value.toString().trim() === '') {
+        return result;
+    }
+    
+    const valueStr = value.toString().trim();
+    const columnNameLower = columnName.toLowerCase();
+    
+    // ✅ แก้ไข: คอลัมน์ "เลขแปลงintech" เป็นค่าเริ่มต้น ไม่ต้องตรวจสอบ
+    if (columnNameLower.includes('แปลงintech')) {
+        return result;
+    }
+    
+    // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
+    if (columnNameLower === 'ชื่อประเภทอ้อย') {
+        // ค่าที่แนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
+        const validTypes = ALLOWED_CANE_TYPES;
+        
+        if (!validTypes.includes(valueStr)) {
+            result.status = 'error';
+            result.message = `ต้องเป็นหนึ่งใน: ${validTypes.join(', ')}`;
+            result.suggestions = validTypes;
         }
+        return result;
+    }
+    
+    // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
+    if (columnNameLower === 'ประเภทอ้อย') {
+        // ค่าที่แนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
+        const validNumbers = sugarcaneNumbers;
+        
+        // ตรวจสอบว่าเป็นตัวเลขหรือไม่
+        const numValue = parseFloat(valueStr);
+        if (isNaN(numValue)) {
+            result.status = 'error';
+            result.message = 'ต้องเป็นตัวเลข';
+            result.suggestions = validNumbers;
+        } 
+        // ตรวจสอบว่าตรงกับตัวเลขที่กำหนดหรือไม่
+        else if (!validNumbers.includes(valueStr)) {
+            result.status = 'error';
+            result.message = `ต้องเป็นหนึ่งใน: ${validNumbers.join(', ')}`;
+            result.suggestions = validNumbers;
+        }
+        return result;
+    }
+    
+    // ✅ ตรวจสอบจังหวัดและอำเภอตามข้อมูล THAI_LOCATIONS
+    if (columnNameLower.includes('จังหวัด')) {
+        if (valueStr !== '' && !THAI_LOCATIONS.hasOwnProperty(valueStr)) {
+            result.status = 'error';
+            result.message = `จังหวัด "${valueStr}" ไม่มีในฐานข้อมูลประเทศไทย`;
+            result.suggestions = Object.keys(THAI_LOCATIONS);
+        }
+        return result;
+    }
+    
+    if (columnNameLower.includes('อำเภอ')) {
+        // หาจังหวัดจากแถวเดียวกัน
+        const provinceColumn = selectedColumns.find(col => col.toLowerCase().includes('จังหวัด'));
+        if (provinceColumn && uploadedData.data[rowIndex]) {
+            const provinceValue = uploadedData.data[rowIndex][provinceColumn] || '';
+            if (provinceValue && THAI_LOCATIONS[provinceValue]) {
+                const districts = THAI_LOCATIONS[provinceValue];
+                const cleanDistrict = valueStr.replace(/^อ\./, '').trim();
+                if (!districts.some(d => d === cleanDistrict || d.includes(cleanDistrict) || cleanDistrict.includes(d))) {
+                    result.status = 'error';
+                    result.message = `อำเภอ "${valueStr}" ไม่มีในจังหวัด "${provinceValue}"`;
+                    result.suggestions = districts;
+                }
+            }
+        }
+        return result;
+    }
+    
+    // ตรวจสอบตามประเภทข้อมูล
+    switch(effectiveType) {
+        case 'number':
+            if (isNaN(valueStr) || valueStr === '') {
+                result.status = 'error';
+                result.message = 'ต้องเป็นตัวเลข';
+                
+                if (columnNameLower === 'lat') {
+                    result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
+                } else if (columnNameLower === 'long') {
+                    result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
+                } else if (columnName.includes('พื้นที่')) {
+                    result.suggestions = ['10.0', '15.5', '20.0', '25.5'];
+                } else if (columnName.includes('อายุ')) {
+                    result.suggestions = ['120', '150', '180', '210'];
+                } else if (columnName.includes('โควต้า')) {
+                    result.suggestions = ['100', '150', '200', '250'];
+                } else {
+                    result.suggestions = ['0', '10', '50', '100'];
+                }
+            } else {
+                const numValue = parseFloat(valueStr);
+                
+                // ตรวจสอบพิกัด latitude (lat)
+                if (columnNameLower === 'lat') {
+                    if (numValue < -90 || numValue > 90) {
+                        result.status = 'error';
+                        result.message = 'latitude ต้องอยู่ระหว่าง -90 ถึง 90';
+                        result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
+                    } else if (Math.abs(numValue) < 1 || Math.abs(numValue) > 99) {
+                        result.status = 'warning';
+                        result.message = 'latitude มักเป็นเลขหลักสิบ (13-17 สำหรับประเทศไทย)';
+                        result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
+                    }
+                }
+                
+                // ตรวจสอบพิกัด longitude (long)
+                if (columnNameLower === 'long') {
+                    if (numValue < -180 || numValue > 180) {
+                        result.status = 'error';
+                        result.message = 'longitude ต้องอยู่ระหว่าง -180 ถึง 180';
+                        result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
+                    } else if (Math.abs(numValue) < 90 || Math.abs(numValue) > 110) {
+                        result.status = 'warning';
+                        result.message = 'longitude มักเป็นเลขหลักร้อย (100-104 สำหรับประเทศไทย)';
+                        result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
+                    }
+                }
+                
+                // ตรวจสอบค่าติดลบสำหรับบางคอลัมน์
+                if ((columnName.includes('พื้นที่') || columnName.includes('อายุ') || 
+                     columnName.includes('จำนวน') || columnName.includes('โควต้า')) && numValue < 0) {
+                    result.status = 'error';
+                    result.message = 'ค่าต้องมากกว่าหรือเท่ากับ 0';
+                    result.suggestions = ['0', '1', '10'];
+                }
+            }
+            break;
+            
+        case 'date':
+            // ตรวจสอบรูปแบบวันที่ (รองรับ YYYY/MM/DD และ YYYY/M/D)
+            const datePatterns = [
+                /^\d{4}-\d{1,2}-\d{1,2}$/,          // YYYY-MM-DD
+                /^\d{4}\/\d{1,2}\/\d{1,2}$/,       // YYYY/MM/DD หรือ YYYY/M/D
+                /^\d{1,2}\/\d{1,2}\/\d{4}$/,       // DD/MM/YYYY หรือ D/M/YYYY
+                /^\d{1,2}-\d{1,2}-\d{4}$/          // DD-MM-YYYY หรือ D-M-YYYY
+            ];
+            
+            const isValidDate = datePatterns.some(pattern => pattern.test(valueStr));
+            if (!isValidDate) {
+                result.status = 'error';
+                result.message = 'รูปแบบวันที่ไม่ถูกต้อง (รองรับ: YYYY/MM/DD, YYYY/M/D, DD/MM/YYYY)';
+                result.suggestions = ['2023/01/01', '2023/6/15', '2023/12/31'];
+            }
+            break;
+            
+        case 'enum':
+            if (columnNameLower.includes('ใช่/ไม่') || columnNameLower.includes('yes/no')) {
+                const validValues = ['ใช่', 'ไม่', 'yes', 'no', 'true', 'false'];
+                if (!validValues.includes(valueStr.toLowerCase())) {
+                    result.status = 'error';
+                    result.message = 'ต้องเป็น "ใช่" หรือ "ไม่"';
+                    result.suggestions = ['ใช่', 'ไม่'];
+                }
+            }
+            break;
+            
+        case 'identifier':
+            if (valueStr.length > 50) {
+                result.status = 'warning';
+                result.message = 'รหัสยาวเกินไป';
+            }
+            break;
+            
+        case 'text':
+            // ✅ แก้ไข: คอลัมน์ "ความเสี่ยงพื้นที่" และ "ความลาดเอียงของพื้นที่" เป็นข้อความ ไม่ต้องตรวจสอบเพิ่มเติม
+            if (columnNameLower.includes('ความเสี่ยงพื้นที่') || 
+                columnNameLower.includes('ความลาดเอียง')) {
+                // ไม่ต้องตรวจสอบเพิ่มเติม
+            } else if (columnNameLower.includes('แปลงintech')) {
+                // ตรวจสอบรูปแบบเลขแปลงintech
+                if (!/^\d+$/.test(valueStr) && valueStr.trim() !== '') {
+                    result.status = 'warning';
+                    result.message = 'เลขแปลงintech ควรเป็นตัวเลข';
+                }
+            } else if (valueStr.length < 1 && valueStr.trim() !== '') {
+                result.status = 'warning';
+                result.message = 'ข้อความสั้นเกินไป';
+            }
+            break;
+    }
+    
+    // ✅ ตรวจสอบให้แน่ใจว่า result มี status เสมอ
+    if (!result.status) {
+        console.warn(`No status returned for: ${columnName}, value: ${valueStr}`);
+        result.status = 'valid';
+    }
+    
+    return result;
+}
         
         function renderDataTableFromUploadedData() {
     // ล้างตารางเดิม
@@ -4311,43 +4422,68 @@ document.head.appendChild(styleElement);
             return colors[type] || '#6c757d';
         }
         
-     function updateDashboard() {
+   function updateDashboard() {
+    // ✅ ตรวจสอบว่ามีข้อมูลก่อน
+    if (!currentValidationResults || currentValidationResults.totalCells === 0) {
+        console.warn('No validation results to update dashboard');
+        return;
+    }
+    
     const total = currentValidationResults.totalCells;
     const valid = currentValidationResults.validCells;
     const warning = currentValidationResults.warningCells;
     const error = currentValidationResults.errorCells;
     
-    // คำนวณเปอร์เซ็นต์ที่ถูกต้อง
+    // ✅ คำนวณเปอร์เซ็นต์ที่ถูกต้อง (ต้องรวมกันได้ 100%)
     const validPercent = total > 0 ? Math.round((valid / total) * 100) : 0;
     const warningPercent = total > 0 ? Math.round((warning / total) * 100) : 0;
     const errorPercent = total > 0 ? Math.round((error / total) * 100) : 0;
     
-    // ✅ ตรวจสอบว่าเปอร์เซ็นต์รวมกันได้ 100%
+    // ✅ ตรวจสอบว่าผลรวมเป็น 100%
     const totalPercent = validPercent + warningPercent + errorPercent;
+    
+    console.log(`Dashboard Calculation:`);
+    console.log(`Valid: ${valid}/${total} = ${validPercent}%`);
+    console.log(`Warning: ${warning}/${total} = ${warningPercent}%`);
+    console.log(`Error: ${error}/${total} = ${errorPercent}%`);
+    console.log(`Total: ${totalPercent}%`);
+    
+    // ✅ ถ้าผลรวมไม่ใช่ 100% ให้ปรับค่า
+    let displayValidPercent = validPercent;
     if (totalPercent !== 100 && total > 0) {
-        // ปรับค่า validPercent ให้ได้ 100%
-        const adjustedValidPercent = 100 - warningPercent - errorPercent;
-        correctDataPercent.textContent = `${Math.max(0, adjustedValidPercent)}%`;
-        correctDataBar.style.width = `${Math.max(0, adjustedValidPercent)}%`;
-    } else {
-        correctDataPercent.textContent = `${validPercent}%`;
-        correctDataBar.style.width = `${validPercent}%`;
+        console.warn(`Percentages don't add up to 100%: ${totalPercent}%`);
+        
+        // ปรับค่าให้ถูกต้อง
+        if (totalPercent > 100) {
+            // ลด validPercent
+            displayValidPercent = 100 - warningPercent - errorPercent;
+        } else if (totalPercent < 100) {
+            // เพิ่ม validPercent
+            displayValidPercent = 100 - warningPercent - errorPercent;
+        }
+        
+        // ตรวจสอบว่าไม่ติดลบ
+        displayValidPercent = Math.max(0, Math.min(100, displayValidPercent));
+        console.log(`Adjusted valid percent: ${displayValidPercent}%`);
     }
+    
+    // ✅ อัพเดต UI
+    correctDataPercent.textContent = `${displayValidPercent}%`;
+    correctDataBar.style.width = `${displayValidPercent}%`;
     
     needReviewCount.textContent = warning;
     errorDataCount.textContent = error;
     
-    // ✅ แก้ไข: คำนวณเซลล์ที่แก้ไขแล้ว
+    needReviewBar.style.width = `${warningPercent}%`;
+    errorDataBar.style.width = `${errorPercent}%`;
+    
+    // ✅ คำนวณเซลล์ที่แก้ไขแล้ว
     const editedCount = countEditedCells();
     editedCellsCount.textContent = editedCount;
     const editedPercent = total > 0 ? Math.round((editedCount / total) * 100) : 0;
-    
-    // ✅ แก้ไข: อัพเดต Progress bars ให้ถูกต้อง
-    needReviewBar.style.width = `${warningPercent}%`;
-    errorDataBar.style.width = `${errorPercent}%`;
     editedCellsBar.style.width = `${Math.min(editedPercent, 100)}%`;
     
-    // ✅ แก้ไข: แสดงปุ่ม "ต้องตรวจสอบ" ถ้ามีข้อมูลที่ต้องตรวจสอบ
+    // ✅ แสดงปุ่ม "ต้องตรวจสอบ" ถ้ามีข้อมูลที่ต้องตรวจสอบ
     if (warning > 0) {
         showReviewBtn.style.display = 'inline-block';
         showReviewBtn.innerHTML = '<i class="fas fa-eye"></i> แสดงแถวที่ต้องตรวจสอบ';
@@ -4358,19 +4494,45 @@ document.head.appendChild(styleElement);
         showReviewBtn.style.display = 'none';
     }
     
-    // ✅ แก้ไข: ต้องไม่มีข้อผิดพลาดและผ่าน 100% จึงจะไปขั้นตอนต่อไปได้
-    const isValidPercent = parseInt(correctDataPercent.textContent);
-    nextToStep4.disabled = !(isValidPercent === 100 && error === 0);
+    // ✅ ตรวจสอบเงื่อนไขสำหรับปุ่มต่อไป
+    // ต้องไม่มีข้อผิดพลาดและข้อมูลถูกต้อง 100%
+    const canProceed = (displayValidPercent === 100 && error === 0);
+    nextToStep4.disabled = !canProceed;
     
-    // ✅ แก้ไข: อัพเดตสถานะข้อมูล
+    console.log(`Can proceed to next step: ${canProceed} (Valid: ${displayValidPercent}%, Error: ${error})`);
+    
+    // ✅ อัพเดตสถานะข้อมูล
     updateDataStatus();
     
-    // แสดงข้อมูลสรุปใน console
-    console.log(`📊 Dashboard Summary (All Data):`);
-    console.log(`✅ ถูกต้อง: ${valid}/${total} (${validPercent}%)`);
+    // แสดงข้อมูลสรุปใน console สำหรับ debugging
+    console.log(`📊 Dashboard Summary:`);
+    console.log(`✅ ถูกต้อง: ${valid}/${total} (${displayValidPercent}%)`);
     console.log(`⚠️ ต้องตรวจสอบ: ${warning}/${total} (${warningPercent}%)`);
     console.log(`❌ ผิดพลาด: ${error}/${total} (${errorPercent}%)`);
     console.log(`✏️ แก้ไขแล้ว: ${editedCount}/${total} (${editedPercent}%)`);
+    
+    // ✅ ถ้ามีข้อผิดพลาด ให้แจ้งเตือน
+    if (error > 0 && displayValidPercent === 100) {
+        console.error('❌ BUG DETECTED: มีข้อผิดพลาดแต่ Dashboard แสดง 100%!');
+        console.error('Debug info:', {
+            total: total,
+            valid: valid,
+            warning: warning,
+            error: error,
+            calculatedValidPercent: (valid/total*100).toFixed(2) + '%',
+            displayValidPercent: displayValidPercent + '%'
+        });
+        
+        // แก้ไขแสดงผลให้ถูกต้อง
+        const actualValidPercent = Math.round(((total - warning - error) / total) * 100);
+        correctDataPercent.textContent = `${actualValidPercent}%`;
+        correctDataBar.style.width = `${actualValidPercent}%`;
+        
+        // แสดงข้อความแจ้งเตือน
+        setTimeout(() => {
+            alert(`⚠️ พบข้อผิดพลาดในการคำนวณ!\n\nมีข้อผิดพลาด ${error} รายการ แต่ Dashboard แสดง ${displayValidPercent}%\n\nกำลังแก้ไขแสดงผล...`);
+        }, 1000);
+    }
 }
         function refreshDashboardFromAllData() {
     if (uploadedData) {
