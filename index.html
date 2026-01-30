@@ -1268,72 +1268,77 @@
             min-width: 1300px; /* ✅ เพิ่มความกว้างให้พอดีกับคอลัมน์ใหม่ */
         }
         
-        /* ✅ ปรับขนาดคอลัมน์ใหม่ทั้งหมด 12 คอลัมน์ */
-        .checking-table th:nth-child(1),
-        .checking-table td:nth-child(1) {
-            width: 60px;
-            min-width: 60px;
-            max-width: 60px;
-            text-align: center;
-            position: sticky;
-            left: 0;
-            background: var(--primary-color);
-            color: white;
-            z-index: 20;
-        }
+       /* ✅ ปรับขนาดคอลัมน์ใหม่ทั้งหมด 14 คอลัมน์สำหรับประเภทอ้อย, 16 คอลัมน์สำหรับปุ๋ย */
+.checking-table th:nth-child(1),
+.checking-table td:nth-child(1) {
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+    text-align: center;
+    position: sticky;
+    left: 0;
+    background: var(--primary-color);
+    color: white;
+    z-index: 20;
+}
 
-        .checking-table td:nth-child(1) {
-            background: white;
-            color: var(--dark-color);
-            border-right: 1px solid #eee;
-        }
+.checking-table td:nth-child(1) {
+    background: white;
+    color: var(--dark-color);
+    border-right: 1px solid #eee;
+}
 
-        .checking-table th:nth-child(2),
-        .checking-table td:nth-child(2) {
-            width: 120px;
-            min-width: 120px;
-            max-width: 120px;
-            position: sticky;
-            left: 60px;
-            background: var(--primary-color);
-            color: white;
-            z-index: 20;
-            border-right: 1px solid #ddd;
-        }
+.checking-table th:nth-child(2),
+.checking-table td:nth-child(2) {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    position: sticky;
+    left: 60px;
+    background: var(--primary-color);
+    color: white;
+    z-index: 20;
+    border-right: 1px solid #ddd;
+}
 
-        .checking-table td:nth-child(2) {
-            background: #f8f9fa;
-            color: var(--dark-color);
-        }
+.checking-table td:nth-child(2) {
+    background: #f8f9fa;
+    color: var(--dark-color);
+}
 
-        .checking-table th:nth-child(3),
-        .checking-table td:nth-child(3) {
-            width: 130px;
-            min-width: 130px;
-            max-width: 130px;
-        }
+/* ✅ คอลัมน์โซน (คอลัมน์ที่ 3) */
+.checking-table th:nth-child(3),
+.checking-table td:nth-child(3) {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    background-color: #e8f5e9;
+}
 
-        .checking-table th:nth-child(4),
-        .checking-table td:nth-child(4) {
-            width: 100px;
-            min-width: 100px;
-            max-width: 100px;
-            text-align: center;
-        }
+/* ✅ คอลัมน์รหัสนักเกษตร (คอลัมน์ที่ 4) */
+.checking-table th:nth-child(4),
+.checking-table td:nth-child(4) {
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    background-color: #e3f2fd;
+}
 
-        .checking-table th:nth-child(5),
-        .checking-table td:nth-child(5) {
-            width: 140px;
-            min-width: 140px;
-            max-width: 140px;
-        }
+/* คอลัมน์อื่นๆ... */
+.checking-table th:nth-child(5),
+.checking-table td:nth-child(5) {
+    width: 130px;
+    min-width: 130px;
+    max-width: 130px;
+}
 
-        .checking-table th:nth-child(6),
-        .checking-table td:nth-child(6) {
-            width: 140px;
-            min-width: 140px;
-            max-width: 140px;
-        }
+.checking-table th:nth-child(6),
+.checking-table td:nth-child(6) {
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
+    text-align: center;
+}
 
         .checking-table th:nth-child(7),
         .checking-table td:nth-child(7) {
@@ -5707,6 +5712,8 @@ function prepareFertilizerCheckingTable() {
     // คอลัมน์ปุ๋ย
     const fertilizerColumns = [
         { name: "เลขแปลงintech", keywords: ["แปลงintech", "แปลง intech", "แปลง"] },
+        { name: "โซน", keywords: ["โซน", "zone"] }, // ✅ เพิ่ม
+        { name: "รหัสนักเกษตร", keywords: ["รหัสนักเกษตร", "รหัสเกษตร", "farmer code"] }, // ✅ เพิ่ม
         { name: "ชื่อประเภทอ้อย", keywords: ["ชื่อประเภทอ้อย", "ประเภทอ้อย", "พันธุ์อ้อย"] },
         { name: "อายุอ้อย", keywords: ["อายุอ้อย", "อายุ", "age", "วัน"] },
         { name: "ประเภทการใส่ปุ๋ยงวด 1", keywords: ["ประเภทการใส่ปุ๋ยงวด 1", "ประเภทปุ๋ยงวด1", "ปุ๋ยงวด1"] },
@@ -5750,6 +5757,9 @@ function prepareFertilizerCheckingTable() {
             id: rowIndex + 1,
             originalRowIndex: rowIndex,
             intechPlot: foundColumns["เลขแปลงintech"] ? row[foundColumns["เลขแปลงintech"]] || '' : '',
+            zone: foundColumns["โซน"] ? row[foundColumns["โซน"]] || '' : '', // ✅ เพิ่ม
+            farmerCode: foundColumns["รหัสนักเกษตร"] ? row[foundColumns["รหัสนักเกษตร"]] || '' : '', // ✅ เพิ่ม
+            sugarcaneType: foundColumns["ชื่อประเภทอ้อย"] ? row[foundColumns["ชื่อประเภทอ้อย"]] || '' : '',
             sugarcaneType: foundColumns["ชื่อประเภทอ้อย"] ? row[foundColumns["ชื่อประเภทอ้อย"]] || '' : '',
             age: foundColumns["อายุอ้อย"] ? row[foundColumns["อายุอ้อย"]] || '' : '',
             fertilizerType1: foundColumns["ประเภทการใส่ปุ๋ยงวด 1"] ? row[foundColumns["ประเภทการใส่ปุ๋ยงวด 1"]] || '' : '',
@@ -5775,7 +5785,9 @@ function prepareFertilizerCheckingTable() {
     const headerRow = document.createElement('tr');
     const headers = [
         "ลำดับ",
-        "เลขแปลงintech", 
+        "เลขแปลงintech",
+        "โซน",              // ✅ เพิ่ม
+        "รหัสนักเกษตร",     // ✅ เพิ่ม
         "ชื่อประเภทอ้อย",
         "อายุอ้อย",
         "ประเภทการใส่ปุ๋ยงวด 1",
@@ -5808,11 +5820,13 @@ function prepareFertilizerCheckingTable() {
     const foundCount = Object.values(foundColumns).filter(col => col !== null).length;
     const totalColumns = fertilizerColumns.length;
     
-    resultsContainer.innerHTML = `
+     resultsContainer.innerHTML = `
         <div class="result-summary" style="background: #e8f5e9; border-left-color: #4caf50;">
             <p><i class="fas fa-check-circle"></i> <strong>เตรียมตารางตรวจสอบ "${getConditionDisplayName(currentCondition)}" เสร็จเรียบร้อย</strong></p>
             <p>พบข้อมูลทั้งหมด: <strong>${checkingTableData.length} แถว</strong></p>
             <p>พบคอลัมน์ปุ๋ย: ${foundCount}/${totalColumns} คอลัมน์</p>
+            ${foundColumns["โซน"] ? `<p><i class="fas fa-map-marker-alt"></i> พบคอลัมน์โซน: <strong>"${foundColumns["โซน"]}"</strong></p>` : ''}
+            ${foundColumns["รหัสนักเกษตร"] ? `<p><i class="fas fa-user-tag"></i> พบคอลัมน์รหัสนักเกษตร: <strong>"${foundColumns["รหัสนักเกษตร"]}"</strong></p>` : ''}
             <div style="margin-top: 15px;">
                 <button class="btn btn-primary" id="startFertilizerCheckBtn">
                     <i class="fas fa-play"></i> เริ่มตรวจสอบปุ๋ย
@@ -5821,7 +5835,7 @@ function prepareFertilizerCheckingTable() {
         </div>
     `;
     
-    // เพิ่ม Event Listener
+     // เพิ่ม Event Listener
     document.getElementById('startFertilizerCheckBtn').addEventListener('click', function() {
         const results = performFertilizerConditionCheck();
         updateCheckingTableWithResults(results, currentCondition);
@@ -5851,6 +5865,8 @@ function renderFertilizerCheckingTable() {
         const cells = [
             rowData.id,
             rowData.intechPlot || '(ไม่พบข้อมูล)',
+            rowData.zone || '(ไม่พบข้อมูล)',      // ✅ เพิ่ม
+            rowData.farmerCode || '(ไม่พบข้อมูล)', // ✅ เพิ่ม
             rowData.sugarcaneType || '(ไม่พบข้อมูล)',
             rowData.age || '',
             rowData.fertilizerType1 || '',
@@ -5871,7 +5887,7 @@ function renderFertilizerCheckingTable() {
             } else {
                 td.textContent = cellContent;
                 
-                // ตรวจสอบค่าว่าง
+               // ตรวจสอบค่าว่าง
                 if (cellContent === '' || cellContent === '(ไม่พบข้อมูล)') {
                     td.style.color = '#999';
                     td.style.fontStyle = 'italic';
@@ -5885,7 +5901,7 @@ function renderFertilizerCheckingTable() {
                 }
                 
                 // ถ้าผ่าน ให้เพิ่มสีเขียว
-                if (rowData.passed && cellIndex > 0 && cellIndex < 10) {
+                if (rowData.passed && (cellIndex === 4 || cellIndex === 5)) { // ✅ ปรับ index
                     td.style.color = 'var(--success-color)';
                     td.style.fontWeight = 'bold';
                     td.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
@@ -5898,6 +5914,7 @@ function renderFertilizerCheckingTable() {
         tableBody.appendChild(tr);
     });
     
+    // อัพเดตจำนวนแถวที่แสดง
     document.getElementById('checkingRowsCount').textContent = displayedRows;
 }
 
@@ -6890,6 +6907,10 @@ function exportCheckingResultsWithColors() {
             
             if (header === "ลำดับ") {
                 value = rowData.id;
+            } else if (header === "โซน") {
+                value = rowData.zone || ''; // ✅ เพิ่ม
+            } else if (header === "รหัสนักเกษตร") {
+                value = rowData.farmerCode || ''; // ✅ เพิ่ม
             } else if (header === "สถานะ") {
                 value = rowData.status;
             } else if (header === "หมายเหตุ") {
