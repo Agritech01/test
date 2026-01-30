@@ -3697,7 +3697,7 @@
     }
 }
         
-       function runDataValidationFromUploadedData() {
+      function runDataValidationFromUploadedData() {
     if (!uploadedData || selectedColumns.length === 0) return;
     
     // ✅ แก้ไข: ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
@@ -3745,7 +3745,7 @@
     // อัพเดต Dashboard จากผลการคำนวณทั้งหมด
     updateDashboard();
 }
-        function calculateAllDataValidation() {
+       function calculateAllDataValidation() {
     if (!uploadedData || selectedColumns.length === 0) {
         return {
             totalCells: 0,
@@ -4118,7 +4118,7 @@
             return result;
         }
         
-        function renderDataTableFromUploadedData() {
+      function renderDataTableFromUploadedData() {
     // ล้างตารางเดิม
     dataTableHeader.innerHTML = '';
     dataTableBody.innerHTML = '';
@@ -4331,7 +4331,7 @@
             return count;
         }
         
-        function updateDataStatus() {
+       function updateDataStatus() {
     const errorCount = currentValidationResults.errorCells;
     const warningCount = currentValidationResults.warningCells;
     const totalRows = uploadedData.data.length;
@@ -4470,51 +4470,54 @@
             });
         }
         
-        // ✅ ฟังก์ชันใหม่: แสดงเฉพาะแถวที่มีข้อผิดพลาด
-        function showErrorRowsOnly() {
-            const rows = document.querySelectorAll('#dataTableBody tr');
-            let errorRowCount = 0;
-            
-            rows.forEach(row => {
-                let hasError = false;
-                const cells = row.querySelectorAll('td');
-                
-                cells.forEach(cell => {
-                    if (cell.classList.contains('cell-error')) {
-                        hasError = true;
-                    }
-                });
-                
-                if (hasError) {
-                    row.style.display = '';
-                    errorRowCount++;
-                    row.style.backgroundColor = 'rgba(255, 235, 238, 0.5)';
-                } else {
-                    row.style.display = 'none';
-                }
+       function showErrorRowsOnly() {
+    // ปัญหา: ฟังก์ชันนี้ทำงานกับแถวที่แสดงในตารางเท่านั้น (currentRowLimit)
+    // แต่ต้องทำงานกับข้อมูลทั้งหมด (uploadedData.data)
+    
+    // แก้ไขเป็น:
+    const rows = document.querySelectorAll('#dataTableBody tr');
+    let errorRowCount = 0;
+    
+    rows.forEach(row => {
+        let hasError = false;
+        const cells = row.querySelectorAll('td');
+        
+        cells.forEach(cell => {
+            if (cell.classList.contains('cell-error')) {
+                hasError = true;
+            }
+        });
+        
+        if (hasError) {
+            row.style.display = '';
+            errorRowCount++;
+            row.style.backgroundColor = 'rgba(255, 235, 238, 0.5)';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    if (errorRowCount > 0) {
+        const tableControls = document.querySelector('.data-table-controls');
+        if (!document.getElementById('showAllRowsBtn')) {
+            const showAllBtn = document.createElement('button');
+            showAllBtn.id = 'showAllRowsBtn';
+            showAllBtn.className = 'btn btn-outline btn-sm';
+            showAllBtn.innerHTML = '<i class="fas fa-list"></i> แสดงทั้งหมด';
+            showAllBtn.style.marginLeft = '10px';
+            showAllBtn.addEventListener('click', function() {
+                showAllRowsInTable();
             });
             
-            if (errorRowCount > 0) {
-                const tableControls = document.querySelector('.data-table-controls');
-                if (!document.getElementById('showAllRowsBtn')) {
-                    const showAllBtn = document.createElement('button');
-                    showAllBtn.id = 'showAllRowsBtn';
-                    showAllBtn.className = 'btn btn-outline btn-sm';
-                    showAllBtn.innerHTML = '<i class="fas fa-list"></i> แสดงทั้งหมด';
-                    showAllBtn.style.marginLeft = '10px';
-                    showAllBtn.addEventListener('click', function() {
-                        showAllRowsInTable();
-                    });
-                    
-                    const tableActions = document.querySelector('.table-actions');
-                    if (tableActions) {
-                        tableActions.appendChild(showAllBtn);
-                    }
-                }
-                
-                alert(`แสดงเฉพาะแถวที่มีข้อผิดพลาด: ${errorRowCount} แถว`);
+            const tableActions = document.querySelector('.table-actions');
+            if (tableActions) {
+                tableActions.appendChild(showAllBtn);
             }
         }
+        
+        alert(`แสดงเฉพาะแถวที่มีข้อผิดพลาด: ${errorRowCount} แถว`);
+    }
+}
         
         // ✅ ฟังก์ชันใหม่: แสดงเฉพาะแถวที่ต้องตรวจสอบ (warning)
         function showReviewRows() {
@@ -5081,8 +5084,7 @@
             valueSuggestions.innerHTML = '';
         }
         
-       // แก้ไขบรรทัด ~3100
-function autoFixAllErrorsForUploadedData() {
+     function autoFixAllErrorsForUploadedData() {
     if (!uploadedData) return;
     
     let fixedCount = 0;
