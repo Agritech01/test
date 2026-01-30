@@ -3134,6 +3134,9 @@ document.head.appendChild(styleElement);
         let conditionResults = {};
         let checkingTableData = [];
         let showOnlyFailed = false;
+       
+        // ✅ เพิ่มตัวแปรควบคุมการจัดเรียงที่ส่วนบน
+        let showOriginalOrder = false; // true = เรียงตามหมายเลขแถว, false = เรียงตามปัญหา
         
         // สำหรับระบบ Advanced Validation
         let appData = { fileName: '', headers: [], data: [], removedStats: {}, rowMeta: [] };
@@ -4188,7 +4191,7 @@ function updateDashboardWithVerification() {
     return result;
 }
         
-        function renderDataTableFromUploadedData() {
+      function renderDataTableFromUploadedData() {
     // ล้างตารางเดิม
     dataTableHeader.innerHTML = '';
     dataTableBody.innerHTML = '';
@@ -4229,26 +4232,125 @@ function updateDashboardWithVerification() {
     
     dataTableHeader.appendChild(headerRow);
     
-    // ✅ แก้ไข: เพิ่มฟิลเตอร์ในหัวตารางเป็น Dropdown
+    // ✅ FIX: เพิ่มฟิลเตอร์ในหัวตาราง
     setTimeout(() => {
         addColumnFilterDropdowns();
     }, 100);
     
-    // ✅ แก้ไข: แสดงข้อมูลตาม currentRowLimit
-    const displayRows = uploadedData.data.slice(0, currentRowLimit);
+    // ✅ FIX: แสดงแถวที่มีข้อผิดพลาดก่อน
+    const allRows = uploadedData.data;
+    let displayRows = [];
     
-    // ✅ แก้ไข: อัพเดตจำนวนแถวที่แสดง
+    // สร้างอาร์เรย์ของแถวพร้อมข้อมูลสถานะ
+    const rowsWithStatus = allRows.map((row, rowIndex) => {
+        let errorCount = 0;
+        let warningCount = 0;
+        let hasError = false;
+        let hasWarning = false;
+        
+        // ตรวจสอบสถานะของแต่ละเซลล์ในแถวนี้
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            
+            if (cellValue.trim() === '') {
+                return;
+            }
+            
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            
+            if (validation.status === 'error') {
+                errorCount++;
+                hasError = true;
+            } else if (validation.status === 'warning') {
+                warningCount++;
+                hasWarning = true;
+            }
+        });
+        
+        return {
+            row: row,
+            rowIndex: rowIndex,
+            errorCount: errorCount,
+            warningCount: warningCount,
+            hasError: hasError,
+            hasWarning: hasWarning,
+            totalIssues: errorCount + warningCount
+        };
+    });
+    
+    // ✅ แก้ไขส่วนจัดเรียง
+if (!showOriginalOrder) {
+    // จัดเรียง: แถวที่มี error มาก่อน, ตามด้วย warning, ตามด้วยแถวที่ผ่าน
+    rowsWithStatus.sort((a, b) => {
+        // 1. เรียงตามจำนวน error (มากไปน้อย)
+        if (a.errorCount !== b.errorCount) {
+            return b.errorCount - a.errorCount;
+        }
+        
+        // 2. ถ้า error เท่ากัน เรียงตามจำนวน warning (มากไปน้อย)
+        if (a.warningCount !== b.warningCount) {
+            return b.warningCount - a.warningCount;
+        }
+        
+        // 3. ถ้าทั้งหมดเท่ากัน เรียงตามหมายเลขแถว
+        return a.rowIndex - b.rowIndex;
+    });
+} else {
+    // เรียงตามหมายเลขแถวเดิม
+    rowsWithStatus.sort((a, b) => a.rowIndex - b.rowIndex);
+}
+    
+    // ✅ เอาเฉพาะ 50 แถวแรก (ซึ่งจะมีแถวที่มีปัญหาอยู่ก่อน)
+    const topRows = rowsWithStatus.slice(0, currentRowLimit);
+    
+    // แยกเฉพาะข้อมูลแถว
+    displayRows = topRows.map(item => item.row);
+    
+    // ✅ FIX: เก็บข้อมูล rowIndex ดั้งเดิมเพื่อการอ้างอิง
+    const originalRowIndices = topRows.map(item => item.rowIndex);
+    
+    // ✅ อัพเดตจำนวนแถวที่แสดง
     totalRows.textContent = uploadedData.data.length; // แสดงจำนวนแถวทั้งหมด
-    currentRows.textContent = Math.min(currentRowLimit, uploadedData.data.length);
+    currentRows.textContent = displayRows.length;
     totalRowCount.textContent = uploadedData.data.length;
     
-    displayRows.forEach((row, rowIndex) => {
+    // ✅ แสดงจำนวนแถวที่มีปัญหาใน 50 แถวแรกนี้
+    const errorRowsInDisplay = topRows.filter(r => r.hasError).length;
+    const warningRowsInDisplay = topRows.filter(r => r.hasWarning).length;
+    
+    console.log(`📊 แสดงแถว ${displayRows.length}/${uploadedData.data.length} แถว`);
+    console.log(`❌ มีแถวที่มี error: ${errorRowsInDisplay} แถวใน ${displayRows.length} แถวนี้`);
+    console.log(`⚠️ มีแถวที่มี warning: ${warningRowsInDisplay} แถวใน ${displayRows.length} แถวนี้`);
+    
+    // ✅ สร้างแถวในตาราง
+    displayRows.forEach((row, displayIndex) => {
+        const originalRowIndex = originalRowIndices[displayIndex];
+        const rowStatus = topRows[displayIndex];
+        
         const tr = document.createElement('tr');
         
-        // เพิ่มหมายเลขแถว
+        // ✅ เพิ่มสีพื้นหลังตามสถานะของแถว
+        if (rowStatus.hasError) {
+            tr.style.backgroundColor = 'rgba(255, 235, 238, 0.3)';
+            tr.style.borderLeft = '3px solid var(--danger-color)';
+        } else if (rowStatus.hasWarning) {
+            tr.style.backgroundColor = 'rgba(255, 248, 225, 0.3)';
+            tr.style.borderLeft = '3px solid var(--warning-color)';
+        }
+        
+        // เพิ่มหมายเลขแถว (ใช้หมายเลขแถวจริง + 1)
         const rowNumCell = document.createElement('td');
-        rowNumCell.textContent = rowIndex + 1;
+        rowNumCell.textContent = originalRowIndex + 1;
         rowNumCell.style.fontWeight = 'bold';
+        
+        // ✅ เพิ่มไอคอนแสดงสถานะ
+        if (rowStatus.hasError) {
+            rowNumCell.innerHTML = `${originalRowIndex + 1} <span style="color: var(--danger-color); margin-left: 5px;"><i class="fas fa-exclamation-circle"></i></span>`;
+        } else if (rowStatus.hasWarning) {
+            rowNumCell.innerHTML = `${originalRowIndex + 1} <span style="color: var(--warning-color); margin-left: 5px;"><i class="fas fa-exclamation-triangle"></i></span>`;
+        }
+        
         tr.appendChild(rowNumCell);
         
         // เพิ่มข้อมูลแต่ละเซลล์
@@ -4262,7 +4364,7 @@ function updateDashboardWithVerification() {
                                  detectColumnType(columnName, cellValue);
             
             // ตรวจสอบข้อมูล
-            const validation = validateCellData(columnName, cellValue, effectiveType, rowIndex, colIndex);
+            const validation = validateCellData(columnName, cellValue, effectiveType, originalRowIndex, colIndex);
             
             // เพิ่มคลาสตามสถานะการตรวจสอบ
             if (validation.status === 'error') {
@@ -4276,7 +4378,7 @@ function updateDashboardWithVerification() {
             }
             
             // เพิ่มข้อมูลสำหรับการแก้ไข
-            td.dataset.row = rowIndex;
+            td.dataset.row = originalRowIndex; // ใช้ rowIndex จริง
             td.dataset.col = colIndex;
             td.dataset.column = columnName;
             td.dataset.value = cellValue;
@@ -4285,7 +4387,7 @@ function updateDashboardWithVerification() {
             // Event listener สำหรับการแก้ไข
             if (validation.status === 'error' || validation.status === 'warning') {
                 td.style.cursor = 'pointer';
-                td.addEventListener('click', () => openCellEditorForUploadedData(rowIndex, colIndex));
+                td.addEventListener('click', () => openCellEditorForUploadedData(originalRowIndex, colIndex));
             }
             
             tr.appendChild(td);
@@ -4294,9 +4396,11 @@ function updateDashboardWithVerification() {
         dataTableBody.appendChild(tr);
     });
     
-    // ✅ แก้ไข: อัพเดตข้อมูลตาราง
+    // ✅ อัพเดตข้อมูลตาราง
     currentColumns.textContent = selectedColumns.length;
-    updateDataStatus();
+    
+    // ✅ แสดงสถิติใน UI
+    updateDataStatusWithPriorityInfo(errorRowsInDisplay, warningRowsInDisplay, displayRows.length);
 }
         
         function getTypeDisplayName(type) {
@@ -4536,7 +4640,75 @@ function updateDashboardWithVerification() {
         dataStatus.style.borderRadius = '20px';
     }
 }
+     function updateDataStatusWithPriorityInfo(errorRows, warningRows, displayCount) {
+    const totalRows = uploadedData.data.length;
+    const validPercent = parseInt(correctDataPercent.textContent);
+    
+    let statusHTML = '';
+    
+    if (errorRows > 0) {
+        statusHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i>
+                <span style="cursor: pointer; text-decoration: underline;" id="showErrorsBtn">
+                    มี ${errorRows} แถวที่มีข้อผิดพลาดใน ${displayCount} แถวนี้
+                </span>
+                <small style="color: #666;">(ทั้งหมด ${totalRows} แถว)</small>
+            </div>
+        `;
+        dataStatus.style.color = 'var(--danger-color)';
+        dataStatus.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+    } else if (warningRows > 0) {
+        statusHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+                <span style="cursor: pointer; text-decoration: underline;" id="showWarningsBtn">
+                    มี ${warningRows} แถวที่ต้องตรวจสอบใน ${displayCount} แถวนี้
+                </span>
+                <small style="color: #666;">(ทั้งหมด ${totalRows} แถว)</small>
+            </div>
+        `;
+        dataStatus.style.color = 'var(--warning-color)';
+        dataStatus.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+    } else {
+        statusHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                <span>✓ ไม่พบข้อผิดพลาดใน ${displayCount} แถวนี้</span>
+                <small style="color: #666;">(ทั้งหมด ${totalRows} แถว)</small>
+            </div>
+        `;
+        dataStatus.style.color = 'var(--success-color)';
+        dataStatus.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+    }
+    
+    dataStatus.innerHTML = statusHTML;
+    dataStatus.style.padding = '8px 15px';
+    dataStatus.style.borderRadius = '20px';
+    
+    // ✅ เพิ่มปุ่มแสดงเฉพาะแถวที่มีปัญหา
+    setTimeout(() => {
+        if (errorRows > 0) {
+            const showErrorsBtn = document.getElementById('showErrorsBtn');
+            if (showErrorsBtn) {
+                showErrorsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showErrorRowsOnly();
+                });
+            }
+        }
         
+        if (warningRows > 0) {
+            const showWarningsBtn = document.getElementById('showWarningsBtn');
+            if (showWarningsBtn) {
+                showWarningsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showReviewRows();
+                });
+            }
+        }
+    }, 100);
+}   
         // ✅ ฟังก์ชันใหม่: เพิ่มฟิลเตอร์ Dropdown ในหัวตาราง
         function addColumnFilterDropdowns() {
             const headerRow = document.getElementById('dataTableHeader').querySelector('tr');
@@ -4896,7 +5068,30 @@ function updateDashboardWithVerification() {
             }
         }
     });
-            
+              // ✅ เพิ่มปุ่มสลับการแสดงผลตามสถานะ
+    const tableControls = document.querySelector('.data-table-controls .table-actions');
+    if (tableControls) {
+        const priorityToggleBtn = document.createElement('button');
+        priorityToggleBtn.id = 'priorityToggleBtn';
+        priorityToggleBtn.className = 'btn btn-outline btn-sm';
+        priorityToggleBtn.innerHTML = '<i class="fas fa-sort-amount-down"></i> แสดงที่มีปัญหาก่อน';
+        priorityToggleBtn.style.marginLeft = '10px';
+        
+        priorityToggleBtn.addEventListener('click', function() {
+            const currentText = this.innerHTML;
+            if (currentText.includes('แสดงที่มีปัญหาก่อน')) {
+                this.innerHTML = '<i class="fas fa-sort-amount-up"></i> เรียงตามหมายเลขแถว';
+                showOriginalOrder = false;
+            } else {
+                this.innerHTML = '<i class="fas fa-sort-amount-down"></i> แสดงที่มีปัญหาก่อน';
+                showOriginalOrder = true;
+            }
+            renderDataTableFromUploadedData();
+        });
+        
+        tableControls.appendChild(priorityToggleBtn);
+    }
+}
             // Cell editor modal
             saveEdit.addEventListener('click', () => {
                 if (uploadedData && editingCell) {
@@ -5135,26 +5330,58 @@ function updateDashboardWithVerification() {
             alert('✅ ตรวจจับประเภทข้อมูลอัตโนมัติเรียบร้อยแล้ว!');
         }
         
-       function toggleAllRows() {
+      function toggleAllRows() {
     isShowingAllRows = !isShowingAllRows;
     
     if (isShowingAllRows) {
-        // แสดงข้อมูลทั้งหมดในตาราง (อาจทำให้เบราว์เซอร์ช้า)
+        // ✅ FIX: แสดงข้อมูลทั้งหมด (7609 แถว) แต่ยังเรียงตาม priority
         currentRowLimit = uploadedData.data.length;
         document.getElementById('toggleAllRows').innerHTML = 
-            `<i class="fas fa-compress"></i> ซ่อนบางส่วน (${Math.min(currentRowLimit, 1000)}/${uploadedData.data.length})`;
+            `<i class="fas fa-compress"></i> แสดงเฉพาะ 50 แถวแรก`;
+        
+        // แสดงข้อความแจ้งเตือน
+        setTimeout(() => {
+            const errorRows = uploadedData.data.filter((row, rowIndex) => {
+                let hasError = false;
+                selectedColumns.forEach((columnName, colIndex) => {
+                    const cellValue = row[columnName] || '';
+                    if (cellValue.trim() === '') return;
+                    
+                    const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+                    const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+                    if (validation.status === 'error') hasError = true;
+                });
+                return hasError;
+            }).length;
+            
+            const warningRows = uploadedData.data.filter((row, rowIndex) => {
+                let hasWarning = false;
+                selectedColumns.forEach((columnName, colIndex) => {
+                    const cellValue = row[columnName] || '';
+                    if (cellValue.trim() === '') return;
+                    
+                    const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+                    const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+                    if (validation.status === 'warning') hasWarning = true;
+                });
+                return hasWarning;
+            }).length;
+            
+            console.log(`📊 แสดงทั้งหมด ${currentRowLimit} แถว`);
+            console.log(`❌ แถวที่มี error: ${errorRows} แถว`);
+            console.log(`⚠️ แถวที่มี warning: ${warningRows} แถว`);
+        }, 100);
     } else {
-        // แสดงเพียงตัวอย่าง
+        // ✅ FIX: แสดงเพียง 50 แถวแรกที่เรียงตาม priority
         currentRowLimit = 50;
         document.getElementById('toggleAllRows').innerHTML = 
             `<i class="fas fa-expand"></i> แสดงทั้งหมด (${uploadedData.data.length})`;
     }
     
-    // อัพเดตตาราง (แต่ Dashboard ยังคงใช้ข้อมูลทั้งหมด)
+    // อัพเดตตารางใหม่ด้วยการจัดเรียงตาม priority
     renderDataTableFromUploadedData();
     
-    console.log(`📋 ตารางแสดง: ${currentRowLimit}/${uploadedData.data.length} แถว`);
-    console.log(`📊 Dashboard ยังคงคำนวณจากทั้งหมด ${uploadedData.data.length} แถว`);
+    console.log(`📋 ตารางแสดง: ${currentRowLimit}/${uploadedData.data.length} แถว (จัดเรียงตามปัญหา)`);
 }
         function exportTableToCSV() {
             if (!uploadedData || selectedColumns.length === 0) return;
