@@ -2369,7 +2369,68 @@
             border-radius: 50%;
             color: var(--primary-color);
         }
-        
+        /* เพิ่ม animation สำหรับไฮไลต์ */
+@keyframes pulse {
+    0% { background-color: #ffebee; }
+    50% { background-color: #ffcdd2; }
+    100% { background-color: #ffebee; }
+}
+
+@keyframes highlight {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.cell-error {
+    animation: highlight 0.3s ease;
+}
+
+/* สไตล์สำหรับ status badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-error {
+    background-color: #ffcdd2;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+
+.status-warning {
+    background-color: #ffe0b2;
+    color: #ef6c00;
+    border: 1px solid #ffcc80;
+}
+
+.status-valid {
+    background-color: #c8e6c9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+
+/* สไตล์สำหรับ inline editor */
+td[contenteditable="true"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+    z-index: 100;
+    position: relative;
+}
+
+/* สไตล์สำหรับ suggestions popup */
+.suggestions-popup {
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
         .rule-name {
             display: flex;
             align-items: center;
@@ -3749,24 +3810,19 @@ document.head.appendChild(styleElement);
     }
 }
         
-       function runDataValidationFromUploadedData() {
+     function runDataValidationFromUploadedData() {
     if (!uploadedData || selectedColumns.length === 0) return;
     
-    // ✅ แก้ไข: ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
+    // ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
     const removedCount = removeEmptyRows();
     if (removedCount > 0) {
         console.log(`✅ ตัดแถวที่ว่างทั้งหมดออกแล้ว: ${removedCount} แถว`);
     }
     
-    // ✅ แก้ไข: คำนวณการตรวจสอบจากข้อมูลทั้งหมด
-    currentValidationResults = calculateAllDataValidation();
-    
-    // สำหรับการแสดงในตาราง ใช้เพียง sample (50 แถว)
-    const sampleRows = uploadedData.data.slice(0, currentRowLimit);
-    
-    // สร้าง cellValidationStatus เฉพาะสำหรับ sample rows
+    // ✅ แก้ไข: สร้าง cellValidationStatus สำหรับข้อมูลทั้งหมด ไม่ใช่แค่ sample
     cellValidationStatus = {};
-    sampleRows.forEach((row, rowIndex) => {
+    
+    uploadedData.data.forEach((row, rowIndex) => {
         selectedColumns.forEach((columnName, colIndex) => {
             const cellValue = row[columnName] || '';
             
@@ -3774,7 +3830,7 @@ document.head.appendChild(styleElement);
                 cellValidationStatus[rowIndex] = {};
             }
             
-            if (cellValue.trim() === '') {
+            if (cellValue.toString().trim() === '') {
                 cellValidationStatus[rowIndex][colIndex] = {
                     status: 'valid',
                     message: 'ค่าว่าง - ผ่าน',
@@ -3791,14 +3847,17 @@ document.head.appendChild(styleElement);
         });
     });
     
-    // แสดงข้อมูลในตาราง (เฉพาะ sample)
+    // ✅ แก้ไข: คำนวณผลการตรวจสอบจากข้อมูลทั้งหมด
+    currentValidationResults = calculateAllDataValidation();
+    
+    // ✅ แก้ไข: แสดงข้อมูลทั้งหมดในตาราง (แสดงแถวแรก 100 แถว)
     renderDataTableFromUploadedData();
     
-    // อัพเดต Dashboard จากผลการคำนวณทั้งหมด
+    // อัพเดต Dashboard
     updateDashboard();
 }
-      function calculateAllDataValidation() {
-    if (!uploadedData || selectedColumns.length === 0) {
+    function calculateAllDataValidation() {
+    if (!uploadedData || !cellValidationStatus || selectedColumns.length === 0) {
         return {
             totalCells: 0,
             validCells: 0,
@@ -3816,23 +3875,11 @@ document.head.appendChild(styleElement);
         details: {}
     };
     
-    // ใช้ข้อมูลทั้งหมดในการคำนวณ
-    uploadedData.data.forEach((row, rowIndex) => {
-        selectedColumns.forEach((columnName, colIndex) => {
-            const cellValue = row[columnName] || '';
+    // ✅ แก้ไข: ใช้ cellValidationStatus ที่คำนวณแล้ว
+    Object.keys(cellValidationStatus).forEach(rowIndex => {
+        Object.keys(cellValidationStatus[rowIndex]).forEach(colIndex => {
+            const validation = cellValidationStatus[rowIndex][colIndex];
             
-            // ถ้าค่าเป็นช่องว่าง ให้ผ่านได้เลย
-            if (cellValue.trim() === '') {
-                results.totalCells++;
-                results.validCells++;
-                return;
-            }
-            
-            // ใช้ประเภทข้อมูลที่ผู้ใช้เลือก หรือตรวจจับอัตโนมัติ
-            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
-            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
-            
-            // นับสถิติ
             results.totalCells++;
             
             if (validation.status === 'valid') {
@@ -3841,10 +3888,9 @@ document.head.appendChild(styleElement);
                 results.warningCells++;
             } else if (validation.status === 'error') {
                 results.errorCells++;
-            }
-            
-            // บันทึกรายละเอียด
-            if (validation.status === 'error' || validation.status === 'warning') {
+                
+                // บันทึกรายละเอียดข้อผิดพลาด
+                const columnName = selectedColumns[colIndex];
                 if (!results.details[columnName]) {
                     results.details[columnName] = {
                         errors: [],
@@ -3852,30 +3898,14 @@ document.head.appendChild(styleElement);
                     };
                 }
                 
-                if (validation.status === 'error') {
-                    results.details[columnName].errors.push({
-                        row: rowIndex + 1,
-                        value: cellValue,
-                        message: validation.message
-                    });
-                } else if (validation.status === 'warning') {
-                    results.details[columnName].warnings.push({
-                        row: rowIndex + 1,
-                        value: cellValue,
-                        message: validation.message
-                    });
-                }
+                results.details[columnName].errors.push({
+                    row: parseInt(rowIndex) + 1,
+                    value: uploadedData.data[rowIndex][columnName] || '',
+                    message: validation.message
+                });
             }
         });
     });
-    
-    // ✅ ตรวจสอบว่าผลรวมเป็น 100%
-    const totalFromResults = results.validCells + results.warningCells + results.errorCells;
-    if (totalFromResults !== results.totalCells && results.totalCells > 0) {
-        console.warn(`⚠️ ผลรวมเซลล์ไม่ตรงกับ totalCells: ${totalFromResults} vs ${results.totalCells}`);
-        // ปรับค่า validCells ให้ตรงกับ totalCells
-        results.validCells = results.totalCells - results.warningCells - results.errorCells;
-    }
     
     return results;
 }
@@ -3980,303 +4010,242 @@ document.head.appendChild(styleElement);
         }
         
         function validateCellData(columnName, value, columnType, rowIndex, colIndex) {
-            // ใช้ประเภทที่ผู้ใช้เลือกถ้ามี
-            const effectiveType = userSelectedDataTypes[columnName] || columnType;
-            
-            const result = {
-                status: 'valid',
-                message: '',
-                suggestions: [],
-                dataType: effectiveType,
-                edited: false
-            };
-            
-            // ตรวจสอบค่าว่าง (ผ่านแล้วในขั้นต้น)
-            if (value === '' || value === null || value === undefined) {
-                return result;
+    // ใช้ประเภทที่ผู้ใช้เลือกถ้ามี
+    const effectiveType = userSelectedDataTypes[columnName] || columnType;
+    
+    const result = {
+        status: 'valid',
+        message: '',
+        suggestions: [],
+        dataType: effectiveType,
+        edited: false
+    };
+    
+    // ✅ แก้ไข: ตรวจสอบค่าว่างให้ครอบคลุมมากขึ้น
+    const strValue = value.toString().trim();
+    if (strValue === '' || strValue === 'null' || strValue === 'undefined' || strValue === '-') {
+        return result;
+    }
+    
+    // ✅ แก้ไข: คอลัมน์ "เลขแปลงintech" เป็นค่าเริ่มต้น ไม่ต้องตรวจสอบ
+    if (columnName.toLowerCase().includes('แปลงintech')) {
+        return result;
+    }
+    
+    // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย" (ตรวจสอบแบบไม่เข้มงวด)
+    if (columnName.toLowerCase().includes('ชื่อประเภทอ้อย') || columnName.toLowerCase().includes('ประเภทอ้อย')) {
+        const validTypes = ALLOWED_CANE_TYPES;
+        const inputValue = strValue.toLowerCase();
+        
+        // ตรวจสอบว่าเป็นค่าที่อนุญาตหรือไม่
+        let isAllowed = false;
+        let matchedType = '';
+        
+        for (const allowedType of validTypes) {
+            if (inputValue.includes(allowedType.toLowerCase()) || 
+                allowedType.toLowerCase().includes(inputValue)) {
+                isAllowed = true;
+                matchedType = allowedType;
+                break;
             }
-            
-            // ✅ แก้ไข: คอลัมน์ "เลขแปลงintech" เป็นค่าเริ่มต้น ไม่ต้องตรวจสอบ
-            if (columnName.toLowerCase().includes('แปลงintech')) {
-                return result;
-            }
-            
-            // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
-            if (columnName.toLowerCase() === 'ชื่อประเภทอ้อย') {
-                // ค่าที่แนะนำสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
-                const validTypes = ALLOWED_CANE_TYPES;
-                
-                if (!validTypes.includes(value.trim())) {
-                    result.status = 'error';
-                    result.message = `ต้องเป็นหนึ่งใน: ${validTypes.join(', ')}`;
-                    result.suggestions = validTypes;
-                }
-                return result;
-            }
-            
-            // ✅ แก้ไข: การตรวจสอบและแนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
-            if (columnName.toLowerCase() === 'ประเภทอ้อย') {
-                // ค่าที่แนะนำสำหรับคอลัมน์ "ประเภทอ้อย"
-                const validNumbers = sugarcaneNumbers;
-                
-                // ตรวจสอบว่าเป็นตัวเลขหรือไม่
-                const numValue = parseFloat(value);
-                if (isNaN(numValue)) {
-                    result.status = 'error';
-                    result.message = 'ต้องเป็นตัวเลข';
-                    result.suggestions = validNumbers;
-                } 
-                // ตรวจสอบว่าตรงกับตัวเลขที่กำหนดหรือไม่
-                else if (!validNumbers.includes(value.trim())) {
-                    result.status = 'error';
-                    result.message = `ต้องเป็นหนึ่งใน: ${validNumbers.join(', ')}`;
-                    result.suggestions = validNumbers;
-                }
-                return result;
-            }
-            
-            // ✅ ตรวจสอบจังหวัดและอำเภอตามข้อมูล THAI_LOCATIONS
-            if (columnName.toLowerCase().includes('จังหวัด')) {
-                if (value !== '' && !THAI_LOCATIONS.hasOwnProperty(value)) {
-                    result.status = 'error';
-                    result.message = `จังหวัด "${value}" ไม่มีในฐานข้อมูลประเทศไทย`;
-                    result.suggestions = Object.keys(THAI_LOCATIONS);
-                }
-                return result;
-            }
-            
-            if (columnName.toLowerCase().includes('อำเภอ')) {
-                // หาจังหวัดจากแถวเดียวกัน
-                const provinceColumn = selectedColumns.find(col => col.toLowerCase().includes('จังหวัด'));
-                if (provinceColumn && uploadedData.data[rowIndex]) {
-                    const provinceValue = uploadedData.data[rowIndex][provinceColumn] || '';
-                    if (provinceValue && THAI_LOCATIONS[provinceValue]) {
-                        const districts = THAI_LOCATIONS[provinceValue];
-                        const cleanDistrict = value.replace(/^อ\./, '').trim();
-                        if (!districts.some(d => d === cleanDistrict || d.includes(cleanDistrict) || cleanDistrict.includes(d))) {
-                            result.status = 'error';
-                            result.message = `อำเภอ "${value}" ไม่มีในจังหวัด "${provinceValue}"`;
-                            result.suggestions = districts;
-                        }
-                    }
-                }
-                return result;
-            }
-            
-            // ตรวจสอบตามประเภทข้อมูล
-            switch(effectiveType) {
-                case 'number':
-                    if (isNaN(value) || value.trim() === '') {
-                        result.status = 'error';
-                        result.message = 'ต้องเป็นตัวเลข';
-                        
-                        if (columnName.toLowerCase() === 'lat') {
-                            result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
-                        } else if (columnName.toLowerCase() === 'long') {
-                            result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
-                        } else if (columnName.includes('พื้นที่')) {
-                            result.suggestions = ['10.0', '15.5', '20.0', '25.5'];
-                        } else if (columnName.includes('อายุ')) {
-                            result.suggestions = ['120', '150', '180', '210'];
-                        } else if (columnName.includes('โควต้า')) {
-                            result.suggestions = ['100', '150', '200', '250'];
-                        } else {
-                            result.suggestions = ['0', '10', '50', '100'];
-                        }
-                    } else {
-                        const numValue = parseFloat(value);
-                        
-                        // ตรวจสอบพิกัด latitude (lat)
-                        if (columnName.toLowerCase() === 'lat') {
-                            if (numValue < -90 || numValue > 90) {
-                                result.status = 'error';
-                                result.message = 'latitude ต้องอยู่ระหว่าง -90 ถึง 90';
-                                result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
-                            } else if (Math.abs(numValue) < 1 || Math.abs(numValue) > 99) {
-                                result.status = 'warning';
-                                result.message = 'latitude มักเป็นเลขหลักสิบ (13-17 สำหรับประเทศไทย)';
-                                result.suggestions = ['13.7563', '14.0790', '15.8700', '16.4393'];
-                            }
-                        }
-                        
-                        // ตรวจสอบพิกัด longitude (long)
-                        if (columnName.toLowerCase() === 'long') {
-                            if (numValue < -180 || numValue > 180) {
-                                result.status = 'error';
-                                result.message = 'longitude ต้องอยู่ระหว่าง -180 ถึง 180';
-                                result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
-                            } else if (Math.abs(numValue) < 90 || Math.abs(numValue) > 110) {
-                                result.status = 'warning';
-                                result.message = 'longitude มักเป็นเลขหลักร้อย (100-104 สำหรับประเทศไทย)';
-                                result.suggestions = ['100.5018', '101.0037', '102.4956', '103.8499'];
-                            }
-                        }
-                        
-                        // ตรวจสอบค่าติดลบสำหรับบางคอลัมน์
-                        if ((columnName.includes('พื้นที่') || columnName.includes('อายุ') || 
-                             columnName.includes('จำนวน') || columnName.includes('โควต้า')) && numValue < 0) {
-                            result.status = 'error';
-                            result.message = 'ค่าต้องมากกว่าหรือเท่ากับ 0';
-                            result.suggestions = ['0', '1', '10'];
-                        }
-                    }
-                    break;
-                    
-                case 'date':
-                    // ตรวจสอบรูปแบบวันที่ (รองรับ YYYY/MM/DD และ YYYY/M/D)
-                    const datePatterns = [
-                        /^\d{4}-\d{1,2}-\d{1,2}$/,          // YYYY-MM-DD
-                        /^\d{4}\/\d{1,2}\/\d{1,2}$/,       // YYYY/MM/DD หรือ YYYY/M/D
-                        /^\d{1,2}\/\d{1,2}\/\d{4}$/,       // DD/MM/YYYY หรือ D/M/YYYY
-                        /^\d{1,2}-\d{1,2}-\d{4}$/          // DD-MM-YYYY หรือ D-M-YYYY
-                    ];
-                    
-                    const isValidDate = datePatterns.some(pattern => pattern.test(value.trim()));
-                    if (!isValidDate) {
-                        result.status = 'error';
-                        result.message = 'รูปแบบวันที่ไม่ถูกต้อง (รองรับ: YYYY/MM/DD, YYYY/M/D, DD/MM/YYYY)';
-                        result.suggestions = ['2023/01/01', '2023/6/15', '2023/12/31'];
-                    }
-                    break;
-                    
-                case 'enum':
-                    if (columnName.toLowerCase().includes('ใช่/ไม่') || columnName.toLowerCase().includes('yes/no')) {
-                        const validValues = ['ใช่', 'ไม่', 'yes', 'no', 'true', 'false'];
-                        if (!validValues.includes(value.toLowerCase())) {
-                            result.status = 'error';
-                            result.message = 'ต้องเป็น "ใช่" หรือ "ไม่"';
-                            result.suggestions = ['ใช่', 'ไม่'];
-                        }
-                    }
-                    break;
-                    
-                case 'identifier':
-                    if (value.length > 50) {
-                        result.status = 'warning';
-                        result.message = 'รหัสยาวเกินไป';
-                    }
-                    break;
-                    
-                case 'text':
-                    // ✅ แก้ไข: คอลัมน์ "ความเสี่ยงพื้นที่" และ "ความลาดเอียงของพื้นที่" เป็นข้อความ ไม่ต้องตรวจสอบเพิ่มเติม
-                    if (columnName.toLowerCase().includes('ความเสี่ยงพื้นที่') || 
-                        columnName.toLowerCase().includes('ความลาดเอียง')) {
-                        // ไม่ต้องตรวจสอบเพิ่มเติม
-                    } else if (columnName.toLowerCase().includes('แปลงintech')) {
-                        // ตรวจสอบรูปแบบเลขแปลงintech
-                        if (!/^\d+$/.test(value) && value.trim() !== '') {
-                            result.status = 'warning';
-                            result.message = 'เลขแปลงintech ควรเป็นตัวเลข';
-                        }
-                    } else if (value.length < 1 && value.trim() !== '') {
-                        result.status = 'warning';
-                        result.message = 'ข้อความสั้นเกินไป';
-                    }
-                    break;
-            }
-            
-            return result;
         }
         
-        function renderDataTableFromUploadedData() {
+        if (!isAllowed) {
+            result.status = 'error';
+            result.message = `ต้องเป็นหนึ่งใน: ${validTypes.join(', ')}`;
+            result.suggestions = validTypes;
+        } else if (strValue !== matchedType) {
+            // ถ้าไม่ตรงเป๊ะแต่ใกล้เคียง แนะนำค่าให้ตรง
+            result.status = 'warning';
+            result.message = `แนะนำให้ใช้: ${matchedType}`;
+            result.suggestions = [matchedType];
+        }
+        return result;
+    }
+        
+     function renderDataTableFromUploadedData() {
     // ล้างตารางเดิม
     dataTableHeader.innerHTML = '';
     dataTableBody.innerHTML = '';
     
     if (!uploadedData || selectedColumns.length === 0) return;
     
-    // สร้างหัวตาราง
+    // สร้างหัวตารางใหม่ที่มีสถานะ
     const headerRow = document.createElement('tr');
     
-    // เพิ่มคอลัมน์หมายเลขแถว
+    // 1. คอลัมน์หมายเลขแถว
     const rowNumHeader = document.createElement('th');
     rowNumHeader.textContent = '#';
-    rowNumHeader.style.width = '50px';
+    rowNumHeader.style.width = '60px';
+    rowNumHeader.style.textAlign = 'center';
+    rowNumHeader.style.backgroundColor = '#f8f9fa';
     headerRow.appendChild(rowNumHeader);
     
-    // เพิ่มหัวคอลัมน์ข้อมูลที่เลือก
+    // 2. คอลัมน์สถานะ (ใหม่)
+    const statusHeader = document.createElement('th');
+    statusHeader.textContent = 'สถานะ';
+    statusHeader.style.width = '100px';
+    statusHeader.style.textAlign = 'center';
+    statusHeader.style.backgroundColor = '#f8f9fa';
+    headerRow.appendChild(statusHeader);
+    
+    // 3. หัวคอลัมน์ข้อมูล
     selectedColumns.forEach(columnName => {
         const th = document.createElement('th');
-        
-        // ตรวจสอบประเภทคอลัมน์ (ใช้ประเภทที่ผู้ใช้เลือก)
-        const effectiveType = userSelectedDataTypes[columnName] || 
-                             detectColumnType(columnName, uploadedData.data[0] ? uploadedData.data[0][columnName] || '' : '');
-        
-        // เพิ่ม badge ประเภทข้อมูล
-        const typeBadge = document.createElement('span');
-        typeBadge.className = 'column-type-badge';
-        typeBadge.textContent = getTypeDisplayName(effectiveType);
-        typeBadge.style.marginLeft = '5px';
-        typeBadge.style.padding = '2px 6px';
-        typeBadge.style.borderRadius = '10px';
-        typeBadge.style.backgroundColor = getTypeColor(effectiveType);
-        typeBadge.style.color = 'white';
-        
-        th.innerHTML = `${columnName} `;
-        th.appendChild(typeBadge);
+        th.textContent = columnName;
+        th.style.minWidth = '150px';
+        th.style.backgroundColor = '#f8f9fa';
         headerRow.appendChild(th);
     });
     
     dataTableHeader.appendChild(headerRow);
     
-    // ✅ แก้ไข: เพิ่มฟิลเตอร์ในหัวตารางเป็น Dropdown
-    setTimeout(() => {
-        addColumnFilterDropdowns();
-    }, 100);
+    // ✅ แก้ไข: แสดงแถวแรก 50 แถว (หรือทั้งหมดถ้าไม่มาก)
+    const displayRowCount = Math.min(50, uploadedData.data.length);
+    const displayRows = uploadedData.data.slice(0, displayRowCount);
     
-    // ✅ แก้ไข: แสดงข้อมูลตาม currentRowLimit
-    const displayRows = uploadedData.data.slice(0, currentRowLimit);
-    
-    // ✅ แก้ไข: อัพเดตจำนวนแถวที่แสดง
-    totalRows.textContent = uploadedData.data.length; // แสดงจำนวนแถวทั้งหมด
-    currentRows.textContent = Math.min(currentRowLimit, uploadedData.data.length);
+    // อัพเดตข้อมูลแสดงผล
+    totalRows.textContent = uploadedData.data.length;
+    currentRows.textContent = displayRowCount;
     totalRowCount.textContent = uploadedData.data.length;
+    currentColumns.textContent = selectedColumns.length;
     
+    // ✅ แก้ไข: สร้างแถวข้อมูลด้วย inline editor
     displayRows.forEach((row, rowIndex) => {
         const tr = document.createElement('tr');
         
-        // เพิ่มหมายเลขแถว
+        // ✅ แก้ไข: ตรวจสอบว่าแถวนี้มีข้อผิดพลาดหรือไม่
+        let hasError = false;
+        let hasWarning = false;
+        let errorMessages = [];
+        
+        selectedColumns.forEach((columnName, colIndex) => {
+            const validation = cellValidationStatus[rowIndex] ? 
+                             cellValidationStatus[rowIndex][colIndex] : 
+                             { status: 'valid', message: '' };
+            
+            if (validation.status === 'error') {
+                hasError = true;
+                errorMessages.push(`${columnName}: ${validation.message}`);
+            } else if (validation.status === 'warning') {
+                hasWarning = true;
+            }
+        });
+        
+        // 1. เซลล์หมายเลขแถว
         const rowNumCell = document.createElement('td');
         rowNumCell.textContent = rowIndex + 1;
         rowNumCell.style.fontWeight = 'bold';
+        rowNumCell.style.textAlign = 'center';
+        rowNumCell.style.backgroundColor = hasError ? '#ffebee' : hasWarning ? '#fff3e0' : '#e8f5e9';
         tr.appendChild(rowNumCell);
         
-        // เพิ่มข้อมูลแต่ละเซลล์
+        // 2. เซลล์สถานะ
+        const statusCell = document.createElement('td');
+        statusCell.style.textAlign = 'center';
+        statusCell.style.fontWeight = 'bold';
+        
+        if (hasError) {
+            statusCell.innerHTML = `<span class="status-badge status-error" title="${errorMessages.join('\n')}">❌ มีข้อผิดพลาด</span>`;
+            tr.style.backgroundColor = '#ffebee';
+        } else if (hasWarning) {
+            statusCell.innerHTML = `<span class="status-badge status-warning">⚠️ ต้องตรวจสอบ</span>`;
+            tr.style.backgroundColor = '#fff3e0';
+        } else {
+            statusCell.innerHTML = `<span class="status-badge status-valid">✓ ผ่าน</span>`;
+            tr.style.backgroundColor = '#e8f5e9';
+        }
+        
+        tr.appendChild(statusCell);
+        
+        // 3. เซลล์ข้อมูล (แก้ไขได้ inline)
         selectedColumns.forEach((columnName, colIndex) => {
             const td = document.createElement('td');
             const cellValue = row[columnName] || '';
+            
+            // ✅ แก้ไข: ทำให้แก้ไขในตารางได้เลย
+            td.contentEditable = true;
             td.textContent = cellValue;
+            td.style.padding = '8px';
+            td.style.minHeight = '40px';
+            td.style.border = '1px solid #e0e0e0';
+            td.style.cursor = 'text';
             
-            // ตรวจสอบประเภทที่ควรใช้
-            const effectiveType = userSelectedDataTypes[columnName] || 
-                                 detectColumnType(columnName, cellValue);
+            // ดึง validation
+            const validation = cellValidationStatus[rowIndex] ? 
+                             cellValidationStatus[rowIndex][colIndex] : 
+                             { status: 'valid', message: '', suggestions: [] };
             
-            // ตรวจสอบข้อมูล
-            const validation = validateCellData(columnName, cellValue, effectiveType, rowIndex, colIndex);
-            
-            // เพิ่มคลาสตามสถานะการตรวจสอบ
+            // ตั้งค่าสีตามสถานะ
             if (validation.status === 'error') {
-                td.className = 'cell-error cell-highlight';
-                td.title = validation.message;
+                td.style.backgroundColor = '#ffebee';
+                td.style.color = '#d32f2f';
+                td.style.border = '2px solid #f44336';
+                td.style.fontWeight = 'bold';
+                td.title = validation.message || 'มีข้อผิดพลาด - คลิกเพื่อแก้ไข';
+                
+                // ✅ แสดงคำแนะนำใน placeholder
+                if (validation.suggestions && validation.suggestions.length > 0) {
+                    td.setAttribute('data-suggestions', validation.suggestions.join(','));
+                }
             } else if (validation.status === 'warning') {
-                td.className = 'cell-warning cell-highlight';
-                td.title = validation.message;
+                td.style.backgroundColor = '#fff3e0';
+                td.style.color = '#f57c00';
+                td.style.border = '1px solid #ff9800';
+                td.title = validation.message || 'ต้องตรวจสอบ';
             } else {
-                td.className = 'cell-valid';
+                td.style.backgroundColor = '#e8f5e9';
+                td.style.color = '#388e3c';
             }
             
-            // เพิ่มข้อมูลสำหรับการแก้ไข
-            td.dataset.row = rowIndex;
-            td.dataset.col = colIndex;
-            td.dataset.column = columnName;
-            td.dataset.value = cellValue;
-            td.dataset.type = effectiveType;
+            // ✅ Event listeners สำหรับ inline editing
+            td.addEventListener('focus', function() {
+                this.style.backgroundColor = '#fffde7';
+                this.style.boxShadow = '0 0 0 2px rgba(33, 150, 243, 0.3)';
+                this.style.zIndex = '10';
+                this.style.position = 'relative';
+                
+                // แสดงคำแนะนำถ้ามี
+                const suggestions = this.getAttribute('data-suggestions');
+                if (suggestions) {
+                    showSuggestionsPopup(this, suggestions.split(','));
+                }
+            });
             
-            // Event listener สำหรับการแก้ไข
-            if (validation.status === 'error' || validation.status === 'warning') {
-                td.style.cursor = 'pointer';
-                td.addEventListener('click', () => openCellEditorForUploadedData(rowIndex, colIndex));
-            }
+            td.addEventListener('blur', function() {
+                const newValue = this.textContent.trim();
+                
+                // อัพเดตข้อมูล
+                uploadedData.data[rowIndex][columnName] = newValue;
+                
+                // ตรวจสอบใหม่
+                const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, newValue);
+                const newValidation = validateCellData(columnName, newValue, columnType, rowIndex, colIndex);
+                newValidation.edited = true;
+                
+                // อัพเดต validation status
+                if (!cellValidationStatus[rowIndex]) {
+                    cellValidationStatus[rowIndex] = {};
+                }
+                cellValidationStatus[rowIndex][colIndex] = newValidation;
+                
+                // อัพเดตสไตล์
+                updateCellStyle(td, newValidation);
+                
+                // อัพเดต Dashboard
+                setTimeout(() => {
+                    currentValidationResults = calculateAllDataValidation();
+                    updateDashboard();
+                    updateRowStatus(tr, rowIndex);
+                }, 100);
+            });
+            
+            td.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.blur();
+                }
+            });
             
             tr.appendChild(td);
         });
@@ -4284,8 +4253,10 @@ document.head.appendChild(styleElement);
         dataTableBody.appendChild(tr);
     });
     
-    // ✅ แก้ไข: อัพเดตข้อมูลตาราง
-    currentColumns.textContent = selectedColumns.length;
+    // ✅ เพิ่มปุ่มควบคุม
+    addTableControlButtons();
+    
+    // อัพเดตสถานะ
     updateDataStatus();
 }
         
@@ -4405,74 +4376,99 @@ document.head.appendChild(styleElement);
             return count;
         }
         
-    function updateDataStatus() {
-    const errorCount = currentValidationResults.errorCells;
-    const warningCount = currentValidationResults.warningCells;
-    const totalRows = uploadedData.data.length;
-    const validPercent = parseInt(correctDataPercent.textContent);
+   function updateDataStatus() {
+    const errorCount = currentValidationResults.errorCells || 0;
+    const warningCount = currentValidationResults.warningCells || 0;
+    const totalRows = uploadedData ? uploadedData.data.length : 0;
+    const validPercent = errorCount === 0 ? 100 : 
+                        Math.round(((currentValidationResults.totalCells - errorCount) / currentValidationResults.totalCells) * 100);
+    
+    // ✅ แก้ไข: อัพเดตค่าบน Dashboard
+    correctDataPercent.textContent = `${validPercent}%`;
+    needReviewCount.textContent = warningCount;
+    errorDataCount.textContent = errorCount;
+    correctDataBar.style.width = `${validPercent}%`;
+    needReviewBar.style.width = `${Math.round((warningCount / currentValidationResults.totalCells) * 100)}%`;
+    errorDataBar.style.width = `${Math.round((errorCount / currentValidationResults.totalCells) * 100)}%`;
     
     if (errorCount > 0) {
         dataStatus.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i>
-                <span style="cursor: pointer; text-decoration: underline;" id="showErrorsBtn">
-                    มี ${errorCount} ข้อผิดพลาดที่ต้องแก้ไข
-                </span>
-                <small style="color: #666;">(ถูกต้อง ${validPercent}%)</small>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--danger-color); font-size: 1.2rem;"></i>
+                <div>
+                    <strong style="color: var(--danger-color);">มี ${errorCount} ข้อผิดพลาดที่ต้องแก้ไข</strong><br>
+                    <small style="color: #666;">
+                        📌 <strong>วิธีการแก้ไข:</strong> คลิกที่เซลล์สีแดงในตารางเพื่อแก้ไขโดยตรง
+                        หรือใช้ปุ่ม "AI แก้ไขข้อผิดพลาดทั้งหมด"
+                    </small>
+                </div>
+                <button class="btn btn-sm btn-danger" id="jumpToErrorsBtn" style="margin-left: auto;">
+                    <i class="fas fa-arrow-down"></i> ไปที่ข้อผิดพลาด
+                </button>
             </div>
         `;
-        dataStatus.style.color = 'var(--danger-color)';
-        dataStatus.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
-        dataStatus.style.padding = '8px 15px';
-        dataStatus.style.borderRadius = '20px';
         
-        // เพิ่ม event listener สำหรับปุ่มแสดงข้อผิดพลาด
+        dataStatus.style.backgroundColor = 'rgba(244, 67, 54, 0.1)';
+        dataStatus.style.border = '1px solid rgba(244, 67, 54, 0.3)';
+        dataStatus.style.borderRadius = '8px';
+        
+        // ✅ แก้ไข: เพิ่ม event listener สำหรับปุ่มไปที่ข้อผิดพลาด
         setTimeout(() => {
-            const showErrorsBtn = document.getElementById('showErrorsBtn');
-            if (showErrorsBtn) {
-                showErrorsBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    showErrorRowsOnly();
+            const jumpBtn = document.getElementById('jumpToErrorsBtn');
+            if (jumpBtn) {
+                jumpBtn.addEventListener('click', function() {
+                    scrollToFirstError();
                 });
             }
         }, 100);
+        
+        // ✅ แก้ไข: ปิดการใช้งานปุ่มไปขั้นตอนที่ 4 ถ้ามีข้อผิดพลาด
+        nextToStep4.disabled = true;
+        nextToStep4.innerHTML = '<i class="fas fa-lock"></i> แก้ไขข้อผิดพลาดก่อน';
+        
     } else if (warningCount > 0) {
         dataStatus.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
-                <span style="cursor: pointer; text-decoration: underline;" id="showWarningsBtn">
-                    มี ${warningCount} รายการที่ต้องตรวจสอบ
-                </span>
-                <small style="color: #666;">(ถูกต้อง ${validPercent}%)</small>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color); font-size: 1.2rem;"></i>
+                <div>
+                    <strong style="color: var(--warning-color);">มี ${warningCount} รายการที่ต้องตรวจสอบ</strong><br>
+                    <small style="color: #666;">ข้อมูลถูกต้อง ${validPercent}% - สามารถไปขั้นตอนต่อไปได้</small>
+                </div>
+                <button class="btn btn-sm btn-warning" id="jumpToWarningsBtn" style="margin-left: auto;">
+                    <i class="fas fa-eye"></i> ดูรายการ
+                </button>
             </div>
         `;
-        dataStatus.style.color = 'var(--warning-color)';
-        dataStatus.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
-        dataStatus.style.padding = '8px 15px';
-        dataStatus.style.borderRadius = '20px';
         
-        // เพิ่ม event listener สำหรับปุ่มแสดง warning
-        setTimeout(() => {
-            const showWarningsBtn = document.getElementById('showWarningsBtn');
-            if (showWarningsBtn) {
-                showWarningsBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    showReviewRows();
-                });
-            }
-        }, 100);
+        dataStatus.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+        dataStatus.style.border = '1px solid rgba(255, 152, 0, 0.3)';
+        dataStatus.style.borderRadius = '8px';
+        
+        // ✅ แก้ไข: เปิดใช้งานปุ่มไปขั้นตอนที่ 4 ถ้ามีแค่ warning
+        nextToStep4.disabled = false;
+        nextToStep4.innerHTML = '<i class="fas fa-arrow-right"></i> ดำเนินการต่อ';
+        
     } else {
         dataStatus.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
-                <span>✓ ข้อมูลถูกต้องทั้งหมด</span>
-                <small style="color: #666;">(${totalRows} แถว, 100%)</small>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px;">
+                <i class="fas fa-check-circle" style="color: var(--success-color); font-size: 1.2rem;"></i>
+                <div>
+                    <strong style="color: var(--success-color);">✓ ข้อมูลถูกต้องทั้งหมด ${validPercent}%</strong><br>
+                    <small style="color: #666;">${totalRows} แถว พร้อมไปขั้นตอนต่อไป</small>
+                </div>
+                <button class="btn btn-sm btn-success" id="proceedToStep4Btn" style="margin-left: auto;">
+                    <i class="fas fa-arrow-right"></i> ไปขั้นตอนที่ 4
+                </button>
             </div>
         `;
-        dataStatus.style.color = 'var(--success-color)';
+        
         dataStatus.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
-        dataStatus.style.padding = '8px 15px';
-        dataStatus.style.borderRadius = '20px';
+        dataStatus.style.border = '1px solid rgba(76, 175, 80, 0.3)';
+        dataStatus.style.borderRadius = '8px';
+        
+        // ✅ แก้ไข: เปิดใช้งานปุ่มไปขั้นตอนที่ 4
+        nextToStep4.disabled = false;
+        nextToStep4.innerHTML = '<i class="fas fa-arrow-right"></i> ดำเนินการต่อ';
     }
 }
         
@@ -4896,7 +4892,171 @@ document.head.appendChild(styleElement);
                 goToStep(4);
             });
         }
+        // ✅ แก้ไข: เพิ่มฟังก์ชัน helper
+function scrollToFirstError() {
+    const firstErrorCell = document.querySelector('.cell-error');
+    if (firstErrorCell) {
+        firstErrorCell.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorCell.focus();
         
+        // ไฮไลต์ชั่วคราว
+        firstErrorCell.style.animation = 'pulse 1s 3';
+        setTimeout(() => {
+            firstErrorCell.style.animation = '';
+        }, 3000);
+    }
+}
+
+function updateCellStyle(cell, validation) {
+    if (validation.status === 'error') {
+        cell.style.backgroundColor = '#ffebee';
+        cell.style.color = '#d32f2f';
+        cell.style.border = '2px solid #f44336';
+        cell.style.fontWeight = 'bold';
+        cell.title = validation.message || 'มีข้อผิดพลาด';
+        
+        if (validation.suggestions && validation.suggestions.length > 0) {
+            cell.setAttribute('data-suggestions', validation.suggestions.join(','));
+        }
+    } else if (validation.status === 'warning') {
+        cell.style.backgroundColor = '#fff3e0';
+        cell.style.color = '#f57c00';
+        cell.style.border = '1px solid #ff9800';
+        cell.title = validation.message || 'ต้องตรวจสอบ';
+        cell.removeAttribute('data-suggestions');
+    } else {
+        cell.style.backgroundColor = '#e8f5e9';
+        cell.style.color = '#388e3c';
+        cell.style.border = '1px solid #c8e6c9';
+        cell.title = '';
+        cell.removeAttribute('data-suggestions');
+    }
+}
+
+function updateRowStatus(rowElement, rowIndex) {
+    let hasError = false;
+    let hasWarning = false;
+    
+    // ตรวจสอบเซลล์ในแถว (ข้าม 2 คอลัมน์แรก)
+    const cells = rowElement.querySelectorAll('td');
+    for (let i = 2; i < cells.length; i++) {
+        if (cells[i].style.backgroundColor === 'rgb(255, 235, 238)') {
+            hasError = true;
+        } else if (cells[i].style.backgroundColor === 'rgb(255, 243, 224)') {
+            hasWarning = true;
+        }
+    }
+    
+    // อัพเดตเซลล์สถานะ
+    const statusCell = cells[1];
+    const rowNumCell = cells[0];
+    
+    if (hasError) {
+        statusCell.innerHTML = `<span class="status-badge status-error">❌ มีข้อผิดพลาด</span>`;
+        rowElement.style.backgroundColor = '#ffebee';
+        rowNumCell.style.backgroundColor = '#ffebee';
+    } else if (hasWarning) {
+        statusCell.innerHTML = `<span class="status-badge status-warning">⚠️ ต้องตรวจสอบ</span>`;
+        rowElement.style.backgroundColor = '#fff3e0';
+        rowNumCell.style.backgroundColor = '#fff3e0';
+    } else {
+        statusCell.innerHTML = `<span class="status-badge status-valid">✓ ผ่าน</span>`;
+        rowElement.style.backgroundColor = '#e8f5e9';
+        rowNumCell.style.backgroundColor = '#e8f5e9';
+    }
+}
+
+function showSuggestionsPopup(cell, suggestions) {
+    // ลบ popup เก่าถ้ามี
+    const oldPopup = document.querySelector('.suggestions-popup');
+    if (oldPopup) oldPopup.remove();
+    
+    const popup = document.createElement('div');
+    popup.className = 'suggestions-popup';
+    popup.style.cssText = `
+        position: absolute;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-top: 5px;
+    `;
+    
+    popup.innerHTML = `
+        <div style="font-size: 0.8rem; color: #666; margin-bottom: 5px;">
+            <i class="fas fa-lightbulb"></i> <strong>คำแนะนำ:</strong>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+            ${suggestions.map(s => `
+                <button class="suggestion-option" 
+                        data-value="${s}"
+                        style="padding: 4px 8px; background: #e3f2fd; 
+                               border: 1px solid #bbdefb; border-radius: 3px; 
+                               cursor: pointer; font-size: 0.8rem;">
+                    ${s}
+                </button>
+            `).join('')}
+        </div>
+    `;
+    
+    // กำหนดตำแหน่ง
+    const rect = cell.getBoundingClientRect();
+    popup.style.left = `${rect.left}px`;
+    popup.style.top = `${rect.bottom + window.scrollY}px`;
+    
+    document.body.appendChild(popup);
+    
+    // เพิ่ม event listeners
+    popup.querySelectorAll('.suggestion-option').forEach(btn => {
+        btn.addEventListener('click', function() {
+            cell.textContent = this.dataset.value;
+            cell.blur();
+            popup.remove();
+        });
+    });
+    
+    // ลบ popup เมื่อคลิกนอก
+    setTimeout(() => {
+        const clickHandler = (e) => {
+            if (!popup.contains(e.target) && e.target !== cell) {
+                popup.remove();
+                document.removeEventListener('click', clickHandler);
+            }
+        };
+        document.addEventListener('click', clickHandler);
+    }, 100);
+}
+
+function addTableControlButtons() {
+    const tableActions = document.querySelector('.table-actions');
+    if (!tableActions) return;
+    
+    // ลบปุ่มเก่าถ้ามี
+    const oldButtons = ['showErrorsOnlyBtn', 'fixPageErrorsBtn'];
+    oldButtons.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.remove();
+    });
+    
+    // ปุ่มแสดงเฉพาะข้อผิดพลาด
+    const showErrorsBtn = document.createElement('button');
+    showErrorsBtn.id = 'showErrorsOnlyBtn';
+    showErrorsBtn.className = 'btn btn-outline btn-sm';
+    showErrorsBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> แสดงเฉพาะข้อผิดพลาด';
+    showErrorsBtn.addEventListener('click', toggleErrorRows);
+    
+    // ปุ่มแก้ไขข้อผิดพลาดในหน้านี้
+    const fixErrorsBtn = document.createElement('button');
+    fixErrorsBtn.id = 'fixPageErrorsBtn';
+    fixErrorsBtn.className = 'btn btn-success btn-sm';
+    fixErrorsBtn.innerHTML = '<i class="fas fa-robot"></i> แก้ไขข้อผิดพลาดในหน้านี้';
+    fixErrorsBtn.addEventListener('click', fixErrorsOnCurrentPage);
+    
+    tableActions.appendChild(showErrorsBtn);
+    tableActions.appendChild(fixErrorsBtn);
+}
         // ฟังก์ชันเพิ่มเติมสำหรับ Step 3
         function showDataTypeConfiguration() {
             dataTypeConfigVisible = true;
