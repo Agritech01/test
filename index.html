@@ -2090,7 +2090,46 @@
     background: rgba(117, 117, 117, 0.1) !important;
     color: #757575 !important;
     border: 1px solid rgba(117, 117, 117, 0.3) !important;
-}        
+}
+        /* เพิ่มในส่วน CSS ที่มีอยู่ */
+.checking-table tr.project-row-warning {
+    background-color: rgba(255, 248, 225, 0.7) !important;
+    border-left: 4px solid var(--warning-color) !important;
+}
+
+.checking-table tr.project-row-error {
+    background-color: rgba(255, 235, 238, 0.7) !important;
+    border-left: 4px solid var(--danger-color) !important;
+}
+
+.checking-table tr.project-row-success {
+    background-color: rgba(232, 245, 233, 0.7) !important;
+    border-left: 4px solid var(--success-color) !important;
+}
+
+.project-cell.not-in-project {
+    color: #757575 !important;
+    font-style: italic !important;
+    background-color: #f5f5f5 !important;
+}
+
+.project-cell.applied {
+    color: var(--success-color) !important;
+    font-weight: bold !important;
+    background-color: rgba(76, 175, 80, 0.1) !important;
+}
+
+.project-cell.error {
+    color: var(--danger-color) !important;
+    font-weight: bold !important;
+    background-color: rgba(247, 37, 133, 0.1) !important;
+    border: 1px solid var(--danger-color) !important;
+}
+        .status-not-in-project {
+    background: rgba(117, 117, 117, 0.1) !important;
+    color: #757575 !important;
+    border: 1px solid rgba(117, 117, 117, 0.3) !important;
+}
         /* Step 5: Column Selection for Export */
         .export-column-selection {
             background: white;
@@ -6397,12 +6436,18 @@ function renderProjectCheckingTable() {
         const tr = document.createElement('tr');
         
         // กำหนดสีแถวตามสถานะ
-        if (rowData.status === "ไม่ผ่าน") {
-            tr.style.backgroundColor = 'rgba(255, 235, 238, 0.5)';
+        if (rowData.hasNoProject) {
+            tr.classList.add('project-row-error'); // แถวสีแดงสำหรับ "ไม่เข้าโครงการ"
+        } else if (rowData.status === "ไม่ผ่าน") {
+            tr.classList.add('project-row-error');
         } else if (rowData.status === "ต้องตรวจสอบ") {
-            tr.style.backgroundColor = 'rgba(255, 248, 225, 0.5)';
+            tr.classList.add('project-row-warning');
         } else if (rowData.passed) {
-            tr.style.backgroundColor = 'rgba(232, 245, 233, 0.5)';
+            if (rowData.appliedProjects && rowData.appliedProjects.length > 0) {
+                tr.classList.add('project-row-success'); // แถวสีเขียวสำหรับมีโครงการ
+            } else {
+                tr.classList.add('project-row-warning'); // แถวสีเหลืองสำหรับไม่มีโครงการ
+            }
         }
         
         const cells = [
@@ -6427,31 +6472,36 @@ function renderProjectCheckingTable() {
             } else {
                 td.textContent = cellContent;
                 
-                // ตรวจสอบค่าว่าง
-                if (cellContent === '' || cellContent === '(ไม่พบข้อมูล)') {
-                    td.style.color = '#999';
-                    td.style.fontStyle = 'italic';
+                // ✅ ตรวจสอบคอลัมน์โครงการ (คอลัมน์ที่ 5-9)
+                if (cellIndex >= 4 && cellIndex <= 8) {
+                    // ถ้ามี "ไม่เข้าโครงการ"
+                    if (cellContent === 'ไม่เข้าโครงการ') {
+                        td.classList.add('project-cell', 'error');
+                        td.style.color = 'var(--danger-color)';
+                        td.style.fontWeight = 'bold';
+                        td.style.backgroundColor = 'rgba(247, 37, 133, 0.2)';
+                    }
+                    // ถ้ามีโครงการที่สมัคร
+                    else if (cellContent.trim() !== '' && rowData.appliedProjects && 
+                             rowData.appliedProjects.includes(cellContent.trim())) {
+                        td.classList.add('project-cell', 'applied');
+                        td.style.color = 'var(--success-color)';
+                        td.style.fontWeight = 'bold';
+                        td.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    }
+                    // ถ้าค่าว่าง
+                    else if (cellContent === '') {
+                        td.classList.add('project-cell', 'not-in-project');
+                        td.style.color = '#757575';
+                        td.style.fontStyle = 'italic';
+                    }
                 }
                 
-                // ตรวจสอบข้อผิดพลาดในคอลัมน์โครงการ
-                if (cellIndex >= 4 && cellIndex <= 8 && rowData.failedCells && rowData.failedCells[cellIndex]) {
+                // ตรวจสอบข้อผิดพลาด
+                if (rowData.failedCells && rowData.failedCells[cellIndex]) {
                     td.style.color = 'var(--danger-color)';
                     td.style.fontWeight = 'bold';
                     td.style.backgroundColor = 'rgba(247, 37, 133, 0.2)';
-                    td.style.border = '1px solid var(--danger-color)';
-                }
-                
-                // ถ้าผ่าน ให้เพิ่มสีเขียวในคอลัมน์โครงการ
-                if (rowData.passed && cellIndex >= 4 && cellIndex <= 8 && cellContent !== '') {
-                    td.style.color = 'var(--success-color)';
-                    td.style.fontWeight = 'bold';
-                    td.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
-                }
-                
-                // ถ้ามีข้อมูล "ไม่เข้าโครงการ" ให้แสดงเป็นสีเทา
-                if (cellIndex >= 4 && cellIndex <= 8 && cellContent === 'ไม่เข้าโครงการ') {
-                    td.style.color = '#757575';
-                    td.style.fontStyle = 'italic';
                 }
             }
             
@@ -6480,20 +6530,22 @@ function performProjectConditionCheck() {
         let notes = [];
         let failedCells = {};
         let appliedProjects = [];
+        let hasNoProject = false; // ✅ เพิ่มตัวแปรตรวจสอบ "ไม่เข้าโครงการ"
         
         // ตรวจสอบแต่ละคอลัมน์โครงการ
         PROJECT_COLUMNS.forEach((projectCol, colIndex) => {
             const projectValue = rowData.projects[projectCol] || '';
             
-            // ถ้าค่าเป็น "ไม่เข้าโครงการ"
+            // ✅ เงื่อนไขใหม่: ถ้าค่าคือ "ไม่เข้าโครงการ" ให้บันทึก
             if (projectValue.trim() === 'ไม่เข้าโครงการ') {
+                hasNoProject = true;
                 notes.push(`คอลัมน์ ${projectCol}: ไม่เข้าโครงการ`);
                 failedCells[colIndex + 4] = true; // +4 เพราะข้ามคอลัมน์แรกๆ
                 passed = false;
                 return;
             }
             
-            // ถ้ามีข้อมูลโครงการ
+            // ✅ ถ้ามีข้อมูลโครงการ (ไม่ใช่ค่าว่างและไม่ใช่ "ไม่เข้าโครงการ")
             if (projectValue.trim() !== '') {
                 // ตรวจสอบว่าเป็นโครงการที่รู้จักหรือไม่
                 const isKnownProject = PROJECT_LIST.some(proj => 
@@ -6510,68 +6562,73 @@ function performProjectConditionCheck() {
             }
         });
         
-        // ตรวจสอบการสมัครโครงการพิเศษซ้ำ
-        const exclusiveProjectsInRow = appliedProjects.filter(proj => 
-            EXCLUSIVE_PROJECTS.some(exProj => proj.includes(exProj) || exProj.includes(proj))
-        );
-        
-        if (exclusiveProjectsInRow.length > 1) {
-            const duplicateProjects = exclusiveProjectsInRow.join(', ');
-            notes.push(`สมัครโครงการพิเศษซ้ำ: ${duplicateProjects} (ไม่สามารถสมัครทั้งสองโครงการได้)`);
+        // ✅ เงื่อนไขหลักใหม่:
+        // 1. ถ้ามี "ไม่เข้าโครงการ" ในคอลัมน์ใดคอลัมน์หนึ่ง → ไม่ผ่าน
+        if (hasNoProject) {
             passed = false;
-            
-            // ระบุคอลัมน์ที่ผิดพลาด
-            PROJECT_COLUMNS.forEach((projectCol, colIndex) => {
-                const projectValue = rowData.projects[projectCol] || '';
-                if (exclusiveProjectsInRow.some(proj => 
-                    projectValue.includes(proj) || proj.includes(projectValue))) {
-                    failedCells[colIndex + 4] = true;
-                }
-            });
-        }
-        
-        // กำหนดสถานะและหมายเหตุ
-        if (passed && appliedProjects.length > 0) {
-            // มีการสมัครโครงการ
-            results.passed++;
-            rowData.status = "ผ่าน";
-            rowData.notes = `สมัครโครงการ: ${appliedProjects.join(', ')}`;
-        } else if (passed && appliedProjects.length === 0) {
-            // ไม่มีการสมัครโครงการ (แต่ไม่ใช่ "ไม่เข้าโครงการ")
-            results.passed++;
-            rowData.status = "ผ่าน";
-            rowData.notes = "ไม่มีโครงการที่สมัคร";
-        } else if (!passed && notes.some(note => note.includes('ไม่เข้าโครงการ'))) {
-            // มี "ไม่เข้าโครงการ" ในคอลัมน์ใดคอลัมน์หนึ่ง
-            results.failed++;
             rowData.status = "ไม่ผ่าน";
             rowData.notes = "ไม่เข้าโครงการ";
+            results.failed++;
             results.issues.push({
                 row: index + 1,
                 message: "ไม่เข้าโครงการ",
                 intechPlot: rowData.intechPlot,
                 farmerCode: rowData.farmerCode
             });
-        } else {
-            // กรณีอื่นๆ ที่ไม่ผ่าน
-            results.failed++;
-            rowData.status = "ไม่ผ่าน";
-            rowData.notes = notes.join('; ');
-            results.issues.push({
-                row: index + 1,
-                message: notes.join('; '),
-                intechPlot: rowData.intechPlot,
-                farmerCode: rowData.farmerCode
-            });
+        }
+        // 2. ถ้ามีการสมัครโครงการอย่างน้อย 1 โครงการ → ผ่าน
+        else if (appliedProjects.length > 0) {
+            // ตรวจสอบการสมัครโครงการพิเศษซ้ำ
+            const exclusiveProjectsInRow = appliedProjects.filter(proj => 
+                EXCLUSIVE_PROJECTS.some(exProj => proj.includes(exProj) || exProj.includes(proj))
+            );
+            
+            if (exclusiveProjectsInRow.length > 1) {
+                const duplicateProjects = exclusiveProjectsInRow.join(', ');
+                notes.push(`สมัครโครงการพิเศษซ้ำ: ${duplicateProjects} (ไม่สามารถสมัครทั้งสองโครงการได้)`);
+                passed = false;
+                
+                // ระบุคอลัมน์ที่ผิดพลาด
+                PROJECT_COLUMNS.forEach((projectCol, colIndex) => {
+                    const projectValue = rowData.projects[projectCol] || '';
+                    if (exclusiveProjectsInRow.some(proj => 
+                        projectValue.includes(proj) || proj.includes(projectValue))) {
+                        failedCells[colIndex + 4] = true;
+                    }
+                });
+            }
+            
+            if (passed) {
+                results.passed++;
+                rowData.status = "ผ่าน";
+                rowData.notes = `สมัครโครงการ: ${appliedProjects.join(', ')}`;
+            } else {
+                results.failed++;
+                rowData.status = "ไม่ผ่าน";
+                rowData.notes = notes.join('; ');
+                results.issues.push({
+                    row: index + 1,
+                    message: notes.join('; '),
+                    intechPlot: rowData.intechPlot,
+                    farmerCode: rowData.farmerCode
+                });
+            }
+        }
+        // 3. ถ้าไม่มีโครงการที่สมัครเลย (ค่าว่างทั้งหมด) → ผ่าน (แต่ไม่มีโครงการ)
+        else if (appliedProjects.length === 0 && !hasNoProject) {
+            results.passed++;
+            rowData.status = "ผ่าน";
+            rowData.notes = "ไม่มีโครงการที่สมัคร";
         }
 
         rowData.passed = passed;
         rowData.failedCells = failedCells;
+        rowData.appliedProjects = appliedProjects; // ✅ บันทึกโครงการที่สมัคร
+        rowData.hasNoProject = hasNoProject; // ✅ บันทึกสถานะ "ไม่เข้าโครงการ"
     });
 
     return results;
 }
-
 // ฟังก์ชันอัพเดตตารางผลลัพธ์ - เพิ่มเงื่อนไขโครงการ
 function updateCheckingTableWithResults(results, condition) {
     checkingTableData.forEach((rowData) => {
@@ -6751,7 +6808,30 @@ function displayAllConditionResults(allResults) {
     
     alert(`✅ ตรวจสอบเงื่อนไขทั้งหมดเสร็จสิ้น\n\nตรวจทั้งหมด: ${allResults.length} เงื่อนไข\nแถวทั้งหมด: ${totalRows} แถว\nผ่านทั้งหมด: ${totalPassed} แถว\nไม่ผ่านทั้งหมด: ${totalFailed} แถว\nต้องตรวจสอบทั้งหมด: ${totalWarnings} แถว`);
 }
-
+// อัพเดตฟังก์ชันสร้าง Badge สถานะ
+function createStatusBadge(status) {
+    let badgeClass = "status-info";
+    let badgeText = status;
+    
+    if (status === "ผ่าน") {
+        badgeClass = "status-valid";
+        badgeText = "ผ่าน";
+    } else if (status === "ไม่ผ่าน") {
+        badgeClass = "status-error";
+        badgeText = "ไม่ผ่าน";
+    } else if (status === "ต้องตรวจสอบ" || status === "รอตรวจสอบ") {
+        badgeClass = "status-warning";
+        badgeText = "ต้องตรวจสอบ";
+    } else if (status === "ไม่มีข้อมูลวันที่ปลูก") {
+        badgeClass = "status-warning";
+        badgeText = "ไม่มีข้อมูลวันที่ปลูก";
+    } else if (status === "ไม่เข้าโครงการ") {
+        badgeClass = "status-not-in-project";
+        badgeText = "ไม่เข้าโครงการ";
+    }
+    
+    return `<span class="status-badge ${badgeClass}">${badgeText}</span>`;
+}
 // ฟังก์ชันเริ่มต้นระบบตรวจสอบเงื่อนไข
 function initConditionChecking() {
     if (!uploadedData || !selectedColumns) {
