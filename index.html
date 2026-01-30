@@ -3759,104 +3759,340 @@
             }
         }
         
-        function runDataValidationFromUploadedData() {
-            if (!uploadedData || selectedColumns.length === 0) return;
+     function runDataValidationFromUploadedData() {
+    if (!uploadedData || selectedColumns.length === 0) return;
+    
+    // ✅ แก้ไข: ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
+    const removedCount = removeEmptyRows();
+    if (removedCount > 0) {
+        alert(`✅ ตัดแถวที่ว่างทั้งหมดออกแล้ว: ${removedCount} แถว`);
+    }
+    
+    currentValidationResults = {
+        totalCells: 0,
+        validCells: 0,
+        warningCells: 0,
+        errorCells: 0,
+        details: {}
+    };
+    
+    cellValidationStatus = {};
+    
+    // ✅ แก้ไข: ใช้ข้อมูลทั้งหมดแทน 50 แถว
+    const allRows = uploadedData.data; // ใช้ข้อมูลทั้งหมด
+    totalCells = allRows.length * selectedColumns.length;
+    
+    // ตรวจสอบแต่ละเซลล์ในข้อมูลที่อัปโหลด
+    allRows.forEach((row, rowIndex) => {
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
             
-            // ✅ แก้ไข: ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
-            const removedCount = removeEmptyRows();
-            if (removedCount > 0) {
-                alert(`✅ ตัดแถวที่ว่างทั้งหมดออกแล้ว: ${removedCount} แถว`);
+            // ✅ แก้ไข: ถ้าค่าเป็นช่องว่าง ให้ผ่านได้เลย
+            if (cellValue.trim() === '') {
+                if (!cellValidationStatus[rowIndex]) {
+                    cellValidationStatus[rowIndex] = {};
+                }
+                cellValidationStatus[rowIndex][colIndex] = {
+                    status: 'valid',
+                    message: 'ค่าว่าง - ผ่าน',
+                    suggestions: [],
+                    dataType: 'text',
+                    edited: false
+                };
+                
+                currentValidationResults.totalCells++;
+                currentValidationResults.validCells++;
+                return;
             }
             
-            currentValidationResults = {
-                totalCells: 0,
-                validCells: 0,
-                warningCells: 0,
-                errorCells: 0,
-                details: {}
-            };
+            // ใช้ประเภทข้อมูลที่ผู้ใช้เลือก หรือตรวจจับอัตโนมัติ
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
             
-            cellValidationStatus = {};
+            // บันทึกผลการตรวจสอบ
+            if (!cellValidationStatus[rowIndex]) {
+                cellValidationStatus[rowIndex] = {};
+            }
             
-            // ใช้แถวแรกตามจำนวนที่กำหนด (เริ่มต้น 50 แถว)
-            const sampleRows = uploadedData.data.slice(0, currentRowLimit);
-            totalCells = sampleRows.length * selectedColumns.length;
+            cellValidationStatus[rowIndex][colIndex] = validation;
             
-            // ตรวจสอบแต่ละเซลล์ในข้อมูลที่อัปโหลด
-            sampleRows.forEach((row, rowIndex) => {
-                selectedColumns.forEach((columnName, colIndex) => {
-                    const cellValue = row[columnName] || '';
-                    
-                    // ✅ แก้ไข: ถ้าค่าเป็นช่องว่าง ให้ผ่านได้เลย
-                    if (cellValue.trim() === '') {
-                        if (!cellValidationStatus[rowIndex]) {
-                            cellValidationStatus[rowIndex] = {};
-                        }
-                        cellValidationStatus[rowIndex][colIndex] = {
-                            status: 'valid',
-                            message: 'ค่าว่าง - ผ่าน',
-                            suggestions: [],
-                            dataType: 'text',
-                            edited: false
-                        };
-                        
-                        currentValidationResults.totalCells++;
-                        currentValidationResults.validCells++;
-                        return;
-                    }
-                    
-                    // ใช้ประเภทข้อมูลที่ผู้ใช้เลือก หรือตรวจจับอัตโนมัติ
-                    const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
-                    const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
-                    
-                    // บันทึกผลการตรวจสอบ
-                    if (!cellValidationStatus[rowIndex]) {
-                        cellValidationStatus[rowIndex] = {};
-                    }
-                    
-                    cellValidationStatus[rowIndex][colIndex] = validation;
-                    
-                    // นับสถิติ
-                    currentValidationResults.totalCells++;
-                    
-                    if (validation.status === 'valid') {
-                        currentValidationResults.validCells++;
-                    } else if (validation.status === 'warning') {
-                        currentValidationResults.warningCells++;
-                    } else if (validation.status === 'error') {
-                        currentValidationResults.errorCells++;
-                    }
-                    
-                    // บันทึกรายละเอียด
-                    if (!currentValidationResults.details[columnName]) {
-                        currentValidationResults.details[columnName] = {
-                            errors: [],
-                            warnings: []
-                        };
-                    }
-                    
-                    if (validation.status === 'error') {
-                        currentValidationResults.details[columnName].errors.push({
-                            row: rowIndex + 1,
-                            value: cellValue,
-                            message: validation.message
-                        });
-                    } else if (validation.status === 'warning') {
-                        currentValidationResults.details[columnName].warnings.push({
-                            row: rowIndex + 1,
-                            value: cellValue,
-                            message: validation.message
-                        });
-                    }
+            // นับสถิติ
+            currentValidationResults.totalCells++;
+            
+            if (validation.status === 'valid') {
+                currentValidationResults.validCells++;
+            } else if (validation.status === 'warning') {
+                currentValidationResults.warningCells++;
+            } else if (validation.status === 'error') {
+                currentValidationResults.errorCells++;
+            }
+            
+            // บันทึกรายละเอียด
+            if (!currentValidationResults.details[columnName]) {
+                currentValidationResults.details[columnName] = {
+                    errors: [],
+                    warnings: []
+                };
+            }
+            
+            if (validation.status === 'error') {
+                currentValidationResults.details[columnName].errors.push({
+                    row: rowIndex + 1,
+                    value: cellValue,
+                    message: validation.message
                 });
+            } else if (validation.status === 'warning') {
+                currentValidationResults.details[columnName].warnings.push({
+                    row: rowIndex + 1,
+                    value: cellValue,
+                    message: validation.message
+                });
+            }
+        });
+    });
+    
+    // แสดงข้อมูลในตาราง
+    renderDataTableFromUploadedData();
+    
+    // อัพเดต Dashboard
+    updateDashboard();
+}
+
+function renderDataTableFromUploadedData() {
+    // ล้างตารางเดิม
+    dataTableHeader.innerHTML = '';
+    dataTableBody.innerHTML = '';
+    
+    if (!uploadedData || selectedColumns.length === 0) return;
+    
+    // สร้างหัวตาราง
+    const headerRow = document.createElement('tr');
+    
+    // เพิ่มคอลัมน์หมายเลขแถว
+    const rowNumHeader = document.createElement('th');
+    rowNumHeader.textContent = '#';
+    rowNumHeader.style.width = '50px';
+    headerRow.appendChild(rowNumHeader);
+    
+    // เพิ่มหัวคอลัมน์ข้อมูลที่เลือก
+    selectedColumns.forEach(columnName => {
+        const th = document.createElement('th');
+        
+        // ตรวจสอบประเภทคอลัมน์ (ใช้ประเภทที่ผู้ใช้เลือก)
+        const effectiveType = userSelectedDataTypes[columnName] || 
+                             detectColumnType(columnName, uploadedData.data[0] ? uploadedData.data[0][columnName] || '' : '');
+        
+        // เพิ่ม badge ประเภทข้อมูล
+        const typeBadge = document.createElement('span');
+        typeBadge.className = 'column-type-badge';
+        typeBadge.textContent = getTypeDisplayName(effectiveType);
+        typeBadge.style.marginLeft = '5px';
+        typeBadge.style.padding = '2px 6px';
+        typeBadge.style.borderRadius = '10px';
+        typeBadge.style.backgroundColor = getTypeColor(effectiveType);
+        typeBadge.style.color = 'white';
+        
+        th.innerHTML = `${columnName} `;
+        th.appendChild(typeBadge);
+        headerRow.appendChild(th);
+    });
+    
+    dataTableHeader.appendChild(headerRow);
+    
+    // ✅ แก้ไข: เพิ่มฟิลเตอร์ในหัวตารางเป็น Dropdown
+    setTimeout(() => {
+        addColumnFilterDropdowns();
+    }, 100);
+    
+    // ✅ แก้ไข: แสดงข้อมูลทั้งหมด
+    const displayRows = uploadedData.data; // ใช้ข้อมูลทั้งหมด
+    
+    // อัพเดตจำนวนแถวที่แสดง
+    totalRows.textContent = uploadedData.data.length;
+    currentRows.textContent = uploadedData.data.length;
+    totalRowCount.textContent = uploadedData.data.length;
+    
+    // ✅ แก้ไข: แสดงเฉพาะ 100 แถวแรกเพื่อไม่ให้หน้าเว็บล่ม (แต่ Dashboard จะคำนวณจากทั้งหมด)
+    const rowsToDisplay = displayRows.slice(0, 100); // แสดง 100 แถวแรกในตาราง
+    
+    rowsToDisplay.forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        
+        // เพิ่มหมายเลขแถว
+        const rowNumCell = document.createElement('td');
+        rowNumCell.textContent = rowIndex + 1;
+        rowNumCell.style.fontWeight = 'bold';
+        tr.appendChild(rowNumCell);
+        
+        // เพิ่มข้อมูลแต่ละเซลล์
+        selectedColumns.forEach((columnName, colIndex) => {
+            const td = document.createElement('td');
+            const cellValue = row[columnName] || '';
+            td.textContent = cellValue;
+            
+            // ตรวจสอบประเภทที่ควรใช้
+            const effectiveType = userSelectedDataTypes[columnName] || 
+                                 detectColumnType(columnName, cellValue);
+            
+            // ตรวจสอบข้อมูล (ใช้การตรวจสอบแบบคร่าวๆ สำหรับการแสดงผล)
+            const validation = validateCellData(columnName, cellValue, effectiveType, rowIndex, colIndex);
+            
+            // เพิ่มคลาสตามสถานะการตรวจสอบ
+            if (validation.status === 'error') {
+                td.className = 'cell-error cell-highlight';
+                td.title = validation.message;
+            } else if (validation.status === 'warning') {
+                td.className = 'cell-warning cell-highlight';
+                td.title = validation.message;
+            } else {
+                td.className = 'cell-valid';
+            }
+            
+            // เพิ่มข้อมูลสำหรับการแก้ไข
+            td.dataset.row = rowIndex;
+            td.dataset.col = colIndex;
+            td.dataset.column = columnName;
+            td.dataset.value = cellValue;
+            td.dataset.type = effectiveType;
+            
+            // Event listener สำหรับการแก้ไข
+            if (validation.status === 'error' || validation.status === 'warning') {
+                td.style.cursor = 'pointer';
+                td.addEventListener('click', () => openCellEditorForUploadedData(rowIndex, colIndex));
+            }
+            
+            tr.appendChild(td);
+        });
+        
+        dataTableBody.appendChild(tr);
+    });
+    
+    // ✅ แก้ไข: เพิ่มข้อความเตือนถ้ามีข้อมูลมากกว่า 100 แถว
+    if (displayRows.length > 100) {
+        const infoRow = document.createElement('tr');
+        const infoCell = document.createElement('td');
+        infoCell.colSpan = selectedColumns.length + 1;
+        infoCell.style.textAlign = 'center';
+        infoCell.style.padding = '20px';
+        infoCell.style.backgroundColor = '#f8f9fa';
+        infoCell.style.color = '#666';
+        infoCell.innerHTML = `
+            <i class="fas fa-info-circle"></i> แสดง ${rowsToDisplay.length} แถวแรกจากทั้งหมด ${displayRows.length} แถว 
+            | Dashboard คำนวณจากข้อมูลทั้งหมด ${displayRows.length} แถว
+            <button class="btn btn-sm btn-outline" id="showAllDataBtn" style="margin-left: 10px;">
+                <i class="fas fa-expand"></i> แสดงทั้งหมด
+            </button>
+        `;
+        infoRow.appendChild(infoCell);
+        dataTableBody.appendChild(infoRow);
+        
+        // เพิ่ม event listener สำหรับปุ่มแสดงทั้งหมด
+        setTimeout(() => {
+            document.getElementById('showAllDataBtn').addEventListener('click', function() {
+                loadAllDataToTable();
             });
+        }, 100);
+    }
+    
+    // อัพเดตข้อมูลตาราง
+    currentColumns.textContent = selectedColumns.length;
+    updateDataStatus();
+}
+
+// ✅ แก้ไข: เพิ่มฟังก์ชันโหลดข้อมูลทั้งหมดลงตาราง
+function loadAllDataToTable() {
+    if (!uploadedData || selectedColumns.length === 0) return;
+    
+    // ล้างตารางเดิม
+    dataTableBody.innerHTML = '';
+    
+    // แสดงข้อมูลทั้งหมด
+    uploadedData.data.forEach((row, rowIndex) => {
+        const tr = document.createElement('tr');
+        
+        // เพิ่มหมายเลขแถว
+        const rowNumCell = document.createElement('td');
+        rowNumCell.textContent = rowIndex + 1;
+        rowNumCell.style.fontWeight = 'bold';
+        tr.appendChild(rowNumCell);
+        
+        // เพิ่มข้อมูลแต่ละเซลล์
+        selectedColumns.forEach((columnName, colIndex) => {
+            const td = document.createElement('td');
+            const cellValue = row[columnName] || '';
+            td.textContent = cellValue;
             
-            // แสดงข้อมูลในตาราง
-            renderDataTableFromUploadedData();
+            // ตรวจสอบประเภทที่ควรใช้
+            const effectiveType = userSelectedDataTypes[columnName] || 
+                                 detectColumnType(columnName, cellValue);
             
-            // อัพเดต Dashboard
-            updateDashboard();
-        }
+            // ตรวจสอบข้อมูล
+            const validation = validateCellData(columnName, cellValue, effectiveType, rowIndex, colIndex);
+            
+            // เพิ่มคลาสตามสถานะการตรวจสอบ
+            if (validation.status === 'error') {
+                td.className = 'cell-error cell-highlight';
+                td.title = validation.message;
+            } else if (validation.status === 'warning') {
+                td.className = 'cell-warning cell-highlight';
+                td.title = validation.message;
+            } else {
+                td.className = 'cell-valid';
+            }
+            
+            // เพิ่มข้อมูลสำหรับการแก้ไข
+            td.dataset.row = rowIndex;
+            td.dataset.col = colIndex;
+            td.dataset.column = columnName;
+            td.dataset.value = cellValue;
+            td.dataset.type = effectiveType;
+            
+            // Event listener สำหรับการแก้ไข
+            if (validation.status === 'error' || validation.status === 'warning') {
+                td.style.cursor = 'pointer';
+                td.addEventListener('click', () => openCellEditorForUploadedData(rowIndex, colIndex));
+            }
+            
+            tr.appendChild(td);
+        });
+        
+        dataTableBody.appendChild(tr);
+    });
+    
+    // อัพเดตจำนวนแถวที่แสดง
+    currentRows.textContent = uploadedData.data.length;
+    
+    // แสดงข้อความสรุป
+    const summaryRow = document.createElement('tr');
+    const summaryCell = document.createElement('td');
+    summaryCell.colSpan = selectedColumns.length + 1;
+    summaryCell.style.textAlign = 'center';
+    summaryCell.style.padding = '15px';
+    summaryCell.style.backgroundColor = '#e8f5e9';
+    summaryCell.style.color = '#2e7d32';
+    summaryCell.innerHTML = `
+        <i class="fas fa-check-circle"></i> แสดงข้อมูลทั้งหมด ${uploadedData.data.length} แถว
+        | Dashboard คำนวณจากข้อมูลทั้งหมด
+    `;
+    summaryRow.appendChild(summaryCell);
+    dataTableBody.appendChild(summaryRow);
+    
+    alert(`✅ แสดงข้อมูลทั้งหมด ${uploadedData.data.length} แถวเรียบร้อยแล้ว`);
+}
+
+function toggleAllRows() {
+    isShowingAllRows = !isShowingAllRows;
+    
+    if (isShowingAllRows) {
+        loadAllDataToTable();
+        document.getElementById('toggleAllRows').innerHTML = 
+            `<i class="fas fa-compress"></i> แสดงบางส่วน`;
+    } else {
+        renderDataTableFromUploadedData(); // กลับไปแสดง 100 แถวแรก
+        document.getElementById('toggleAllRows').innerHTML = 
+            `<i class="fas fa-expand"></i> แสดงทั้งหมด (${uploadedData.data.length})`;
+    }
+}
         
         // ✅ แก้ไขฟังก์ชันตรวจจับประเภทข้อมูลตามข้อกำหนดใหม่
         function detectColumnType(columnName, sampleValue) {
