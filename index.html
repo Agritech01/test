@@ -1268,7 +1268,7 @@
             min-width: 1300px; /* ✅ เพิ่มความกว้างให้พอดีกับคอลัมน์ใหม่ */
         }
         
-       /* ✅ ปรับขนาดคอลัมน์ใหม่ทั้งหมด 14 คอลัมน์สำหรับประเภทอ้อย, 16 คอลัมน์สำหรับปุ๋ย */
+     /* ✅ ปรับให้คอลัมน์ลำดับตรึงอยู่ด้านซ้าย */
 .checking-table th:nth-child(1),
 .checking-table td:nth-child(1) {
     width: 60px;
@@ -1279,33 +1279,88 @@
     left: 0;
     background: var(--primary-color);
     color: white;
-    z-index: 20;
+    z-index: 30; /* เพิ่ม z-index เพื่อให้อยู่ด้านบน */
 }
 
 .checking-table td:nth-child(1) {
-    background: white;
+    background: #f8f9fa; /* เปลี่ยนพื้นหลังให้เหมือนกับแถว */
     color: var(--dark-color);
-    border-right: 1px solid #eee;
+    font-weight: bold;
+    border-right: 2px solid #ddd; /* เพิ่มเส้นขวาเพื่อแยกคอลัมน์ */
 }
 
+/* ✅ ปรับให้คอลัมน์เลขแปลงintech ตรึงอยู่ด้านซ้ายถัดจากลำดับ */
 .checking-table th:nth-child(2),
 .checking-table td:nth-child(2) {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
+    width: 140px; /* เพิ่มความกว้างเล็กน้อย */
+    min-width: 140px;
+    max-width: 140px;
     position: sticky;
-    left: 60px;
+    left: 60px; /* เริ่มจากความกว้างของคอลัมน์แรก */
     background: var(--primary-color);
     color: white;
-    z-index: 20;
-    border-right: 1px solid #ddd;
+    z-index: 25; /* z-index น้อยกว่าคอลัมน์แรก */
+    border-right: 2px solid #ddd;
 }
 
 .checking-table td:nth-child(2) {
     background: #f8f9fa;
     color: var(--dark-color);
+    font-weight: 500;
+    border-right: 2px solid #ddd; /* เส้นขวาที่ชัดเจน */
 }
 
+/* ✅ สำหรับแถวที่มีคำเตือน/ข้อผิดพลาด */
+.checking-table tr.warning-row td:nth-child(1),
+.checking-table tr.warning-row td:nth-child(2) {
+    background: rgba(255, 248, 225, 0.7); /* สีเหลืองอ่อนเหมือนแถว */
+}
+
+.checking-table tr.project-row-error td:nth-child(1),
+.checking-table tr.project-row-error td:nth-child(2) {
+    background: rgba(255, 235, 238, 0.7); /* สีแดงอ่อนเหมือนแถว */
+}
+
+.checking-table tr.project-row-success td:nth-child(1),
+.checking-table tr.project-row-success td:nth-child(2) {
+    background: rgba(232, 245, 233, 0.7); /* สีเขียวอ่อนเหมือนแถว */
+}
+
+/* ✅ เมื่อ hover ต้องไม่เปลี่ยนสีพื้นหลังของคอลัมน์ที่ตรึง */
+.checking-table tr:hover td:nth-child(1),
+.checking-table tr:hover td:nth-child(2) {
+    background: inherit !important; /* ใช้สีเดิม ไม่เปลี่ยนตาม hover */
+}
+/* ✅ ปรับ scroll hint ให้ชัดเจนขึ้น */
+#scrollHint {
+    color: var(--accent-color);
+    font-size: 0.9rem;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* ✅ ข้อความแจ้งเตือนเมื่อเลื่อน */
+.checking-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.checking-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.checking-table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
 /* ✅ คอลัมน์โซน (คอลัมน์ที่ 3) */
 .checking-table th:nth-child(3),
 .checking-table td:nth-child(3) {
@@ -2373,7 +2428,20 @@
         .rule-name {
             display: flex;
             align-items: center;
-        }
+        }/* ✅ Class สำหรับคอลัมน์ที่ตรึง */
+.sticky-column {
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* เงาเพื่อแยกคอลัมน์ */
+    transition: background-color 0.3s ease;
+}
+
+/* ✅ เมื่อเลื่อนแนวนอน ให้แสดงเงาเพิ่มเติม */
+.checking-table-wrapper {
+    scroll-behavior: smooth;
+}
+
+.checking-table-wrapper.scrolling {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
     </style>
 </head>
 <body>
@@ -5491,7 +5559,10 @@ function renderCheckingTable() {
         if (rowData.status === "ไม่มีข้อมูลวันที่ปลูก") {
             tr.classList.add('warning-row');
         }
-        
+        // ✅ เพิ่มคลาสพิเศษสำหรับแถวที่มีสีพิเศษ
+        if (rowData.status === "ไม่มีข้อมูลวันที่ปลูก") {
+            tr.classList.add('warning-row');
+        }
         // สร้างเซลล์
         const cells = [
             rowData.id,
@@ -5505,7 +5576,10 @@ function renderCheckingTable() {
         
         cells.forEach((cellContent, cellIndex) => {
             const td = document.createElement('td');
-            
+            // ✅ สำหรับคอลัมน์ที่ 1 และ 2 (ลำดับและเลขแปลง)
+            if (cellIndex === 0 || cellIndex === 1) {
+                td.classList.add('sticky-column');
+            }
             if (typeof cellContent === 'string' && cellContent.includes('status-badge')) {
                 td.innerHTML = cellContent;
             } else {
@@ -6111,7 +6185,19 @@ function prepareCheckingTable() {
         prepareFertilizerCheckingTable();
     }
 }
-
+// ✅ เพิ่มตรวจจับการเลื่อนตาราง
+function setupTableScrollDetection() {
+    const tableWrapper = document.querySelector('.checking-table-wrapper');
+    if (tableWrapper) {
+        tableWrapper.addEventListener('scroll', function() {
+            if (this.scrollLeft > 10) {
+                this.classList.add('scrolling');
+            } else {
+                this.classList.remove('scrolling');
+            }
+        });
+    }
+}
 // ในฟังก์ชัน setupConditionCheckingSystem() ให้เพิ่มเงื่อนไขโครงการ
 function setupConditionCheckingSystem() {
     // ปุ่มเลือกเงื่อนไข
