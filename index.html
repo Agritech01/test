@@ -2510,13 +2510,19 @@
                     </div>
                 </div>
                 
-                <div class="upload-area" id="dropZone">
-                    <i class="fas fa-cloud-upload-alt fa-3x" style="color:var(--primary-color); margin-bottom:15px;"></i>
-                    <h3>ลากไฟล์ CSV มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
-                    <p style="color: #888;">รองรับเฉพาะไฟล์ .csv เท่านั้น</p>
-                    <input type="file" id="fileInput" accept=".csv" style="display: none;">
-                </div>
-
+               <div class="upload-area" id="dropZone">
+    <i class="fas fa-cloud-upload-alt fa-3x" style="color:var(--primary-color); margin-bottom:15px;"></i>
+    <h3>ลากไฟล์ CSV มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์</h3>
+    <p style="color: #888;">รองรับเฉพาะไฟล์ .csv เท่านั้น</p>
+    
+    <!-- เพิ่มปุ่มที่เห็นได้ชัดเจน -->
+    <div style="margin-top: 20px;">
+        <label for="fileInput" class="btn btn-primary" style="cursor: pointer; padding: 12px 30px; font-size: 1.1rem;">
+            <i class="fas fa-upload"></i> เลือกไฟล์ CSV
+        </label>
+        <input type="file" id="fileInput" accept=".csv" style="display: none;">
+    </div>
+</div>
                 <div id="fileInfo" style="display: none; margin-top: 30px;">
                     <!-- File Meta Card -->
                     <div class="file-meta-card">
@@ -3388,11 +3394,6 @@ fileInput.addEventListener('change', function(e) {
                 }
             });
         }
-        
-        fileInput.onchange = (e) => { 
-            if(e.target.files[0]) handleFile(e.target.files[0]); 
-        };
-
         // ============================================
         // ฟังก์ชันจัดการขั้นตอน
         // ============================================
@@ -7168,7 +7169,16 @@ function exportCheckingResultsWithColors() {
     document.addEventListener('DOMContentLoaded', function() {
         // ตั้งค่า event listeners พื้นฐาน
         setupEnhancedEventListeners();
-        
+        // เพิ่ม Event Listener สำหรับ file input (บรรทัดใหม่)
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        console.log('File input changed - selected file:', e.target.files[0]?.name);
+        if (e.target.files && e.target.files[0]) {
+            console.log('Starting file processing...');
+            handleFile(e.target.files[0]);
+        } else {
+            console.log('No file selected');
+        }
+    });
         // แสดงข้อความต้อนรับ
         console.log('✅ ระบบ Clean Data สำหรับข้อมูลอ้อยพร้อมใช้งานแล้ว');
         console.log('✅ ระบบตรวจสอบข้อมูลอ้อยครบวงจร - แบบขั้นตอนการใช้งาน');
