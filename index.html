@@ -2442,6 +2442,60 @@
 .checking-table-wrapper.scrolling {
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
 }
+     /* ✅ เพิ่มสไตล์สำหรับแถวข้อผิดพลาด */
+.error-row {
+    border-left: 4px solid var(--danger-color) !important;
+    animation: pulseError 2s infinite;
+}
+
+.error-detail-row {
+    border-left: 4px solid #ff9800 !important;
+}
+
+@keyframes pulseError {
+    0% { background-color: rgba(255, 235, 238, 0.5); }
+    50% { background-color: rgba(255, 235, 238, 0.8); }
+    100% { background-color: rgba(255, 235, 238, 0.5); }
+}
+
+/* ✅ ปุ่มแสดงข้อผิดพลาดในสถานะ */
+#dataStatus button {
+    transition: all 0.3s ease;
+}
+
+#dataStatus button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* ✅ สไตล์สำหรับข้อความข้อผิดพลาด */
+.cell-error {
+    position: relative;
+}
+
+.cell-error:after {
+    content: "!";
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--danger-color);
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    animation: pulseIcon 1.5s infinite;
+}
+
+@keyframes pulseIcon {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}   
     </style>
 </head>
 <body>
@@ -4576,35 +4630,309 @@ function toggleAllRows() {
             }
             return count;
         }
+        function showAllErrorRows() {
+    if (!uploadedData || !selectedColumns || selectedColumns.length === 0) return;
+    
+    // ล้างตารางเดิม
+    dataTableBody.innerHTML = '';
+    
+    let errorRowCount = 0;
+    const allRows = uploadedData.data;
+    
+    // แสดงแถวทั้งหมดและตรวจสอบข้อผิดพลาด
+    allRows.forEach((row, rowIndex) => {
+        let hasError = false;
+        let errorCells = [];
         
-        function updateDataStatus() {
-            const errorCount = currentValidationResults.errorCells;
-            const warningCount = currentValidationResults.warningCells;
+        // ตรวจสอบแต่ละเซลล์ในแถว
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
             
-            if (errorCount > 0) {
-                dataStatus.innerHTML = `<span style="cursor: pointer; text-decoration: underline;" id="showErrorsBtn">⚠️ มี ${errorCount} ข้อผิดพลาดที่ต้องแก้ไข</span>`;
-                dataStatus.style.color = 'var(--danger-color)';
-                dataStatus.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+            if (validation.status === 'error') {
+                hasError = true;
+                errorCells.push({
+                    column: columnName,
+                    value: cellValue,
+                    message: validation.message,
+                    colIndex: colIndex
+                });
+            }
+        });
+        
+        // ถ้าแถวนี้มีข้อผิดพลาด ให้แสดง
+        if (hasError) {
+            errorRowCount++;
+            const tr = document.createElement('tr');
+            tr.style.backgroundColor = 'rgba(255, 235, 238, 0.5)'; // สีพื้นหลังแดงอ่อน
+            tr.classList.add('error-row');
+            
+            // เพิ่มหมายเลขแถว
+            const rowNumCell = document.createElement('td');
+            rowNumCell.textContent = rowIndex + 1;
+            rowNumCell.style.fontWeight = 'bold';
+            rowNumCell.style.color = '#d32f2f';
+            tr.appendChild(rowNumCell);
+            
+            // เพิ่มข้อมูลแต่ละเซลล์
+            selectedColumns.forEach((columnName, colIndex) => {
+                const td = document.createElement('td');
+                const cellValue = row[columnName] || '';
+                td.textContent = cellValue;
                 
-                setTimeout(() => {
-                    const showErrorsBtn = document.getElementById('showErrorsBtn');
-                    if (showErrorsBtn) {
-                        showErrorsBtn.addEventListener('click', function() {
-                            showErrorRowsOnly();
-                        });
-                    }
-                }, 100);
-            } else if (warningCount > 0) {
-                dataStatus.textContent = `⚠️ มี ${warningCount} รายการที่ต้องตรวจสอบ`;
-                dataStatus.style.color = 'var(--warning-color)';
-                dataStatus.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
-            } else {
-                dataStatus.textContent = '✓ ข้อมูลถูกต้องทั้งหมด (100%)';
-                dataStatus.style.color = 'var(--success-color)';
-                dataStatus.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+                // ตรวจสอบประเภทที่ควรใช้
+                const effectiveType = userSelectedDataTypes[columnName] || 
+                                     detectColumnType(columnName, cellValue);
+                
+                // ตรวจสอบข้อมูล
+                const validation = validateCellData(columnName, cellValue, effectiveType, rowIndex, colIndex);
+                
+                // เพิ่มคลาสตามสถานะการตรวจสอบ
+                if (validation.status === 'error') {
+                    td.className = 'cell-error cell-highlight';
+                    td.title = validation.message;
+                    td.style.fontWeight = 'bold';
+                    td.style.color = '#d32f2f';
+                    td.style.backgroundColor = 'rgba(255, 205, 210, 0.5)';
+                } else if (validation.status === 'warning') {
+                    td.className = 'cell-warning cell-highlight';
+                    td.title = validation.message;
+                } else {
+                    td.className = 'cell-valid';
+                }
+                
+                // เพิ่มข้อมูลสำหรับการแก้ไข
+                td.dataset.row = rowIndex;
+                td.dataset.col = colIndex;
+                td.dataset.column = columnName;
+                td.dataset.value = cellValue;
+                td.dataset.type = effectiveType;
+                
+                // Event listener สำหรับการแก้ไข
+                if (validation.status === 'error' || validation.status === 'warning') {
+                    td.style.cursor = 'pointer';
+                    td.addEventListener('click', () => openCellEditorForUploadedData(rowIndex, colIndex));
+                }
+                
+                tr.appendChild(td);
+            });
+            
+            dataTableBody.appendChild(tr);
+            
+            // เพิ่มแถวแสดงรายละเอียดข้อผิดพลาด
+            if (errorCells.length > 0) {
+                const errorDetailRow = document.createElement('tr');
+                errorDetailRow.style.backgroundColor = '#fff8e1';
+                errorDetailRow.classList.add('error-detail-row');
+                
+                const detailCell = document.createElement('td');
+                detailCell.colSpan = selectedColumns.length + 1;
+                detailCell.style.padding = '10px 15px';
+                detailCell.style.fontSize = '0.9rem';
+                detailCell.style.color = '#e65100';
+                detailCell.style.borderTop = '1px dashed #ffcc80';
+                
+                let detailHTML = '<div style="display: flex; align-items: center; gap: 10px;">';
+                detailHTML += '<i class="fas fa-exclamation-circle" style="color: #f44336;"></i>';
+                detailHTML += '<div>';
+                detailHTML += `<strong>แถวที่ ${rowIndex + 1} มี ${errorCells.length} ข้อผิดพลาด:</strong>`;
+                detailHTML += '<ul style="margin: 5px 0 0 20px;">';
+                
+                errorCells.forEach((error, idx) => {
+                    detailHTML += `<li><strong>${error.column}:</strong> "${error.value}" - ${error.message}</li>`;
+                });
+                
+                detailHTML += '</ul>';
+                detailHTML += '</div>';
+                detailHTML += '</div>';
+                
+                detailCell.innerHTML = detailHTML;
+                errorDetailRow.appendChild(detailCell);
+                dataTableBody.appendChild(errorDetailRow);
             }
         }
+    });
+    
+    // อัพเดตจำนวนแถวที่แสดง
+    currentRows.textContent = errorRowCount;
+    
+    // แสดงข้อความสรุป
+    if (errorRowCount === 0) {
+        const noErrorRow = document.createElement('tr');
+        const noErrorCell = document.createElement('td');
+        noErrorCell.colSpan = selectedColumns.length + 1;
+        noErrorCell.style.textAlign = 'center';
+        noErrorCell.style.padding = '30px';
+        noErrorCell.style.color = '#4caf50';
+        noErrorCell.innerHTML = `
+            <i class="fas fa-check-circle fa-2x" style="margin-bottom: 15px;"></i>
+            <h3>ไม่มีข้อผิดพลาดที่ต้องแก้ไข</h3>
+            <p>ข้อมูลทั้งหมดถูกต้องเรียบร้อยแล้ว</p>
+            <button class="btn btn-success" id="showAllDataAgainBtn" style="margin-top: 15px;">
+                <i class="fas fa-list"></i> แสดงข้อมูลทั้งหมด
+            </button>
+        `;
+        noErrorRow.appendChild(noErrorCell);
+        dataTableBody.appendChild(noErrorRow);
         
+        // เพิ่ม event listener สำหรับปุ่มแสดงข้อมูลทั้งหมด
+        setTimeout(() => {
+            document.getElementById('showAllDataAgainBtn').addEventListener('click', function() {
+                renderDataTableFromUploadedData();
+            });
+        }, 100);
+    } else {
+        const summaryRow = document.createElement('tr');
+        const summaryCell = document.createElement('td');
+        summaryCell.colSpan = selectedColumns.length + 1;
+        summaryCell.style.textAlign = 'center';
+        summaryCell.style.padding = '15px';
+        summaryCell.style.backgroundColor = '#ffebee';
+        summaryCell.style.color = '#d32f2f';
+        summaryCell.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="text-align: left;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>พบ ${errorRowCount} แถวที่มีข้อผิดพลาดที่ต้องแก้ไข</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9rem;">
+                        คลิกที่เซลล์สีแดงเพื่อแก้ไขข้อมูล
+                    </p>
+                </div>
+                <div>
+                    <button class="btn btn-primary" id="fixSelectedErrorsBtn">
+                        <i class="fas fa-robot"></i> AI ช่วยแก้ไขที่เลือก
+                    </button>
+                    <button class="btn btn-success" id="showAllDataBtn2">
+                        <i class="fas fa-list"></i> แสดงข้อมูลทั้งหมด
+                    </button>
+                </div>
+            </div>
+        `;
+        summaryRow.appendChild(summaryCell);
+        dataTableBody.appendChild(summaryRow);
+        
+        // เพิ่ม event listener สำหรับปุ่มต่างๆ
+        setTimeout(() => {
+            // ปุ่ม AI ช่วยแก้ไขที่เลือก
+            document.getElementById('fixSelectedErrorsBtn').addEventListener('click', function() {
+                if (confirm('ต้องการให้ AI ช่วยแก้ไขข้อผิดพลาดในแถวที่แสดงอยู่หรือไม่?')) {
+                    autoFixVisibleErrors();
+                }
+            });
+            
+            // ปุ่มแสดงข้อมูลทั้งหมด
+            document.getElementById('showAllDataBtn2').addEventListener('click', function() {
+                renderDataTableFromUploadedData();
+            });
+        }, 100);
+    }
+    
+    // อัพเดตสถานะตาราง
+    dataStatus.innerHTML = `<span style="color: #d32f2f;">
+        <i class="fas fa-exclamation-triangle"></i> แสดง ${errorRowCount} แถวที่มีข้อผิดพลาด
+    </span>`;
+    dataStatus.style.backgroundColor = 'rgba(255, 235, 238, 0.5)';
+    
+    return errorRowCount;
+}
+       / ✅ แก้ไข: ฟังก์ชันอัพเดตสถานะข้อมูลให้มีปุ่มคลิก
+function updateDataStatus() {
+    const errorCount = currentValidationResults.errorCells;
+    const warningCount = currentValidationResults.warningCells;
+    
+    if (errorCount > 0) {
+        dataStatus.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong style="color: var(--danger-color);">มี ${errorCount} ข้อผิดพลาดที่ต้องแก้ไข</strong>
+                    <div style="margin-top: 5px;">
+                        <button class="btn btn-sm btn-outline" id="showErrorsBtn" style="padding: 3px 10px; font-size: 0.85rem;">
+                            <i class="fas fa-eye"></i> แสดงแถวที่มีข้อผิดพลาด
+                        </button>
+                        <button class="btn btn-sm btn-outline" id="showAllDataBtn3" style="padding: 3px 10px; font-size: 0.85rem; margin-left: 5px;">
+                            <i class="fas fa-list"></i> แสดงข้อมูลทั้งหมด
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        dataStatus.style.color = 'var(--danger-color)';
+        dataStatus.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+        dataStatus.style.padding = '10px 15px';
+        dataStatus.style.borderRadius = '8px';
+        dataStatus.style.cursor = 'default';
+        
+        // เพิ่ม event listener สำหรับปุ่มต่างๆ
+        setTimeout(() => {
+            // ปุ่มแสดงแถวที่มีข้อผิดพลาด
+            document.getElementById('showErrorsBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                showAllErrorRows();
+                alert(`แสดงแถวที่มีข้อผิดพลาดทั้งหมด ${errorCount} ข้อผิดพลาด`);
+            });
+            
+            // ปุ่มแสดงข้อมูลทั้งหมด
+            document.getElementById('showAllDataBtn3').addEventListener('click', function(e) {
+                e.stopPropagation();
+                renderDataTableFromUploadedData();
+            });
+        }, 100);
+    } else if (warningCount > 0) {
+        dataStatus.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-circle" style="color: var(--warning-color);"></i>
+                <div>
+                    <strong style="color: var(--warning-color);">มี ${warningCount} รายการที่ต้องตรวจสอบ</strong>
+                    <div style="margin-top: 5px;">
+                        <button class="btn btn-sm btn-outline" id="showWarningsBtn" style="padding: 3px 10px; font-size: 0.85rem;">
+                            <i class="fas fa-eye"></i> แสดงแถวที่ต้องตรวจสอบ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        dataStatus.style.color = 'var(--warning-color)';
+        dataStatus.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+        dataStatus.style.padding = '10px 15px';
+        dataStatus.style.borderRadius = '8px';
+        
+        // เพิ่ม event listener สำหรับปุ่มแสดงแถวที่ต้องตรวจสอบ
+        setTimeout(() => {
+            document.getElementById('showWarningsBtn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                showReviewRows();
+            });
+        }, 100);
+    } else {
+        dataStatus.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                <div>
+                    <strong style="color: var(--success-color);">ข้อมูลถูกต้องทั้งหมด (100%)</strong>
+                    <div style="margin-top: 5px;">
+                        <button class="btn btn-sm btn-outline" id="showAllDataBtn4" style="padding: 3px 10px; font-size: 0.85rem;">
+                            <i class="fas fa-list"></i> แสดงข้อมูลทั้งหมด
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        dataStatus.style.color = 'var(--success-color)';
+        dataStatus.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+        dataStatus.style.padding = '10px 15px';
+        dataStatus.style.borderRadius = '8px';
+        
+        // เพิ่ม event listener สำหรับปุ่มแสดงข้อมูลทั้งหมด
+        setTimeout(() => {
+            document.getElementById('showAllDataBtn4').addEventListener('click', function(e) {
+                e.stopPropagation();
+                renderDataTableFromUploadedData();
+            });
+        }, 100);
+    }
+} 
         // ✅ ฟังก์ชันใหม่: เพิ่มฟิลเตอร์ Dropdown ในหัวตาราง
         function addColumnFilterDropdowns() {
             const headerRow = document.getElementById('dataTableHeader').querySelector('tr');
@@ -4716,9 +5044,8 @@ function toggleAllRows() {
         }
         
         // ✅ ฟังก์ชันใหม่: แสดงเฉพาะแถวที่มีข้อผิดพลาด
-        function showErrorRowsOnly() {
-            const rows = document.querySelectorAll('#dataTableBody tr');
-            let errorRowCount = 0;
+      function showErrorRowsOnly() {
+    showAllErrorRows();}
             
             rows.forEach(row => {
                 let hasError = false;
@@ -4760,7 +5087,132 @@ function toggleAllRows() {
                 alert(`แสดงเฉพาะแถวที่มีข้อผิดพลาด: ${errorRowCount} แถว`);
             }
         }
+        function autoFixVisibleErrors() {
+    const errorRows = document.querySelectorAll('.error-row');
+    let fixedCount = 0;
+    
+    errorRows.forEach((row, rowIndex) => {
+        const cells = row.querySelectorAll('td.cell-error');
         
+        cells.forEach((cell, cellIndex) => {
+            const rowIndex = parseInt(cell.dataset.row);
+            const colIndex = parseInt(cell.dataset.col);
+            const columnName = cell.dataset.column;
+            const currentValue = cell.dataset.value;
+            
+            if (!uploadedData || !uploadedData.data[rowIndex]) return;
+            
+            // หาค่าใหม่ที่เหมาะสม
+            let newValue = currentValue;
+            const columnNameLower = columnName.toLowerCase();
+            
+            // ✅ แก้ไขสำหรับคอลัมน์ "ชื่อประเภทอ้อย"
+            if (columnNameLower === 'ชื่อประเภทอ้อย') {
+                // พยายามหาค่าที่ใกล้เคียง
+                let bestMatch = null;
+                let bestScore = 0;
+                
+                ALLOWED_CANE_TYPES.forEach(validType => {
+                    const similarity = calculateSimilarity(currentValue, validType);
+                    if (similarity > bestScore && similarity > 0.3) {
+                        bestScore = similarity;
+                        bestMatch = validType;
+                    }
+                });
+                
+                if (bestMatch) {
+                    newValue = bestMatch;
+                } else {
+                    newValue = ALLOWED_CANE_TYPES[0];
+                }
+            }
+            // ✅ แก้ไขสำหรับคอลัมน์ "ประเภทอ้อย"
+            else if (columnNameLower === 'ประเภทอ้อย') {
+                const numValue = parseFloat(currentValue);
+                if (isNaN(numValue)) {
+                    newValue = "101";
+                } else {
+                    let closest = sugarcaneNumbers[0];
+                    let minDiff = Math.abs(numValue - parseInt(closest));
+                    
+                    sugarcaneNumbers.forEach(num => {
+                        const diff = Math.abs(numValue - parseInt(num));
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closest = num;
+                        }
+                    });
+                    
+                    newValue = closest;
+                }
+            }
+            // แก้ไขตัวเลขทั่วไป
+            else if (isNaN(currentValue) && currentValue.trim() !== '') {
+                if (columnNameLower === 'lat') {
+                    newValue = '13.7563';
+                } else if (columnNameLower === 'long') {
+                    newValue = '100.5018';
+                } else if (columnName.includes('พื้นที่')) {
+                    newValue = '10.0';
+                } else if (columnName.includes('อายุ')) {
+                    newValue = '120';
+                } else {
+                    newValue = '0';
+                }
+            }
+            
+            // ถ้าค่าเปลี่ยน ให้อัพเดต
+            if (newValue !== currentValue) {
+                uploadedData.data[rowIndex][columnName] = newValue;
+                fixedCount++;
+                
+                // อัพเดตเซลล์
+                cell.textContent = newValue;
+                cell.dataset.value = newValue;
+                
+                // ตรวจสอบใหม่
+                const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, newValue);
+                const newValidation = validateCellData(columnName, newValue, columnType, rowIndex, colIndex);
+                
+                // อัพเดตคลาส
+                cell.className = '';
+                if (newValidation.status === 'error') {
+                    cell.className = 'cell-error cell-highlight';
+                    cell.title = newValidation.message;
+                } else if (newValidation.status === 'warning') {
+                    cell.className = 'cell-warning cell-highlight';
+                    cell.title = newValidation.message;
+                } else {
+                    cell.className = 'cell-valid';
+                    cell.style.color = '#4caf50';
+                    cell.style.fontWeight = 'normal';
+                    cell.style.backgroundColor = '';
+                }
+            }
+        });
+    });
+    
+    if (fixedCount > 0) {
+        // รันการตรวจสอบใหม่
+        runDataValidationFromUploadedData();
+        updateDashboard();
+        
+        alert(`✅ AI ได้แก้ไขข้อผิดพลาด ${fixedCount} จุด`);
+        
+        // แสดงข้อผิดพลาดที่เหลือ (ถ้ามี)
+        setTimeout(() => {
+            const remainingErrors = document.querySelectorAll('.cell-error').length;
+            if (remainingErrors > 0) {
+                alert(`⚠️ ยังมีข้อผิดพลาดที่ต้องแก้ไขด้วยตนเอง: ${remainingErrors} จุด`);
+            } else {
+                alert(`🎉 แก้ไขข้อผิดพลาดทั้งหมดเรียบร้อยแล้ว!`);
+                renderDataTableFromUploadedData();
+            }
+        }, 500);
+    } else {
+        alert('ไม่พบข้อผิดพลาดที่ AI สามารถแก้ไขได้อัตโนมัติ');
+    }
+}
         // ✅ ฟังก์ชันใหม่: แสดงเฉพาะแถวที่ต้องตรวจสอบ (warning)
         function showReviewRows() {
             const rows = document.querySelectorAll('#dataTableBody tr');
@@ -4853,89 +5305,208 @@ function toggleAllRows() {
             
             return removedCount;
         }
-        
+        function runDataValidationFromUploadedData() {
+    if (!uploadedData || selectedColumns.length === 0) return;
+    
+    // ✅ แก้ไข: ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
+    const removedCount = removeEmptyRows();
+    if (removedCount > 0) {
+        console.log(`✅ ตัดแถวที่ว่างทั้งหมดออกแล้ว: ${removedCount} แถว`);
+    }
+    
+    currentValidationResults = {
+        totalCells: 0,
+        validCells: 0,
+        warningCells: 0,
+        errorCells: 0,
+        details: {}
+    };
+    
+    cellValidationStatus = {};
+    
+    // ✅ แก้ไข: ใช้ข้อมูลทั้งหมด
+    const allRows = uploadedData.data;
+    totalCells = allRows.length * selectedColumns.length;
+    
+    // ตรวจสอบแต่ละเซลล์ในข้อมูลที่อัปโหลด
+    allRows.forEach((row, rowIndex) => {
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            
+            // ✅ แก้ไข: ถ้าค่าเป็นช่องว่าง ให้ผ่านได้เลย
+            if (cellValue.trim() === '') {
+                if (!cellValidationStatus[rowIndex]) {
+                    cellValidationStatus[rowIndex] = {};
+                }
+                cellValidationStatus[rowIndex][colIndex] = {
+                    status: 'valid',
+                    message: 'ค่าว่าง - ผ่าน',
+                    suggestions: [],
+                    dataType: 'text',
+                    edited: false
+                };
+                
+                currentValidationResults.totalCells++;
+                currentValidationResults.validCells++;
+                return;
+            }
+            
+            // ใช้ประเภทข้อมูลที่ผู้ใช้เลือก หรือตรวจจับอัตโนมัติ
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            
+            // บันทึกผลการตรวจสอบ
+            if (!cellValidationStatus[rowIndex]) {
+                cellValidationStatus[rowIndex] = {};
+            }
+            
+            cellValidationStatus[rowIndex][colIndex] = validation;
+            
+            // นับสถิติ
+            currentValidationResults.totalCells++;
+            
+            if (validation.status === 'valid') {
+                currentValidationResults.validCells++;
+            } else if (validation.status === 'warning') {
+                currentValidationResults.warningCells++;
+            } else if (validation.status === 'error') {
+                currentValidationResults.errorCells++;
+            }
+            
+            // บันทึกรายละเอียด
+            if (!currentValidationResults.details[columnName]) {
+                currentValidationResults.details[columnName] = {
+                    errors: [],
+                    warnings: []
+                };
+            }
+            
+            if (validation.status === 'error') {
+                currentValidationResults.details[columnName].errors.push({
+                    row: rowIndex + 1,
+                    value: cellValue,
+                    message: validation.message
+                });
+            } else if (validation.status === 'warning') {
+                currentValidationResults.details[columnName].warnings.push({
+                    row: rowIndex + 1,
+                    value: cellValue,
+                    message: validation.message
+                });
+            }
+        });
+    });
+    
         // ============================================
         // ตั้งค่า Event Listeners สำหรับฟังก์ชันเพิ่มเติม (Step 3)
         // ============================================
-        function setupEnhancedEventListeners() {
-            // Dashboard buttons
-            refreshDashboard.addEventListener('click', () => {
-                if (uploadedData) {
-                    runDataValidationFromUploadedData();
-                    updateDashboard();
-                    updateDataStatus();
-                    alert('✅ อัพเดต Dashboard เรียบร้อยแล้ว');
-                }
-            });
-            
-            fixAllErrors.addEventListener('click', () => {
-                if (uploadedData) {
-                    if (confirm('AI จะพยายามแก้ไขข้อผิดพลาดทั้งหมดอัตโนมัติ\nยืนยันดำเนินการ?')) {
-                        autoFixAllErrorsForUploadedData();
-                    }
-                }
-            });
-            
-            // Cell editor modal
-            saveEdit.addEventListener('click', () => {
-                if (uploadedData && editingCell) {
-                    saveCellEditForUploadedData();
-                }
-            });
-            
-            cancelEdit.addEventListener('click', closeCellEditor);
-            closeModal.addEventListener('click', closeCellEditor);
-            
-            // ปิด modal เมื่อคลิกนอก
-            cellEditorModal.addEventListener('click', (e) => {
-                if (e.target === cellEditorModal) {
-                    closeCellEditor();
-                }
-            });
-            
-            // Data Type Configuration
-            showDataTypeConfig.addEventListener('click', showDataTypeConfiguration);
-            
-            autoDetectTypes.addEventListener('click', autoDetectDataTypes);
-            
-            applyDataTypes.addEventListener('click', function() {
-                dataTypeConfigVisible = false;
-                dataTypeConfig.style.display = 'none';
-                
-                // รันการตรวจสอบใหม่ด้วยประเภทข้อมูลที่ตั้งค่า
-                if (uploadedData) {
-                    runDataValidationFromUploadedData();
-                    alert('✅ ใช้การตั้งค่าประเภทข้อมูลเรียบร้อย!');
-                }
-            });
-            
-            // Table actions
-            showAllRows.addEventListener('click', toggleAllRows);
-            
-            exportTable.addEventListener('click', exportTableToCSV);
-            
-            // ปุ่มต่อไปใน Step 3
-            nextToStep4.addEventListener('click', () => {
-                if (currentValidationResults.errorCells > 0) {
-                    alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
-                    return;
-                }
-                
-                // ✅ แก้ไข: ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
-                const validPercent = parseInt(correctDataPercent.textContent);
-                if (validPercent !== 100) {
-                    alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
-                    return;
-                }
-                
-                const editedCount = countEditedCells();
-                
-                alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
-                
-                // ไปยังขั้นตอนที่ 4
-                goToStep(4);
-            });
+       // ✅ แก้ไข: ในฟังก์ชัน setupEnhancedEventListeners() ให้เพิ่มปุ่มแสดงข้อผิดพลาด
+function setupEnhancedEventListeners() {
+    // Dashboard buttons
+    refreshDashboard.addEventListener('click', () => {
+        if (uploadedData) {
+            runDataValidationFromUploadedData();
+            updateDashboard();
+            alert('✅ อัพเดต Dashboard เรียบร้อยแล้ว');
         }
+    });
+    
+    fixAllErrors.addEventListener('click', () => {
+        if (uploadedData) {
+            if (confirm('AI จะพยายามแก้ไขข้อผิดพลาดทั้งหมดอัตโนมัติ\nยืนยันดำเนินการ?')) {
+                autoFixAllErrorsForUploadedData();
+            }
+        }
+    });
+    
+    // เพิ่มปุ่มใน Dashboard สำหรับแสดงข้อผิดพลาด
+    showReviewBtn.addEventListener('click', () => {
+        if (currentValidationResults.warningCells > 0) {
+            showReviewRows();
+        } else {
+            alert('ไม่มีข้อมูลที่ต้องตรวจสอบ (warning)');
+        }
+    });
+    
+    // Cell editor modal
+    saveEdit.addEventListener('click', () => {
+        if (uploadedData && editingCell) {
+            saveCellEditForUploadedData();
+        }
+    });
+    
+    cancelEdit.addEventListener('click', closeCellEditor);
+    closeModal.addEventListener('click', closeCellEditor);
+    
+    // ปิด modal เมื่อคลิกนอก
+    cellEditorModal.addEventListener('click', (e) => {
+        if (e.target === cellEditorModal) {
+            closeCellEditor();
+        }
+    });
+    
+    // Data Type Configuration
+    showDataTypeConfig.addEventListener('click', showDataTypeConfiguration);
+    
+    autoDetectTypes.addEventListener('click', autoDetectDataTypes);
+    
+    applyDataTypes.addEventListener('click', function() {
+        dataTypeConfigVisible = false;
+        dataTypeConfig.style.display = 'none';
+        
+        // รันการตรวจสอบใหม่ด้วยประเภทข้อมูลที่ตั้งค่า
+        if (uploadedData) {
+            runDataValidationFromUploadedData();
+            alert('✅ ใช้การตั้งค่าประเภทข้อมูลเรียบร้อย!');
+        }
+    });
+    
+    // Table actions
+    showAllRows.addEventListener('click', toggleAllRows);
+    
+    exportTable.addEventListener('click', exportTableToCSV);
+    
+    // ✅ เพิ่ม: ปุ่มแสดงข้อผิดพลาดในตาราง
+    const tableActions = document.querySelector('.table-actions');
+    if (tableActions && !document.getElementById('showErrorsTableBtn')) {
+        const showErrorsBtn = document.createElement('button');
+        showErrorsBtn.id = 'showErrorsTableBtn';
+        showErrorsBtn.className = 'btn btn-outline btn-sm';
+        showErrorsBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> แสดงข้อผิดพลาด';
+        showErrorsBtn.style.marginLeft = '10px';
+        showErrorsBtn.addEventListener('click', function() {
+            if (currentValidationResults.errorCells > 0) {
+                showAllErrorRows();
+            } else {
+                alert('ไม่มีข้อผิดพลาดที่ต้องแสดง');
+            }
+        });
+        tableActions.appendChild(showErrorsBtn);
+    }
+    
+    // ปุ่มต่อไปใน Step 3
+    nextToStep4.addEventListener('click', () => {
+        if (currentValidationResults.errorCells > 0) {
+            alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
+            showAllErrorRows(); // แสดงข้อผิดพลาดอัตโนมัติ
+            return;
+        }
+        
+        // ✅ แก้ไข: ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
+        const validPercent = parseInt(correctDataPercent.textContent);
+        if (validPercent !== 100) {
+            alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
+            return;
+        }
+        
+        const editedCount = countEditedCells();
+        
+        alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
+        
+        // ไปยังขั้นตอนที่ 4
+        goToStep(4);
+    });
+}
         
         // ฟังก์ชันเพิ่มเติมสำหรับ Step 3
         function showDataTypeConfiguration() {
