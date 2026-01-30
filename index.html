@@ -2944,7 +2944,7 @@
     </div>
 
     <script>
-        // --- DATA VALIDATION CONFIGURATION ---
+         // --- DATA VALIDATION CONFIGURATION ---
         const ALLOWED_CANE_TYPES = [
             "ปลายฝนขยาย", "ปลายฝนรื้อตอ", "ตอ1", "ตอ2", "ตอ3",
             "ต้นฝนขยาย", "ต้นฝนรื้อตอ", "พื้นที่เสียหาย", ">ตอ3"
@@ -3280,7 +3280,6 @@
             return { headers, cleaned, stats, rowMetaList };
         }
         
-        // --- HELPER FUNCTIONS ---
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -3297,7 +3296,7 @@
             return `<div class="report-item"><div class="rule-name"><div class="rule-icon"><i class="${icon}"></i></div><span>${text}</span></div><span class="count-badge ${classBadge}">${count.toLocaleString()} ${unit}</span></div>`;
         }
         
-        // --- FILE HANDLING ---
+         // --- FILE HANDLING FIXED ---
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         dropZone.onclick = () => fileInput.click();
