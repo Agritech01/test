@@ -2374,6 +2374,58 @@
             display: flex;
             align-items: center;
         }
+        // 🔧 เพิ่ม CSS สำหรับการแสดงผลที่ชัดเจนขึ้น
+const additionalCSS = `
+    /* เพิ่ม CSS สำหรับการแสดงผล Dashboard */
+    .dashboard-warning {
+        animation: pulseWarning 2s infinite;
+    }
+    
+    @keyframes pulseWarning {
+        0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+    }
+    
+    .dashboard-error {
+        animation: pulseError 2s infinite;
+    }
+    
+    @keyframes pulseError {
+        0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(247, 37, 133, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+    }
+    
+    .status-hint {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: white;
+        border: 2px solid var(--primary-color);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: var(--primary-color);
+        font-size: 0.8rem;
+        cursor: help;
+        z-index: 5;
+    }
+    
+    .filter-hint {
+        transition: all 0.3s ease;
+    }
+`;
+
+// 🔧 เพิ่ม CSS ไปในหน้าเว็บ
+const styleElement = document.createElement('style');
+styleElement.textContent = additionalCSS;
+document.head.appendChild(styleElement);
+        
     </style>
 </head>
 <body>
@@ -3745,7 +3797,7 @@
     // อัพเดต Dashboard จากผลการคำนวณทั้งหมด
     updateDashboard();
 }
-        function calculateAllDataValidation() {
+      function calculateAllDataValidation() {
     if (!uploadedData || selectedColumns.length === 0) {
         return {
             totalCells: 0,
@@ -3791,7 +3843,7 @@
                 results.errorCells++;
             }
             
-            // บันทึกรายละเอียด (เฉพาะ error/warning)
+            // บันทึกรายละเอียด
             if (validation.status === 'error' || validation.status === 'warning') {
                 if (!results.details[columnName]) {
                     results.details[columnName] = {
@@ -3816,6 +3868,14 @@
             }
         });
     });
+    
+    // ✅ ตรวจสอบว่าผลรวมเป็น 100%
+    const totalFromResults = results.validCells + results.warningCells + results.errorCells;
+    if (totalFromResults !== results.totalCells && results.totalCells > 0) {
+        console.warn(`⚠️ ผลรวมเซลล์ไม่ตรงกับ totalCells: ${totalFromResults} vs ${results.totalCells}`);
+        // ปรับค่า validCells ให้ตรงกับ totalCells
+        results.validCells = results.totalCells - results.warningCells - results.errorCells;
+    }
     
     return results;
 }
@@ -4251,30 +4311,46 @@
             return colors[type] || '#6c757d';
         }
         
-        function updateDashboard() {
+     function updateDashboard() {
     const total = currentValidationResults.totalCells;
     const valid = currentValidationResults.validCells;
     const warning = currentValidationResults.warningCells;
     const error = currentValidationResults.errorCells;
     
-    // คำนวณเปอร์เซ็นต์
+    // คำนวณเปอร์เซ็นต์ที่ถูกต้อง
     const validPercent = total > 0 ? Math.round((valid / total) * 100) : 0;
     const warningPercent = total > 0 ? Math.round((warning / total) * 100) : 0;
     const errorPercent = total > 0 ? Math.round((error / total) * 100) : 0;
     
-    // ✅ แก้ไข: อัพเดต Dashboard ด้วยผลการคำนวณทั้งหมด
-    correctDataPercent.textContent = `${validPercent}%`;
+    // ✅ ตรวจสอบว่าเปอร์เซ็นต์รวมกันได้ 100%
+    const totalPercent = validPercent + warningPercent + errorPercent;
+    if (totalPercent !== 100 && total > 0) {
+        // ปรับค่า validPercent ให้ได้ 100%
+        const adjustedValidPercent = 100 - warningPercent - errorPercent;
+        correctDataPercent.textContent = `${Math.max(0, adjustedValidPercent)}%`;
+        correctDataBar.style.width = `${Math.max(0, adjustedValidPercent)}%`;
+    } else {
+        correctDataPercent.textContent = `${validPercent}%`;
+        correctDataBar.style.width = `${validPercent}%`;
+    }
+    
     needReviewCount.textContent = warning;
     errorDataCount.textContent = error;
     
-    // ✅ แก้ไข: จำนวนเซลล์ที่แก้ไขแล้ว (ต้องคำนวณใหม่)
+    // ✅ แก้ไข: คำนวณเซลล์ที่แก้ไขแล้ว
     const editedCount = countEditedCells();
     editedCellsCount.textContent = editedCount;
     const editedPercent = total > 0 ? Math.round((editedCount / total) * 100) : 0;
     
+    // ✅ แก้ไข: อัพเดต Progress bars ให้ถูกต้อง
+    needReviewBar.style.width = `${warningPercent}%`;
+    errorDataBar.style.width = `${errorPercent}%`;
+    editedCellsBar.style.width = `${Math.min(editedPercent, 100)}%`;
+    
     // ✅ แก้ไข: แสดงปุ่ม "ต้องตรวจสอบ" ถ้ามีข้อมูลที่ต้องตรวจสอบ
     if (warning > 0) {
         showReviewBtn.style.display = 'inline-block';
+        showReviewBtn.innerHTML = '<i class="fas fa-eye"></i> แสดงแถวที่ต้องตรวจสอบ';
         showReviewBtn.onclick = function() {
             showReviewRows();
         };
@@ -4282,16 +4358,14 @@
         showReviewBtn.style.display = 'none';
     }
     
-    // อัพเดต Progress bars
-    correctDataBar.style.width = `${validPercent}%`;
-    needReviewBar.style.width = `${warningPercent}%`;
-    errorDataBar.style.width = `${errorPercent}%`;
-    editedCellsBar.style.width = `${Math.min(editedPercent, 100)}%`;
+    // ✅ แก้ไข: ต้องไม่มีข้อผิดพลาดและผ่าน 100% จึงจะไปขั้นตอนต่อไปได้
+    const isValidPercent = parseInt(correctDataPercent.textContent);
+    nextToStep4.disabled = !(isValidPercent === 100 && error === 0);
     
-    // ✅ แก้ไข: ต้องมีข้อมูลถูกต้อง 100% จึงจะไปขั้นตอนต่อไปได้
-    nextToStep4.disabled = validPercent !== 100 || error > 0;
+    // ✅ แก้ไข: อัพเดตสถานะข้อมูล
+    updateDataStatus();
     
-    // แสดงข้อมูลสรุปใน console สำหรับ debugging
+    // แสดงข้อมูลสรุปใน console
     console.log(`📊 Dashboard Summary (All Data):`);
     console.log(`✅ ถูกต้อง: ${valid}/${total} (${validPercent}%)`);
     console.log(`⚠️ ต้องตรวจสอบ: ${warning}/${total} (${warningPercent}%)`);
@@ -4331,32 +4405,74 @@
             return count;
         }
         
-        function updateDataStatus() {
+    function updateDataStatus() {
     const errorCount = currentValidationResults.errorCells;
     const warningCount = currentValidationResults.warningCells;
     const totalRows = uploadedData.data.length;
+    const validPercent = parseInt(correctDataPercent.textContent);
     
     if (errorCount > 0) {
-        dataStatus.innerHTML = `<span style="cursor: pointer; text-decoration: underline;" id="showErrorsBtn">⚠️ มี ${errorCount} ข้อผิดพลาดที่ต้องแก้ไข (จาก ${totalRows} แถวทั้งหมด)</span>`;
+        dataStatus.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i>
+                <span style="cursor: pointer; text-decoration: underline;" id="showErrorsBtn">
+                    มี ${errorCount} ข้อผิดพลาดที่ต้องแก้ไข
+                </span>
+                <small style="color: #666;">(ถูกต้อง ${validPercent}%)</small>
+            </div>
+        `;
         dataStatus.style.color = 'var(--danger-color)';
         dataStatus.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+        dataStatus.style.padding = '8px 15px';
+        dataStatus.style.borderRadius = '20px';
         
+        // เพิ่ม event listener สำหรับปุ่มแสดงข้อผิดพลาด
         setTimeout(() => {
             const showErrorsBtn = document.getElementById('showErrorsBtn');
             if (showErrorsBtn) {
-                showErrorsBtn.addEventListener('click', function() {
+                showErrorsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
                     showErrorRowsOnly();
                 });
             }
         }, 100);
     } else if (warningCount > 0) {
-        dataStatus.textContent = `⚠️ มี ${warningCount} รายการที่ต้องตรวจสอบ (จาก ${totalRows} แถวทั้งหมด)`;
+        dataStatus.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+                <span style="cursor: pointer; text-decoration: underline;" id="showWarningsBtn">
+                    มี ${warningCount} รายการที่ต้องตรวจสอบ
+                </span>
+                <small style="color: #666;">(ถูกต้อง ${validPercent}%)</small>
+            </div>
+        `;
         dataStatus.style.color = 'var(--warning-color)';
         dataStatus.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+        dataStatus.style.padding = '8px 15px';
+        dataStatus.style.borderRadius = '20px';
+        
+        // เพิ่ม event listener สำหรับปุ่มแสดง warning
+        setTimeout(() => {
+            const showWarningsBtn = document.getElementById('showWarningsBtn');
+            if (showWarningsBtn) {
+                showWarningsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    showReviewRows();
+                });
+            }
+        }, 100);
     } else {
-        dataStatus.textContent = `✓ ข้อมูลถูกต้องทั้งหมด (${totalRows} แถว, 100%)`;
+        dataStatus.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
+                <span>✓ ข้อมูลถูกต้องทั้งหมด</span>
+                <small style="color: #666;">(${totalRows} แถว, 100%)</small>
+            </div>
+        `;
         dataStatus.style.color = 'var(--success-color)';
         dataStatus.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+        dataStatus.style.padding = '8px 15px';
+        dataStatus.style.borderRadius = '20px';
     }
 }
         
@@ -4470,98 +4586,98 @@
             });
         }
         
-        // ✅ ฟังก์ชันใหม่: แสดงเฉพาะแถวที่มีข้อผิดพลาด
-        function showErrorRowsOnly() {
-            const rows = document.querySelectorAll('#dataTableBody tr');
-            let errorRowCount = 0;
-            
-            rows.forEach(row => {
-                let hasError = false;
-                const cells = row.querySelectorAll('td');
-                
-                cells.forEach(cell => {
-                    if (cell.classList.contains('cell-error')) {
-                        hasError = true;
-                    }
-                });
-                
-                if (hasError) {
-                    row.style.display = '';
-                    errorRowCount++;
-                    row.style.backgroundColor = 'rgba(255, 235, 238, 0.5)';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-            
-            if (errorRowCount > 0) {
-                const tableControls = document.querySelector('.data-table-controls');
-                if (!document.getElementById('showAllRowsBtn')) {
-                    const showAllBtn = document.createElement('button');
-                    showAllBtn.id = 'showAllRowsBtn';
-                    showAllBtn.className = 'btn btn-outline btn-sm';
-                    showAllBtn.innerHTML = '<i class="fas fa-list"></i> แสดงทั้งหมด';
-                    showAllBtn.style.marginLeft = '10px';
-                    showAllBtn.addEventListener('click', function() {
-                        showAllRowsInTable();
-                    });
-                    
-                    const tableActions = document.querySelector('.table-actions');
-                    if (tableActions) {
-                        tableActions.appendChild(showAllBtn);
-                    }
-                }
-                
-                alert(`แสดงเฉพาะแถวที่มีข้อผิดพลาด: ${errorRowCount} แถว`);
+       function showReviewRows() {
+    if (!uploadedData || !selectedColumns || selectedColumns.length === 0) {
+        alert('ไม่มีข้อมูลที่จะแสดง');
+        return;
+    }
+    
+    const rows = document.querySelectorAll('#dataTableBody tr');
+    const tableContainer = document.querySelector('.data-table-container');
+    let reviewRowCount = 0;
+    
+    // ซ่อนทุกแถวก่อน
+    rows.forEach(row => {
+        row.style.display = 'none';
+    });
+    
+    // แสดงเฉพาะแถวที่มี warning
+    rows.forEach(row => {
+        let hasWarning = false;
+        const cells = row.querySelectorAll('td');
+        
+        // ตรวจสอบแต่ละเซลล์ (ข้ามเซลล์หมายเลขแถว)
+        for (let i = 1; i < cells.length; i++) {
+            if (cells[i].classList.contains('cell-warning')) {
+                hasWarning = true;
+                break;
             }
         }
         
-        // ✅ ฟังก์ชันใหม่: แสดงเฉพาะแถวที่ต้องตรวจสอบ (warning)
-        function showReviewRows() {
-            const rows = document.querySelectorAll('#dataTableBody tr');
-            let reviewRowCount = 0;
+        if (hasWarning) {
+            row.style.display = '';
+            reviewRowCount++;
+            row.style.backgroundColor = 'rgba(255, 248, 225, 0.7)';
+            row.style.borderLeft = '4px solid var(--warning-color)';
             
-            rows.forEach(row => {
-                let hasWarning = false;
-                const cells = row.querySelectorAll('td');
-                
-                cells.forEach(cell => {
-                    if (cell.classList.contains('cell-warning')) {
-                        hasWarning = true;
-                    }
-                });
-                
-                if (hasWarning) {
-                    row.style.display = '';
-                    reviewRowCount++;
-                    row.style.backgroundColor = 'rgba(255, 248, 225, 0.5)';
-                } else {
-                    row.style.display = 'none';
+            // ไฮไลต์เซลล์ warning
+            cells.forEach(cell => {
+                if (cell.classList.contains('cell-warning')) {
+                    cell.style.backgroundColor = 'rgba(255, 248, 225, 0.9)';
+                    cell.style.border = '1px solid #ffc107';
                 }
             });
+        }
+    });
+    
+    if (reviewRowCount > 0) {
+        // สร้างหรืออัพเดตปุ่มแสดงทั้งหมด
+        let showAllBtn = document.getElementById('showAllRowsBtn');
+        if (!showAllBtn) {
+            showAllBtn = document.createElement('button');
+            showAllBtn.id = 'showAllRowsBtn';
+            showAllBtn.className = 'btn btn-outline btn-sm';
+            showAllBtn.innerHTML = '<i class="fas fa-list"></i> แสดงทั้งหมด';
+            showAllBtn.style.marginLeft = '10px';
+            showAllBtn.addEventListener('click', function() {
+                showAllRowsInTable();
+            });
             
-            if (reviewRowCount > 0) {
-                const tableControls = document.querySelector('.data-table-controls');
-                if (!document.getElementById('showAllRowsBtn')) {
-                    const showAllBtn = document.createElement('button');
-                    showAllBtn.id = 'showAllRowsBtn';
-                    showAllBtn.className = 'btn btn-outline btn-sm';
-                    showAllBtn.innerHTML = '<i class="fas fa-list"></i> แสดงทั้งหมด';
-                    showAllBtn.style.marginLeft = '10px';
-                    showAllBtn.addEventListener('click', function() {
-                        showAllRowsInTable();
-                    });
-                    
-                    const tableActions = document.querySelector('.table-actions');
-                    if (tableActions) {
-                        tableActions.appendChild(showAllBtn);
-                    }
-                }
-                
-                alert(`แสดงเฉพาะแถวที่ต้องตรวจสอบ: ${reviewRowCount} แถว`);
+            const tableActions = document.querySelector('.table-actions');
+            if (tableActions) {
+                tableActions.appendChild(showAllBtn);
             }
         }
         
+        // เพิ่มข้อความแจ้งเตือนใน table container
+        const existingHint = document.querySelector('.filter-hint');
+        if (existingHint) existingHint.remove();
+        
+        const hint = document.createElement('div');
+        hint.className = 'filter-hint';
+        hint.innerHTML = `
+            <div style="padding: 10px; background: #fff3e0; border-radius: 5px; margin: 10px 0; border-left: 4px solid #ff9800;">
+                <i class="fas fa-info-circle" style="color: #ff9800;"></i>
+                <strong>แสดงเฉพาะแถวที่ต้องตรวจสอบ:</strong> ${reviewRowCount} แถว
+                <button class="btn btn-sm" onclick="showAllRowsInTable()" style="margin-left: 10px; padding: 2px 8px; font-size: 0.8rem;">
+                    <i class="fas fa-times"></i> ล้างการกรอง
+                </button>
+            </div>
+        `;
+        
+        if (tableContainer) {
+            tableContainer.insertBefore(hint, tableContainer.firstChild);
+        }
+        
+        // เลื่อนไปที่ตาราง
+        tableContainer.scrollIntoView({ behavior: 'smooth' });
+        
+        console.log(`🔍 แสดงแถวที่ต้องตรวจสอบ: ${reviewRowCount} แถว`);
+    } else {
+        alert('ไม่พบแถวที่ต้องตรวจสอบ');
+        showAllRowsInTable();
+    }
+}
         function showAllRowsInTable() {
             const rows = document.querySelectorAll('#dataTableBody tr');
             rows.forEach(row => {
@@ -4574,7 +4690,103 @@
                 showAllBtn.remove();
             }
         }
+        function showErrorRowsOnly() {
+    if (!uploadedData || !selectedColumns || selectedColumns.length === 0) {
+        alert('ไม่มีข้อมูลที่จะแสดง');
+        return;
+    }
+    
+    const rows = document.querySelectorAll('#dataTableBody tr');
+    const tableContainer = document.querySelector('.data-table-container');
+    let errorRowCount = 0;
+    
+    // ซ่อนทุกแถวก่อน
+    rows.forEach(row => {
+        row.style.display = 'none';
+    });
+    
+    // แสดงเฉพาะแถวที่มี error
+    rows.forEach(row => {
+        let hasError = false;
+        const cells = row.querySelectorAll('td');
         
+        // ตรวจสอบแต่ละเซลล์ (ข้ามเซลล์หมายเลขแถว)
+        for (let i = 1; i < cells.length; i++) {
+            if (cells[i].classList.contains('cell-error')) {
+                hasError = true;
+                break;
+            }
+        }
+        
+        if (hasError) {
+            row.style.display = '';
+            errorRowCount++;
+            row.style.backgroundColor = 'rgba(255, 235, 238, 0.7)';
+            row.style.borderLeft = '4px solid var(--danger-color)';
+            
+            // ไฮไลต์เซลล์ error
+            cells.forEach(cell => {
+                if (cell.classList.contains('cell-error')) {
+                    cell.style.backgroundColor = 'rgba(255, 235, 238, 0.9)';
+                    cell.style.border = '1px solid #f44336';
+                }
+            });
+        }
+    });
+    
+    if (errorRowCount > 0) {
+        // สร้างหรืออัพเดตปุ่มแสดงทั้งหมด
+        let showAllBtn = document.getElementById('showAllRowsBtn');
+        if (!showAllBtn) {
+            showAllBtn = document.createElement('button');
+            showAllBtn.id = 'showAllRowsBtn';
+            showAllBtn.className = 'btn btn-outline btn-sm';
+            showAllBtn.innerHTML = '<i class="fas fa-list"></i> แสดงทั้งหมด';
+            showAllBtn.style.marginLeft = '10px';
+            showAllBtn.addEventListener('click', function() {
+                showAllRowsInTable();
+            });
+            
+            const tableActions = document.querySelector('.table-actions');
+            if (tableActions) {
+                tableActions.appendChild(showAllBtn);
+            }
+        }
+        
+        // เพิ่มข้อความแจ้งเตือนใน table container
+        const existingHint = document.querySelector('.filter-hint');
+        if (existingHint) existingHint.remove();
+        
+        const hint = document.createElement('div');
+        hint.className = 'filter-hint';
+        hint.innerHTML = `
+            <div style="padding: 10px; background: #ffebee; border-radius: 5px; margin: 10px 0; border-left: 4px solid #f44336;">
+                <i class="fas fa-exclamation-triangle" style="color: #f44336;"></i>
+                <strong>แสดงเฉพาะแถวที่มีข้อผิดพลาด:</strong> ${errorRowCount} แถว
+                <button class="btn btn-sm" onclick="showAllRowsInTable()" style="margin-left: 10px; padding: 2px 8px; font-size: 0.8rem;">
+                    <i class="fas fa-times"></i> ล้างการกรอง
+                </button>
+            </div>
+        `;
+        
+        if (tableContainer) {
+            tableContainer.insertBefore(hint, tableContainer.firstChild);
+        }
+        
+        // เลื่อนไปที่ตาราง
+        tableContainer.scrollIntoView({ behavior: 'smooth' });
+        
+        console.log(`❌ แสดงแถวที่มีข้อผิดพลาด: ${errorRowCount} แถว`);
+        
+        // แสดงคำแนะนำในการแก้ไข
+        setTimeout(() => {
+            alert(`พบข้อผิดพลาด ${errorRowCount} แถว\n\nคำแนะนำ:\n1. คลิกที่เซลล์สีแดงเพื่อแก้ไข\n2. ใช้คำแนะนำที่ระบบให้\n3. กด "บันทึกการแก้ไข"\n4. ตรวจสอบจนไม่มีข้อผิดพลาด`);
+        }, 500);
+    } else {
+        alert('ไม่พบแถวที่มีข้อผิดพลาด');
+        showAllRowsInTable();
+    }
+}
         // ✅ ฟังก์ชันสำหรับตัดแถวที่ว่างเปล่าทั้งหมด
         function removeEmptyRows() {
             if (!uploadedData || selectedColumns.length === 0) return 0;
