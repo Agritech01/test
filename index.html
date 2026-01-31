@@ -6020,12 +6020,14 @@ function prepareSugarcaneCheckingTable() {
     const tableBody = document.getElementById('checkingTableBody');
     tableBody.innerHTML = '';
     
-    // คอลัมน์ที่จำเป็น
     const requiredColumns = [
-        { name: "เลขแปลงintech", keywords: ["แปลงintech", "แปลง intech", "แปลง"] },
-        { name: "ชื่อประเภทอ้อย", keywords: ["ชื่อประเภทอ้อย", "ประเภทอ้อย", "พันธุ์อ้อย"] },
-        { name: "วันที่ปลูก", keywords: ["วันที่ปลูก", "วันปลูก", "planting date"] }
-    ];
+    { name: "เลขแปลงintech", keywords: ["แปลงintech", "แปลง intech", "แปลง"] },
+    { name: "โซน", keywords: ["โซน", "zone"] },
+    { name: "รหัสนักเกษตร", keywords: ["รหัสนักเกษตร", "รหัสเกษตร", "farmer code"] },
+    { name: "ชื่อประเภทอ้อย", keywords: ["ชื่อประเภทอ้อย", "ประเภทอ้อย", "พันธุ์อ้อย"] },
+    { name: "วันที่ปลูก", keywords: ["วันที่ปลูก", "วันปลูก", "planting date"] }
+];
+
     
     // หาคอลัมน์
     const foundColumns = {};
@@ -6080,22 +6082,25 @@ function prepareSugarcaneCheckingTable() {
     // สร้างข้อมูลตาราง
     checkingTableData = [];
     
-    uploadedData.data.forEach((row, rowIndex) => {
-        const rowData = {
-            id: rowIndex + 1,
-            originalRowIndex: rowIndex,
-            intechPlot: foundColumns["เลขแปลงintech"] ? row[foundColumns["เลขแปลงintech"]] || '' : '',
-            sugarcaneType: foundColumns["ชื่อประเภทอ้อย"] ? row[foundColumns["ชื่อประเภทอ้อย"]] || '' : '',
-            plantingDate: foundColumns["วันที่ปลูก"] ? row[foundColumns["วันที่ปลูก"]] || '' : '',
-            condition: getConditionDisplayName(currentCondition),
-            status: "รอตรวจสอบ",
-            notes: "ยังไม่ได้ตรวจสอบ",
-            passed: false,
-            failedCells: {}
-        };
-        
-        checkingTableData.push(rowData);
-    });
+   // ในฟังก์ชัน performSugarcaneConditionCheck() - เก็บข้อมูล
+uploadedData.data.forEach((row, rowIndex) => {
+    const rowData = {
+        id: rowIndex + 1,
+        originalRowIndex: rowIndex,
+        intechPlot: foundColumns["เลขแปลงintech"] ? row[foundColumns["เลขแปลงintech"]] || '' : '',
+        zone: foundColumns["โซน"] ? row[foundColumns["โซน"]] || '' : '', // ✅ เพิ่ม
+        farmerCode: foundColumns["รหัสนักเกษตร"] ? row[foundColumns["รหัสนักเกษตร"]] || '' : '', // ✅ เพิ่ม
+        sugarcaneType: foundColumns["ชื่อประเภทอ้อย"] ? row[foundColumns["ชื่อประเภทอ้อย"]] || '' : '',
+        plantingDate: foundColumns["วันที่ปลูก"] ? row[foundColumns["วันที่ปลูก"]] || '' : '',
+        condition: getConditionDisplayName(currentCondition),
+        status: "รอตรวจสอบ",
+        notes: "ยังไม่ได้ตรวจสอบ",
+        passed: false,
+        failedCells: {}
+    };
+    
+    checkingTableData.push(rowData);
+});
     
     // สร้างหัวตาราง
     const tableHeader = document.getElementById('checkingTableHeader');
@@ -6171,16 +6176,18 @@ function renderCheckingTable() {
             tr.classList.add('warning-row');
         }
         
-        // สร้างเซลล์
-        const cells = [
-            rowData.id,
-            rowData.intechPlot || '(ไม่พบข้อมูล)',
-            rowData.sugarcaneType || '(ไม่พบข้อมูล)',
-            rowData.plantingDate || '(ไม่พบข้อมูล)',
-            rowData.condition,
-            createStatusBadge(rowData.status),
-            rowData.notes
-        ];
+        // ในฟังก์ชัน renderCheckingTable() - แสดงผล
+const cells = [
+    rowData.id,
+    rowData.intechPlot || '(ไม่พบข้อมูล)',
+    rowData.zone || '(ไม่พบข้อมูล)', // ✅ เพิ่ม
+    rowData.farmerCode || '(ไม่พบข้อมูล)', // ✅ เพิ่ม
+    rowData.sugarcaneType || '(ไม่พบข้อมูล)',
+    rowData.plantingDate || '(ไม่พบข้อมูล)',
+    rowData.condition,
+    createStatusBadge(rowData.status),
+    rowData.notes
+];
         
         cells.forEach((cellContent, cellIndex) => {
             const td = document.createElement('td');
