@@ -1269,27 +1269,17 @@
             min-width: 1300px; /* ✅ เพิ่มความกว้างให้พอดีกับคอลัมน์ใหม่ */
         }
         
-/* ปรับสีคอลัมน์ที่ 1 และ 2 ให้เป็นสีเดียวกัน */
-.checking-table th:nth-child(1),
-.checking-table th:nth-child(2) {
-    background: #a7d7f7 !important; /* สีฟ้าพาสเทลเดียวกัน */
+/* แก้ไขทั้งหมดในส่วนนี้ให้เป็นสีเดียวกัน */
+.checking-table th {
+    background: #a7d7f7 !important; /* สีฟ้าพาสเทล */
     color: #333 !important;
-    border-right: 1px solid #7abae8 !important; /* เส้นแบ่ง */
-}
-
-/* ลบสไตล์เดิมที่มีการกำหนดสีแตกต่าง */
-.checking-table th:nth-child(3),
-.checking-table th:nth-child(4),
-.checking-table th:nth-child(5),
-.checking-table th:nth-child(6),
-.checking-table th:nth-child(7),
-.checking-table th:nth-child(8),
-.checking-table th:nth-child(9),
-.checking-table th:nth-child(10),
-.checking-table th:nth-child(11),
-.checking-table th:nth-child(12) {
-    background: #a7d7f7 !important; /* สีฟ้าพาสเทลเดียวกันทั้งหมด */
-    color: #333 !important;
+    padding: 12px;
+    text-align: left;
+    font-weight: 500;
+    border-bottom: 2px solid #7abae8 !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
         
         /* ✅ แถวที่ไม่มีข้อมูลวันที่ปลูก - สีเหลือง */
