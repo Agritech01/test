@@ -3761,12 +3761,13 @@ document.head.appendChild(styleElement);
     // ✅ แก้ไข: คำนวณการตรวจสอบจากข้อมูลทั้งหมด
     currentValidationResults = calculateAllDataValidation();
     
-    // ✅ แก้ไข: หาแถวที่มีข้อผิดพลาดก่อน
+    // ✅ แก้ไข: แยกแถวที่มีข้อผิดพลาดและถูกต้อง
     const rowsWithErrors = [];
     const rowsWithoutErrors = [];
     
     uploadedData.data.forEach((row, rowIndex) => {
         let hasError = false;
+        let hasWarning = false;
         
         selectedColumns.forEach((columnName, colIndex) => {
             const cellValue = row[columnName] || '';
@@ -3778,11 +3779,15 @@ document.head.appendChild(styleElement);
             
             if (validation.status === 'error') {
                 hasError = true;
+            } else if (validation.status === 'warning') {
+                hasWarning = true;
             }
         });
         
         if (hasError) {
-            rowsWithErrors.push({ rowIndex, row });
+            rowsWithErrors.push({ rowIndex, row, hasError: true, hasWarning });
+        } else if (hasWarning) {
+            rowsWithErrors.push({ rowIndex, row, hasError: false, hasWarning: true });
         } else {
             rowsWithoutErrors.push({ rowIndex, row });
         }
@@ -3795,7 +3800,6 @@ document.head.appendChild(styleElement);
     let sampleRows = [];
     let sampleRowIndices = [];
     
-    // ถ้ามีแถวที่มีข้อผิดพลาด
     if (rowsWithErrors.length > 0) {
         // เอาแถวที่มีข้อผิดพลาดก่อน (สูงสุด 50 แถว)
         const errorRowsToShow = rowsWithErrors.slice(0, Math.min(50, rowsWithErrors.length));
@@ -3853,9 +3857,17 @@ document.head.appendChild(styleElement);
     
     // อัพเดต Dashboard จากผลการคำนวณทั้งหมด
     updateDashboard();
+    
+    // ✅ เพิ่ม: แสดงข้อความแจ้งเตือน
+    if (rowsWithErrors.length > 0) {
+        console.log(`⚠️ แสดง ${Math.min(rowsWithErrors.length, 50)} แถวแรกที่มีข้อผิดพลาด`);
+        console.log(`✅ ข้อมูลถูกต้อง ${rowsWithoutErrors.length} แถว`);
+    } else {
+        console.log(`✅ ไม่พบข้อผิดพลาด แสดง ${sampleRows.length} แถวแรกที่ถูกต้อง`);
+    }
 }
         
-      function calculateAllDataValidation() {
+     function calculateAllDataValidation() {
     if (!uploadedData || selectedColumns.length === 0) {
         return {
             totalCells: 0,
@@ -3935,7 +3947,36 @@ document.head.appendChild(styleElement);
         results.validCells = results.totalCells - results.warningCells - results.errorCells;
     }
     
+    console.log(`📊 สถิติเซลล์ทั้งหมด: ${results.totalCells} เซลล์`);
+    console.log(`✅ ถูกต้อง: ${results.validCells} (${Math.round((results.validCells/results.totalCells)*100)}%)`);
+    console.log(`⚠️ คำเตือน: ${results.warningCells} (${Math.round((results.warningCells/results.totalCells)*100)}%)`);
+    console.log(`❌ ผิดพลาด: ${results.errorCells} (${Math.round((results.errorCells/results.totalCells)*100)}%)`);
+    
     return results;
+}
+        // ✅ ฟังก์ชันตรวจสอบว่ามีข้อมูลผิดพลาดหรือไม่
+function hasDataErrors() {
+    if (!uploadedData || selectedColumns.length === 0) return false;
+    
+    for (let i = 0; i < Math.min(100, uploadedData.data.length); i++) {
+        const row = uploadedData.data[i];
+        
+        for (let j = 0; j < selectedColumns.length; j++) {
+            const columnName = selectedColumns[j];
+            const cellValue = row[columnName] || '';
+            
+            if (cellValue.trim() === '') continue;
+            
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, i, j);
+            
+            if (validation.status === 'error') {
+                return true;
+            }
+        }
+    }
+    
+    return false;
 }
         // ✅ แก้ไขฟังก์ชันตรวจจับประเภทข้อมูลตามข้อกำหนดใหม่
         function detectColumnType(columnName, sampleValue) {
@@ -4236,7 +4277,7 @@ document.head.appendChild(styleElement);
             return result;
         }
         
-      function renderDataTableFromUploadedData(sampleRows = null, sampleRowIndices = null) {
+     function renderDataTableFromUploadedData(sampleRows = null, sampleRowIndices = null) {
     // ล้างตารางเดิม
     dataTableHeader.innerHTML = '';
     dataTableBody.innerHTML = '';
@@ -4282,7 +4323,7 @@ document.head.appendChild(styleElement);
         addColumnFilterDropdowns();
     }, 100);
     
-    // ✅ แก้ไข: ถ้ามี sampleRows ที่ส่งมาให้ใช้ นếuไม่ให้หาด้วยตัวเอง
+    // ✅ แก้ไข: ถ้ามี sampleRows ที่ส่งมาให้ใช้ ถ้าไม่ให้หาด้วยตัวเอง
     let displayRows = [];
     let displayRowIndices = [];
     
@@ -4296,6 +4337,7 @@ document.head.appendChild(styleElement);
         
         uploadedData.data.forEach((row, rowIndex) => {
             let hasError = false;
+            let hasWarning = false;
             
             selectedColumns.forEach((columnName, colIndex) => {
                 const cellValue = row[columnName] || '';
@@ -4307,11 +4349,15 @@ document.head.appendChild(styleElement);
                 
                 if (validation.status === 'error') {
                     hasError = true;
+                } else if (validation.status === 'warning') {
+                    hasWarning = true;
                 }
             });
             
             if (hasError) {
-                rowsWithErrors.push({ rowIndex, row });
+                rowsWithErrors.push({ rowIndex, row, hasError: true, hasWarning });
+            } else if (hasWarning) {
+                rowsWithErrors.push({ rowIndex, row, hasError: false, hasWarning: true });
             } else {
                 rowsWithoutErrors.push({ rowIndex, row });
             }
@@ -4348,9 +4394,41 @@ document.head.appendChild(styleElement);
     totalRowCount.textContent = uploadedData.data.length;
     
     // ✅ แก้ไข: แสดงสถานะว่ามีการจัดลำดับแถวอย่างไร
-    const errorCount = rowsWithErrors ? rowsWithErrors.length : 0;
+    const errorCount = displayRows.filter((row, index) => {
+        const rowIndex = displayRowIndices[index];
+        let hasError = false;
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            if (cellValue.trim() === '') return;
+            
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            if (validation.status === 'error') hasError = true;
+        });
+        return hasError;
+    }).length;
+    
+    const warningCount = displayRows.filter((row, index) => {
+        const rowIndex = displayRowIndices[index];
+        let hasWarning = false;
+        let hasError = false;
+        
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            if (cellValue.trim() === '') return;
+            
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            if (validation.status === 'error') hasError = true;
+            if (validation.status === 'warning') hasWarning = true;
+        });
+        
+        return hasWarning && !hasError;
+    }).length;
+    
     const infoText = errorCount > 0 ? 
-        `(แสดง ${errorCount} แถวที่มีข้อผิดพลาด และ ${Math.max(0, displayRows.length - errorCount)} แถวที่ถูกต้อง)` :
+        `(แสดง ${errorCount} แถวที่มีข้อผิดพลาด ${warningCount > 0 ? `และ ${warningCount} แถวที่มีคำเตือน` : ''})` :
+        warningCount > 0 ? `(แสดง ${warningCount} แถวที่มีคำเตือน)` :
         `(แสดง ${displayRows.length} แถวที่ถูกต้องทั้งหมด)`;
     
     console.log(`📋 ตารางแสดง: ${displayRows.length} แถว ${infoText}`);
@@ -4364,6 +4442,9 @@ document.head.appendChild(styleElement);
         rowNumCell.textContent = originalRowIndex + 1;
         rowNumCell.style.fontWeight = 'bold';
         tr.appendChild(rowNumCell);
+        
+        let rowHasError = false;
+        let rowHasWarning = false;
         
         // เพิ่มข้อมูลแต่ละเซลล์
         selectedColumns.forEach((columnName, colIndex) => {
@@ -4380,6 +4461,13 @@ document.head.appendChild(styleElement);
                                cellValidationStatus[displayIndex][colIndex] : 
                                validateCellData(columnName, cellValue, effectiveType, originalRowIndex, colIndex);
             
+            // ตรวจสอบสถานะของแถว
+            if (validation && validation.status === 'error') {
+                rowHasError = true;
+            } else if (validation && validation.status === 'warning') {
+                rowHasWarning = true;
+            }
+            
             // เพิ่มคลาสตามสถานะการตรวจสอบ
             if (validation && validation.status === 'error') {
                 td.className = 'cell-error cell-highlight';
@@ -4390,6 +4478,11 @@ document.head.appendChild(styleElement);
             } else if (validation && validation.status === 'warning') {
                 td.className = 'cell-warning cell-highlight';
                 td.title = validation.message;
+                // เพิ่มสไตล์สำหรับแถวที่มีคำเตือน
+                if (!rowHasError) {
+                    tr.style.backgroundColor = 'rgba(255, 248, 225, 0.3)';
+                    tr.style.borderLeft = '4px solid var(--warning-color)';
+                }
             } else {
                 td.className = 'cell-valid';
             }
@@ -4419,19 +4512,28 @@ document.head.appendChild(styleElement);
     updateDataStatus();
     
     // ✅ แก้ไข: แสดงข้อความแจ้งเตือนในตาราง
-    if (displayRows.length > 0 && rowsWithErrors && rowsWithErrors.length > 0) {
+    if (displayRows.length > 0 && (errorCount > 0 || warningCount > 0)) {
         // เพิ่มข้อความแจ้งเตือนด้านบนตาราง
         const tableContainer = document.querySelector('.data-table-container');
         const existingNote = document.querySelector('.display-note');
         if (existingNote) existingNote.remove();
         
+        let noteMessage = '';
+        if (errorCount > 0 && warningCount > 0) {
+            noteMessage = `แสดง ${errorCount} แถวที่มีข้อผิดพลาด (สีแดง) และ ${warningCount} แถวที่มีคำเตือน (สีเหลือง)`;
+        } else if (errorCount > 0) {
+            noteMessage = `แสดง ${errorCount} แถวที่มีข้อผิดพลาด (สีแดง)`;
+        } else if (warningCount > 0) {
+            noteMessage = `แสดง ${warningCount} แถวที่มีคำเตือน (สีเหลือง)`;
+        }
+        
         const noteDiv = document.createElement('div');
         noteDiv.className = 'display-note';
         noteDiv.innerHTML = `
-            <div style="padding: 10px; margin: 10px 0; background: #fff3e0; border-radius: 5px; border-left: 4px solid #ff9800;">
-                <i class="fas fa-info-circle" style="color: #ff9800;"></i>
-                <strong>แสดงแถวที่มีข้อผิดพลาดก่อน:</strong> ${rowsWithErrors.length} แถวที่มีข้อผิดพลาด (สีแดง) 
-                ${displayRows.length - rowsWithErrors.length > 0 ? `และ ${displayRows.length - rowsWithErrors.length} แถวที่ถูกต้อง` : ''}
+            <div style="padding: 10px; margin: 10px 0; background: ${errorCount > 0 ? '#ffebee' : '#fff3e0'}; border-radius: 5px; border-left: 4px solid ${errorCount > 0 ? '#f44336' : '#ff9800'};">
+                <i class="fas fa-info-circle" style="color: ${errorCount > 0 ? '#f44336' : '#ff9800'}"></i>
+                <strong>${noteMessage}</strong>
+                ${displayRows.length - errorCount - warningCount > 0 ? `และ ${displayRows.length - errorCount - warningCount} แถวที่ถูกต้อง` : ''}
             </div>
         `;
         
