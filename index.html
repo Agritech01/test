@@ -3749,7 +3749,7 @@ document.head.appendChild(styleElement);
     }
 }
         
-       function runDataValidationFromUploadedData() {
+     function runDataValidationFromUploadedData() {
     if (!uploadedData || selectedColumns.length === 0) return;
     
     // ✅ แก้ไข: ตัดแถวที่ว่างทั้งหมดออกก่อนตรวจสอบ
@@ -3761,21 +3761,78 @@ document.head.appendChild(styleElement);
     // ✅ แก้ไข: คำนวณการตรวจสอบจากข้อมูลทั้งหมด
     currentValidationResults = calculateAllDataValidation();
     
-    // สำหรับการแสดงในตาราง ใช้เพียง sample (50 แถว)
-    const sampleRows = uploadedData.data.slice(0, currentRowLimit);
+    // ✅ แก้ไข: หาแถวที่มีข้อผิดพลาดก่อน
+    const rowsWithErrors = [];
+    const rowsWithoutErrors = [];
     
-    // สร้าง cellValidationStatus เฉพาะสำหรับ sample rows
-    cellValidationStatus = {};
-    sampleRows.forEach((row, rowIndex) => {
+    uploadedData.data.forEach((row, rowIndex) => {
+        let hasError = false;
+        
         selectedColumns.forEach((columnName, colIndex) => {
             const cellValue = row[columnName] || '';
             
-            if (!cellValidationStatus[rowIndex]) {
-                cellValidationStatus[rowIndex] = {};
+            if (cellValue.trim() === '') return;
+            
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            
+            if (validation.status === 'error') {
+                hasError = true;
+            }
+        });
+        
+        if (hasError) {
+            rowsWithErrors.push({ rowIndex, row });
+        } else {
+            rowsWithoutErrors.push({ rowIndex, row });
+        }
+    });
+    
+    console.log(`📊 พบแถวที่มีข้อผิดพลาด: ${rowsWithErrors.length} แถว`);
+    console.log(`📊 พบแถวที่ถูกต้อง: ${rowsWithoutErrors.length} แถว`);
+    
+    // ✅ แก้ไข: เลือกตัวอย่างแถว 50 แถวแรก โดยแสดงแถวที่มีข้อผิดพลาดก่อน
+    let sampleRows = [];
+    let sampleRowIndices = [];
+    
+    // ถ้ามีแถวที่มีข้อผิดพลาด
+    if (rowsWithErrors.length > 0) {
+        // เอาแถวที่มีข้อผิดพลาดก่อน (สูงสุด 50 แถว)
+        const errorRowsToShow = rowsWithErrors.slice(0, Math.min(50, rowsWithErrors.length));
+        sampleRows = errorRowsToShow.map(item => item.row);
+        sampleRowIndices = errorRowsToShow.map(item => item.rowIndex);
+        
+        // ถ้ายังไม่ครบ 50 แถว ให้เพิ่มแถวที่ถูกต้อง
+        if (sampleRows.length < 50 && rowsWithoutErrors.length > 0) {
+            const remainingSlots = 50 - sampleRows.length;
+            const validRowsToAdd = rowsWithoutErrors.slice(0, Math.min(remainingSlots, rowsWithoutErrors.length));
+            
+            validRowsToAdd.forEach(item => {
+                sampleRows.push(item.row);
+                sampleRowIndices.push(item.rowIndex);
+            });
+        }
+    } else {
+        // ถ้าไม่มีแถวที่มีข้อผิดพลาด แสดงแถวที่ถูกต้อง 50 แถวแรก
+        const validRowsToShow = rowsWithoutErrors.slice(0, Math.min(50, rowsWithoutErrors.length));
+        sampleRows = validRowsToShow.map(item => item.row);
+        sampleRowIndices = validRowsToShow.map(item => item.rowIndex);
+    }
+    
+    // สร้าง cellValidationStatus เฉพาะสำหรับ sample rows
+    cellValidationStatus = {};
+    sampleRows.forEach((row, sampleIndex) => {
+        const rowIndex = sampleRowIndices[sampleIndex];
+        
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            
+            if (!cellValidationStatus[sampleIndex]) {
+                cellValidationStatus[sampleIndex] = {};
             }
             
             if (cellValue.trim() === '') {
-                cellValidationStatus[rowIndex][colIndex] = {
+                cellValidationStatus[sampleIndex][colIndex] = {
                     status: 'valid',
                     message: 'ค่าว่าง - ผ่าน',
                     suggestions: [],
@@ -3787,16 +3844,17 @@ document.head.appendChild(styleElement);
             
             const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
             const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
-            cellValidationStatus[rowIndex][colIndex] = validation;
+            cellValidationStatus[sampleIndex][colIndex] = validation;
         });
     });
     
     // แสดงข้อมูลในตาราง (เฉพาะ sample)
-    renderDataTableFromUploadedData();
+    renderDataTableFromUploadedData(sampleRows, sampleRowIndices);
     
     // อัพเดต Dashboard จากผลการคำนวณทั้งหมด
     updateDashboard();
 }
+        
       function calculateAllDataValidation() {
     if (!uploadedData || selectedColumns.length === 0) {
         return {
@@ -4178,7 +4236,7 @@ document.head.appendChild(styleElement);
             return result;
         }
         
-        function renderDataTableFromUploadedData() {
+      function renderDataTableFromUploadedData(sampleRows = null, sampleRowIndices = null) {
     // ล้างตารางเดิม
     dataTableHeader.innerHTML = '';
     dataTableBody.innerHTML = '';
@@ -4224,20 +4282,86 @@ document.head.appendChild(styleElement);
         addColumnFilterDropdowns();
     }, 100);
     
-    // ✅ แก้ไข: แสดงข้อมูลตาม currentRowLimit
-    const displayRows = uploadedData.data.slice(0, currentRowLimit);
+    // ✅ แก้ไข: ถ้ามี sampleRows ที่ส่งมาให้ใช้ นếuไม่ให้หาด้วยตัวเอง
+    let displayRows = [];
+    let displayRowIndices = [];
+    
+    if (sampleRows && sampleRowIndices) {
+        displayRows = sampleRows;
+        displayRowIndices = sampleRowIndices;
+    } else {
+        // หาแถวที่มีข้อผิดพลาดก่อน
+        const rowsWithErrors = [];
+        const rowsWithoutErrors = [];
+        
+        uploadedData.data.forEach((row, rowIndex) => {
+            let hasError = false;
+            
+            selectedColumns.forEach((columnName, colIndex) => {
+                const cellValue = row[columnName] || '';
+                
+                if (cellValue.trim() === '') return;
+                
+                const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+                const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+                
+                if (validation.status === 'error') {
+                    hasError = true;
+                }
+            });
+            
+            if (hasError) {
+                rowsWithErrors.push({ rowIndex, row });
+            } else {
+                rowsWithoutErrors.push({ rowIndex, row });
+            }
+        });
+        
+        // เลือกตัวอย่างแถว 50 แถวแรก โดยแสดงแถวที่มีข้อผิดพลาดก่อน
+        if (rowsWithErrors.length > 0) {
+            // เอาแถวที่มีข้อผิดพลาดก่อน (สูงสุด 50 แถว)
+            const errorRowsToShow = rowsWithErrors.slice(0, Math.min(50, rowsWithErrors.length));
+            displayRows = errorRowsToShow.map(item => item.row);
+            displayRowIndices = errorRowsToShow.map(item => item.rowIndex);
+            
+            // ถ้ายังไม่ครบ 50 แถว ให้เพิ่มแถวที่ถูกต้อง
+            if (displayRows.length < 50 && rowsWithoutErrors.length > 0) {
+                const remainingSlots = 50 - displayRows.length;
+                const validRowsToAdd = rowsWithoutErrors.slice(0, Math.min(remainingSlots, rowsWithoutErrors.length));
+                
+                validRowsToAdd.forEach(item => {
+                    displayRows.push(item.row);
+                    displayRowIndices.push(item.rowIndex);
+                });
+            }
+        } else {
+            // ถ้าไม่มีแถวที่มีข้อผิดพลาด แสดงแถวที่ถูกต้อง 50 แถวแรก
+            const validRowsToShow = rowsWithoutErrors.slice(0, Math.min(50, rowsWithoutErrors.length));
+            displayRows = validRowsToShow.map(item => item.row);
+            displayRowIndices = validRowsToShow.map(item => item.rowIndex);
+        }
+    }
     
     // ✅ แก้ไข: อัพเดตจำนวนแถวที่แสดง
     totalRows.textContent = uploadedData.data.length; // แสดงจำนวนแถวทั้งหมด
-    currentRows.textContent = Math.min(currentRowLimit, uploadedData.data.length);
+    currentRows.textContent = Math.min(displayRows.length, uploadedData.data.length);
     totalRowCount.textContent = uploadedData.data.length;
     
-    displayRows.forEach((row, rowIndex) => {
+    // ✅ แก้ไข: แสดงสถานะว่ามีการจัดลำดับแถวอย่างไร
+    const errorCount = rowsWithErrors ? rowsWithErrors.length : 0;
+    const infoText = errorCount > 0 ? 
+        `(แสดง ${errorCount} แถวที่มีข้อผิดพลาด และ ${Math.max(0, displayRows.length - errorCount)} แถวที่ถูกต้อง)` :
+        `(แสดง ${displayRows.length} แถวที่ถูกต้องทั้งหมด)`;
+    
+    console.log(`📋 ตารางแสดง: ${displayRows.length} แถว ${infoText}`);
+    
+    displayRows.forEach((row, displayIndex) => {
         const tr = document.createElement('tr');
+        const originalRowIndex = displayRowIndices[displayIndex];
         
-        // เพิ่มหมายเลขแถว
+        // เพิ่มหมายเลขแถว (แสดงหมายเลขแถวจริงจากข้อมูลต้นฉบับ)
         const rowNumCell = document.createElement('td');
-        rowNumCell.textContent = rowIndex + 1;
+        rowNumCell.textContent = originalRowIndex + 1;
         rowNumCell.style.fontWeight = 'bold';
         tr.appendChild(rowNumCell);
         
@@ -4251,14 +4375,19 @@ document.head.appendChild(styleElement);
             const effectiveType = userSelectedDataTypes[columnName] || 
                                  detectColumnType(columnName, cellValue);
             
-            // ตรวจสอบข้อมูล
-            const validation = validateCellData(columnName, cellValue, effectiveType, rowIndex, colIndex);
+            // ตรวจสอบข้อมูล (ใช้ displayIndex สำหรับ cellValidationStatus)
+            const validation = cellValidationStatus[displayIndex] ? 
+                               cellValidationStatus[displayIndex][colIndex] : 
+                               validateCellData(columnName, cellValue, effectiveType, originalRowIndex, colIndex);
             
             // เพิ่มคลาสตามสถานะการตรวจสอบ
-            if (validation.status === 'error') {
+            if (validation && validation.status === 'error') {
                 td.className = 'cell-error cell-highlight';
                 td.title = validation.message;
-            } else if (validation.status === 'warning') {
+                // เพิ่มสไตล์พิเศษสำหรับแถวที่มีข้อผิดพลาด
+                tr.style.backgroundColor = 'rgba(255, 235, 238, 0.3)';
+                tr.style.borderLeft = '4px solid var(--danger-color)';
+            } else if (validation && validation.status === 'warning') {
                 td.className = 'cell-warning cell-highlight';
                 td.title = validation.message;
             } else {
@@ -4266,16 +4395,17 @@ document.head.appendChild(styleElement);
             }
             
             // เพิ่มข้อมูลสำหรับการแก้ไข
-            td.dataset.row = rowIndex;
+            td.dataset.row = originalRowIndex; // เก็บหมายเลขแถวจริง
+            td.dataset.displayRow = displayIndex; // เก็บหมายเลขแถวในการแสดง
             td.dataset.col = colIndex;
             td.dataset.column = columnName;
             td.dataset.value = cellValue;
             td.dataset.type = effectiveType;
             
             // Event listener สำหรับการแก้ไข
-            if (validation.status === 'error' || validation.status === 'warning') {
+            if (validation && (validation.status === 'error' || validation.status === 'warning')) {
                 td.style.cursor = 'pointer';
-                td.addEventListener('click', () => openCellEditorForUploadedData(rowIndex, colIndex));
+                td.addEventListener('click', () => openCellEditorForUploadedData(originalRowIndex, colIndex));
             }
             
             tr.appendChild(td);
@@ -4287,6 +4417,28 @@ document.head.appendChild(styleElement);
     // ✅ แก้ไข: อัพเดตข้อมูลตาราง
     currentColumns.textContent = selectedColumns.length;
     updateDataStatus();
+    
+    // ✅ แก้ไข: แสดงข้อความแจ้งเตือนในตาราง
+    if (displayRows.length > 0 && rowsWithErrors && rowsWithErrors.length > 0) {
+        // เพิ่มข้อความแจ้งเตือนด้านบนตาราง
+        const tableContainer = document.querySelector('.data-table-container');
+        const existingNote = document.querySelector('.display-note');
+        if (existingNote) existingNote.remove();
+        
+        const noteDiv = document.createElement('div');
+        noteDiv.className = 'display-note';
+        noteDiv.innerHTML = `
+            <div style="padding: 10px; margin: 10px 0; background: #fff3e0; border-radius: 5px; border-left: 4px solid #ff9800;">
+                <i class="fas fa-info-circle" style="color: #ff9800;"></i>
+                <strong>แสดงแถวที่มีข้อผิดพลาดก่อน:</strong> ${rowsWithErrors.length} แถวที่มีข้อผิดพลาด (สีแดง) 
+                ${displayRows.length - rowsWithErrors.length > 0 ? `และ ${displayRows.length - rowsWithErrors.length} แถวที่ถูกต้อง` : ''}
+            </div>
+        `;
+        
+        if (tableContainer) {
+            tableContainer.insertBefore(noteDiv, tableContainer.firstChild);
+        }
+    }
 }
         
         function getTypeDisplayName(type) {
@@ -4379,18 +4531,32 @@ document.head.appendChild(styleElement);
         updateDashboard();
         updateDataStatus();
         
-        // อัพเดตข้อมูลในตาราง (แสดงเฉพาะ sample)
-        renderDataTableFromUploadedData();
+        // อัพเดตข้อมูลในตาราง (แสดงตัวอย่างใหม่)
+        runDataValidationFromUploadedData();
         
         // แสดงผลใน console
         const totalRows = uploadedData.data.length;
+        const errorRows = uploadedData.data.filter((row, rowIndex) => {
+            let hasError = false;
+            selectedColumns.forEach((columnName, colIndex) => {
+                const cellValue = row[columnName] || '';
+                if (cellValue.trim() === '') return;
+                
+                const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+                const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+                if (validation.status === 'error') hasError = true;
+            });
+            return hasError;
+        }).length;
+        
         const validPercent = parseInt(correctDataPercent.textContent);
         
         console.log(`🔄 Dashboard อัพเดตเรียบร้อย!`);
         console.log(`📈 แถวทั้งหมด: ${totalRows} แถว`);
+        console.log(`❌ แถวที่มีข้อผิดพลาด: ${errorRows} แถว`);
         console.log(`✅ ข้อมูลถูกต้อง: ${validPercent}%`);
         
-        alert(`✅ อัพเดต Dashboard เรียบร้อยแล้ว\n\n📊 แถวทั้งหมด: ${totalRows} แถว\n✅ ข้อมูลถูกต้อง: ${validPercent}%`);
+        alert(`✅ อัพเดต Dashboard เรียบร้อยแล้ว\n\n📊 แถวทั้งหมด: ${totalRows} แถว\n❌ แถวที่มีข้อผิดพลาด: ${errorRows} แถว\n✅ ข้อมูลถูกต้อง: ${validPercent}%`);
     }
 }
         function countEditedCells() {
@@ -4404,6 +4570,32 @@ document.head.appendChild(styleElement);
             }
             return count;
         }
+function countRowsWithErrors() {
+    if (!uploadedData || selectedColumns.length === 0) return 0;
+    
+    let errorCount = 0;
+    
+    uploadedData.data.forEach((row, rowIndex) => {
+        let hasError = false;
+        
+        selectedColumns.forEach((columnName, colIndex) => {
+            const cellValue = row[columnName] || '';
+            if (cellValue.trim() === '') return;
+            
+            const columnType = userSelectedDataTypes[columnName] || detectColumnType(columnName, cellValue);
+            const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
+            if (validation.status === 'error') {
+                hasError = true;
+            }
+        });
+        
+        if (hasError) {
+            errorCount++;
+        }
+    });
+    
+    return errorCount;
+}
         
     function updateDataStatus() {
     const errorCount = currentValidationResults.errorCells;
@@ -5074,7 +5266,7 @@ document.head.appendChild(styleElement);
             alert('✅ ตรวจจับประเภทข้อมูลอัตโนมัติเรียบร้อยแล้ว!');
         }
         
-       function toggleAllRows() {
+      function toggleAllRows() {
     isShowingAllRows = !isShowingAllRows;
     
     if (isShowingAllRows) {
@@ -5082,19 +5274,22 @@ document.head.appendChild(styleElement);
         currentRowLimit = uploadedData.data.length;
         document.getElementById('toggleAllRows').innerHTML = 
             `<i class="fas fa-compress"></i> ซ่อนบางส่วน (${Math.min(currentRowLimit, 1000)}/${uploadedData.data.length})`;
+        
+        // แสดงข้อมูลทั้งหมด
+        renderDataTableFromUploadedData();
     } else {
-        // แสดงเพียงตัวอย่าง
+        // แสดงเพียงตัวอย่าง (แสดงแถวที่มีข้อผิดพลาดก่อน)
         currentRowLimit = 50;
         document.getElementById('toggleAllRows').innerHTML = 
             `<i class="fas fa-expand"></i> แสดงทั้งหมด (${uploadedData.data.length})`;
+        
+        // รันการตรวจสอบใหม่เพื่อแสดงแถวที่มีข้อผิดพลาดก่อน
+        runDataValidationFromUploadedData();
     }
     
-    // อัพเดตตาราง (แต่ Dashboard ยังคงใช้ข้อมูลทั้งหมด)
-    renderDataTableFromUploadedData();
-    
-    console.log(`📋 ตารางแสดง: ${currentRowLimit}/${uploadedData.data.length} แถว`);
-    console.log(`📊 Dashboard ยังคงคำนวณจากทั้งหมด ${uploadedData.data.length} แถว`);
+    console.log(`📋 ตารางแสดง: ${isShowingAllRows ? 'ทั้งหมด' : 'ตัวอย่าง (แถวที่มีข้อผิดพลาดก่อน)'} ${uploadedData.data.length} แถว`);
 }
+        
         function exportTableToCSV() {
             if (!uploadedData || selectedColumns.length === 0) return;
             
@@ -5272,7 +5467,7 @@ document.head.appendChild(styleElement);
             // เปิดให้แก้ไขได้ถ้ายังมีปัญหา
             if (newValidation.status === 'error' || newValidation.status === 'warning') {
                 cell.style.cursor = 'pointer';
-                cell.addEventListener('click', () => openCellEditorForUploadedData(rowIndex, colIndex));
+                td.addEventListener('click', () => openCellEditorForUploadedData(originalRowIndex, colIndex));
             }
             
             // รันการตรวจสอบใหม่
