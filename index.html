@@ -1269,110 +1269,27 @@
             min-width: 1300px; /* ✅ เพิ่มความกว้างให้พอดีกับคอลัมน์ใหม่ */
         }
         
-/* แก้ไขเป็นแบบนี้แทน: */
+/* ปรับสีคอลัมน์ที่ 1 และ 2 ให้เป็นสีเดียวกัน */
 .checking-table th:nth-child(1),
-.checking-table td:nth-child(1) {
-    width: 60px;
-    min-width: 60px;
-    max-width: 60px;
-    text-align: center;
-    /* ลบ position: sticky และ left */
-    background: var(--primary-color);
-    color: white;
+.checking-table th:nth-child(2) {
+    background: #a7d7f7 !important; /* สีฟ้าพาสเทลเดียวกัน */
+    color: #333 !important;
+    border-right: 1px solid #7abae8 !important; /* เส้นแบ่ง */
 }
 
-.checking-table td:nth-child(1) {
-    background: white;
-    color: var(--dark-color);
-    border-right: 1px solid #eee;
-}
-
-.checking-table th:nth-child(2),
-.checking-table td:nth-child(2) {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
-    /* ลบ position: sticky และ left */
-    background: var(--primary-color);
-    color: white;
-    border-right: 1px solid #ddd;
-}
-
-.checking-table td:nth-child(2) {
-    background: #f8f9fa;
-    color: var(--dark-color);
-}
-/* ปรับขนาดคอลัมน์ใหม่ทั้งหมดสำหรับทุกประเภท */
-.checking-table {
-    width: 100%;
-    border-collapse: collapse;
-    /* ลดความกว้างตารางลง */
-    min-width: 900px; /* ลดจาก 1300px */
-}
-
-/* คอลัมน์ที่เหลือปรับตามลำดับ */
+/* ลบสไตล์เดิมที่มีการกำหนดสีแตกต่าง */
 .checking-table th:nth-child(3),
-.checking-table td:nth-child(3) {
-    width: 80px;
-    min-width: 80px;
-    max-width: 100px;
-    background-color: #e8f5e9;
-}
-
 .checking-table th:nth-child(4),
-.checking-table td:nth-child(4) {
-    width: 120px;
-    min-width: 120px;
-    max-width: 150px;
-    background-color: #e3f2fd;
-}
-
 .checking-table th:nth-child(5),
-.checking-table td:nth-child(5) {
-    width: 120px;
-    min-width: 120px;
-    max-width: 150px;
-}
-
 .checking-table th:nth-child(6),
-.checking-table td:nth-child(6) {
-    width: 100px;
-    min-width: 100px;
-    max-width: 120px;
-    text-align: center;
-}
-
 .checking-table th:nth-child(7),
-.checking-table td:nth-child(7) {
-    width: 120px;
-    min-width: 120px;
-    max-width: 150px;
-}
-
 .checking-table th:nth-child(8),
-.checking-table td:nth-child(8) {
-    width: 120px;
-    min-width: 120px;
-    max-width: 150px;
-}
-
-/* ... คอลัมน์อื่นๆ ... */
-
+.checking-table th:nth-child(9),
+.checking-table th:nth-child(10),
 .checking-table th:nth-child(11),
-.checking-table td:nth-child(11) {
-    width: 100px;
-    min-width: 100px;
-    max-width: 120px;
-    text-align: center;
-    background-color: #f8f9fa;
-}
-
-.checking-table th:nth-child(12),
-.checking-table td:nth-child(12) {
-    width: 150px;
-    min-width: 150px;
-    max-width: 200px;
-    background-color: #f8f9fa;
+.checking-table th:nth-child(12) {
+    background: #a7d7f7 !important; /* สีฟ้าพาสเทลเดียวกันทั้งหมด */
+    color: #333 !important;
 }
         
         /* ✅ แถวที่ไม่มีข้อมูลวันที่ปลูก - สีเหลือง */
@@ -1879,16 +1796,12 @@
 }
 
 .checking-table th {
-    background: var(--primary-color);
-    color: white;
+    background: #a7d7f7 !important; /* สีฟ้าพาสเทล */
+    color: #333 !important;
     padding: 12px;
     text-align: left;
     font-weight: 500;
-    /* ลบ position: sticky, top, z-index */
-    /* position: sticky;
-    top: 0;
-    z-index: 10; */
-    border-bottom: 2px solid var(--secondary-color);
+    border-bottom: 2px solid #7abae8 !important; /* เส้นขอบสีฟ้าเข้มขึ้นเล็กน้อย */
 }
 
 .checking-table td {
