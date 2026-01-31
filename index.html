@@ -3867,7 +3867,7 @@ document.head.appendChild(styleElement);
     }
 }
         
-     function calculateAllDataValidation() {
+   function calculateAllDataValidation() {
     if (!uploadedData || selectedColumns.length === 0) {
         return {
             totalCells: 0,
@@ -3891,9 +3891,11 @@ document.head.appendChild(styleElement);
         selectedColumns.forEach((columnName, colIndex) => {
             const cellValue = row[columnName] || '';
             
-            // ถ้าค่าเป็นช่องว่าง ให้ผ่านได้เลย
+            // ✅ FIX: นับทุกเซลล์รวมทั้งเซลล์ว่าง
+            results.totalCells++;
+            
+            // ถ้าค่าเป็นช่องว่าง ให้นับเป็น valid
             if (cellValue.trim() === '') {
-                results.totalCells++;
                 results.validCells++;
                 return;
             }
@@ -3903,8 +3905,6 @@ document.head.appendChild(styleElement);
             const validation = validateCellData(columnName, cellValue, columnType, rowIndex, colIndex);
             
             // นับสถิติ
-            results.totalCells++;
-            
             if (validation.status === 'valid') {
                 results.validCells++;
             } else if (validation.status === 'warning') {
@@ -3940,17 +3940,27 @@ document.head.appendChild(styleElement);
     });
     
     // ✅ ตรวจสอบว่าผลรวมเป็น 100%
-    const totalFromResults = results.validCells + results.warningCells + results.errorCells;
-    if (totalFromResults !== results.totalCells && results.totalCells > 0) {
-        console.warn(`⚠️ ผลรวมเซลล์ไม่ตรงกับ totalCells: ${totalFromResults} vs ${results.totalCells}`);
-        // ปรับค่า validCells ให้ตรงกับ totalCells
-        results.validCells = results.totalCells - results.warningCells - results.errorCells;
+    const totalCalculated = results.validCells + results.warningCells + results.errorCells;
+    if (totalCalculated !== results.totalCells) {
+        console.warn(`⚠️ ผลรวมเซลล์ไม่ตรงกับ totalCells: ${totalCalculated} vs ${results.totalCells}`);
+        // ปรับค่าให้ตรงกัน
+        results.totalCells = totalCalculated;
     }
     
+    // ✅ แสดงข้อมูลดีบัก
     console.log(`📊 สถิติเซลล์ทั้งหมด: ${results.totalCells} เซลล์`);
     console.log(`✅ ถูกต้อง: ${results.validCells} (${Math.round((results.validCells/results.totalCells)*100)}%)`);
     console.log(`⚠️ คำเตือน: ${results.warningCells} (${Math.round((results.warningCells/results.totalCells)*100)}%)`);
     console.log(`❌ ผิดพลาด: ${results.errorCells} (${Math.round((results.errorCells/results.totalCells)*100)}%)`);
+    
+    // ✅ ตรวจสอบว่าเปอร์เซ็นต์รวมกันได้ 100%
+    const totalPercent = Math.round((results.validCells/results.totalCells)*100) + 
+                        Math.round((results.warningCells/results.totalCells)*100) + 
+                        Math.round((results.errorCells/results.totalCells)*100);
+    
+    if (totalPercent !== 100) {
+        console.warn(`⚠️ ผลรวมเปอร์เซ็นต์: ${totalPercent}%`);
+    }
     
     return results;
 }
@@ -4618,41 +4628,43 @@ function isSugarcaneAgeColumn(columnName) {
             return colors[type] || '#6c757d';
         }
         
-     function updateDashboard() {
+    function updateDashboard() {
     const total = currentValidationResults.totalCells;
     const valid = currentValidationResults.validCells;
     const warning = currentValidationResults.warningCells;
     const error = currentValidationResults.errorCells;
     
-    // คำนวณเปอร์เซ็นต์ที่ถูกต้อง
+    // ✅ FIX: คำนวณเปอร์เซ็นต์ให้ถูกต้อง
     const validPercent = total > 0 ? Math.round((valid / total) * 100) : 0;
     const warningPercent = total > 0 ? Math.round((warning / total) * 100) : 0;
     const errorPercent = total > 0 ? Math.round((error / total) * 100) : 0;
     
-    // ✅ ตรวจสอบว่าเปอร์เซ็นต์รวมกันได้ 100%
-    const totalPercent = validPercent + warningPercent + errorPercent;
-    if (totalPercent !== 100 && total > 0) {
-        // ปรับค่า validPercent ให้ได้ 100%
-        const adjustedValidPercent = 100 - warningPercent - errorPercent;
-        correctDataPercent.textContent = `${Math.max(0, adjustedValidPercent)}%`;
-        correctDataBar.style.width = `${Math.max(0, adjustedValidPercent)}%`;
-    } else {
-        correctDataPercent.textContent = `${validPercent}%`;
-        correctDataBar.style.width = `${validPercent}%`;
-    }
-    
+    // ✅ FIX: อัพเดตค่าบน Dashboard
+    correctDataPercent.textContent = `${validPercent}%`;
     needReviewCount.textContent = warning;
     errorDataCount.textContent = error;
     
-    // ✅ แก้ไข: คำนวณเซลล์ที่แก้ไขแล้ว
+    // ✅ FIX: คำนวณเซลล์ที่แก้ไขแล้ว
     const editedCount = countEditedCells();
     editedCellsCount.textContent = editedCount;
     const editedPercent = total > 0 ? Math.round((editedCount / total) * 100) : 0;
     
-    // ✅ แก้ไข: อัพเดต Progress bars ให้ถูกต้อง
+    // ✅ FIX: อัพเดต Progress bars ให้ถูกต้อง
+    correctDataBar.style.width = `${validPercent}%`;
     needReviewBar.style.width = `${warningPercent}%`;
     errorDataBar.style.width = `${errorPercent}%`;
     editedCellsBar.style.width = `${Math.min(editedPercent, 100)}%`;
+    
+    // ✅ แก้ไข: ตรวจสอบว่าเปอร์เซ็นต์รวมกันได้ 100%
+    const totalPercent = validPercent + warningPercent + errorPercent;
+    if (totalPercent !== 100 && total > 0) {
+        console.warn(`⚠️ ผลรวมเปอร์เซ็นต์ไม่เท่ากับ 100%: ${totalPercent}% (valid:${validPercent}, warning:${warningPercent}, error:${errorPercent})`);
+        
+        // ปรับค่า validPercent ให้ได้ 100% หากมีข้อผิดพลาด
+        const adjustedValidPercent = 100 - warningPercent - errorPercent;
+        correctDataPercent.textContent = `${Math.max(0, adjustedValidPercent)}%`;
+        correctDataBar.style.width = `${Math.max(0, adjustedValidPercent)}%`;
+    }
     
     // ✅ แก้ไข: แสดงปุ่ม "ต้องตรวจสอบ" ถ้ามีข้อมูลที่ต้องตรวจสอบ
     if (warning > 0) {
@@ -4666,8 +4678,8 @@ function isSugarcaneAgeColumn(columnName) {
     }
     
     // ✅ แก้ไข: ต้องไม่มีข้อผิดพลาดและผ่าน 100% จึงจะไปขั้นตอนต่อไปได้
-    const isValidPercent = parseInt(correctDataPercent.textContent);
-    nextToStep4.disabled = !(isValidPercent === 100 && error === 0);
+    const currentValidPercent = parseInt(correctDataPercent.textContent);
+    nextToStep4.disabled = !(currentValidPercent === 100 && error === 0);
     
     // ✅ แก้ไข: อัพเดตสถานะข้อมูล
     updateDataStatus();
@@ -4752,10 +4764,9 @@ function countRowsWithErrors() {
     return errorCount;
 }
         
-    function updateDataStatus() {
+  function updateDataStatus() {
     const errorCount = currentValidationResults.errorCells;
     const warningCount = currentValidationResults.warningCells;
-    const totalRows = uploadedData.data.length;
     const validPercent = parseInt(correctDataPercent.textContent);
     
     if (errorCount > 0) {
@@ -4813,7 +4824,7 @@ function countRowsWithErrors() {
             <div style="display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-check-circle" style="color: var(--success-color);"></i>
                 <span>✓ ข้อมูลถูกต้องทั้งหมด</span>
-                <small style="color: #666;">(${totalRows} แถว, 100%)</small>
+                <small style="color: #666;">(${validPercent}%)</small>
             </div>
         `;
         dataStatus.style.color = 'var(--success-color)';
@@ -4822,7 +4833,30 @@ function countRowsWithErrors() {
         dataStatus.style.borderRadius = '20px';
     }
 }
-        
+        // ✅ เพิ่มฟังก์ชันตรวจสอบการคำนวณ
+function validateCalculations() {
+    const total = currentValidationResults.totalCells;
+    const valid = currentValidationResults.validCells;
+    const warning = currentValidationResults.warningCells;
+    const error = currentValidationResults.errorCells;
+    
+    console.log('🔍 ตรวจสอบการคำนวณ:');
+    console.log(`Total cells: ${total}`);
+    console.log(`Valid cells: ${valid} (${Math.round((valid/total)*100)}%)`);
+    console.log(`Warning cells: ${warning} (${Math.round((warning/total)*100)}%)`);
+    console.log(`Error cells: ${error} (${Math.round((error/total)*100)}%)`);
+    
+    const sum = valid + warning + error;
+    console.log(`Sum: ${valid} + ${warning} + ${error} = ${sum}`);
+    console.log(`Match: ${sum === total ? '✅' : '❌'}`);
+    
+    const totalPercent = Math.round((valid/total)*100) + 
+                        Math.round((warning/total)*100) + 
+                        Math.round((error/total)*100);
+    console.log(`Total percent: ${totalPercent}%`);
+    
+    return sum === total;
+}
         // ✅ ฟังก์ชันใหม่: เพิ่มฟิลเตอร์ Dropdown ในหัวตาราง
         function addColumnFilterDropdowns() {
             const headerRow = document.getElementById('dataTableHeader').querySelector('tr');
@@ -5221,28 +5255,32 @@ function countRowsWithErrors() {
             
             exportTable.addEventListener('click', exportTableToCSV);
             
-            // ปุ่มต่อไปใน Step 3
-            nextToStep4.addEventListener('click', () => {
-                if (currentValidationResults.errorCells > 0) {
-                    alert('ยังมีข้อผิดพลาดที่ต้องแก้ไข กรุณาตรวจสอบเซลล์สีแดง');
-                    return;
-                }
-                
-                // ✅ แก้ไข: ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
-                const validPercent = parseInt(correctDataPercent.textContent);
-                if (validPercent !== 100) {
-                    alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100% กรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
-                    return;
-                }
-                
-                const editedCount = countEditedCells();
-                
-                alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
-                
-                // ไปยังขั้นตอนที่ 4
-                goToStep(4);
-            });
-        }
+           // ในฟังก์ชัน setupEnhancedEventListeners() ให้แก้ไขส่วนของ nextToStep4
+nextToStep4.addEventListener('click', () => {
+    // ✅ ตรวจสอบการคำนวณก่อน
+    validateCalculations();
+    
+    const errorCount = currentValidationResults.errorCells;
+    const validPercent = parseInt(correctDataPercent.textContent);
+    
+    if (errorCount > 0) {
+        alert(`ยังมีข้อผิดพลาด ${errorCount} รายการที่ต้องแก้ไข\nข้อมูลถูกต้อง: ${validPercent}%`);
+        return;
+    }
+    
+    // ✅ ตรวจสอบว่าข้อมูลถูกต้อง 100% หรือไม่
+    if (validPercent !== 100) {
+        alert(`ข้อมูลถูกต้อง ${validPercent}% ยังไม่ครบ 100%\nกรุณาตรวจสอบและแก้ไขข้อมูลให้ถูกต้องทั้งหมด`);
+        return;
+    }
+    
+    const editedCount = countEditedCells();
+    
+    alert(`✅ ตรวจสอบข้อมูลเสร็จสมบูรณ์\n✅ แก้ไขข้อมูลแล้ว: ${editedCount} เซลล์\n✅ ข้อมูลถูกต้อง: 100%\n\nกำลังไปยังขั้นตอนต่อไป...`);
+    
+    // ไปยังขั้นตอนที่ 4
+    goToStep(4);
+});
         
         // ฟังก์ชันเพิ่มเติมสำหรับ Step 3
         function showDataTypeConfiguration() {
